@@ -1,0 +1,287 @@
+import { ref } from 'vue'
+import { defineStore } from 'pinia'
+import { apiService } from '@/api'
+import { useRouter } from 'vue-router'
+
+export const useUserStorage = defineStore('user', () => {
+  const router = useRouter()
+
+  const accessToken = ref(
+    localStorage.getItem('access_token') ? localStorage.getItem('access_token') : null
+  )
+
+  const currentUser = ref(
+    localStorage.getItem('profile') ? JSON.parse(localStorage.getItem('profile')) : null
+  )
+
+  const activeRole = ref(
+    localStorage.getItem('activeRole') ? JSON.parse(localStorage.getItem('activeRole')) : null
+  )
+
+  const dialog = ref(false)
+  const dialogProfile = ref(false)
+  const loading = ref(false)
+  const me = ref()
+  const alertMessage = ref('Terjadi Kesalahan')
+  const hasAlert = ref(false)
+  const alertType = ref(null)
+
+  const closeDialog = () => {
+    dialog.value = false
+    hasAlert.value = false
+    alertMessage.value = null
+    alertType.value = 'error'
+  }
+
+  const closeDialogProfile = () => {
+    dialogProfile.value = false
+    hasAlert.value = false
+    alertMessage.value = null
+    alertType.value = 'error'
+  }
+
+  const loginUser = async (inputUser) => {
+    hasAlert.value = false
+    loading.value = true
+    try {
+      const { data } = await apiService.post('/auth/login', {
+        email: inputUser.email,
+        password: inputUser.password
+      })
+
+      accessToken.value = data.access_token
+      localStorage.setItem('access_token', accessToken.value)
+
+      const profile = await apiService.get('/users/me', {
+        headers: {
+          Authorization: `Bearer ${accessToken.value}`
+        }
+      })
+
+      const profileData = profile.data
+      currentUser.value = profileData.data
+      localStorage.setItem('profile', JSON.stringify(currentUser.value))
+      me.value = profileData.data
+
+      if (profileData.data.roles.length > 0) {
+        localStorage.setItem('activeRole', JSON.stringify(profileData.data.roles[0]))
+        activeRole.value = profileData.data.roles[0]
+      }
+
+      hasAlert.value = true
+      alertType.value = 'success'
+      alertMessage.value = data.message
+
+      setTimeout(() => {
+        closeDialog()
+      }, 500)
+      router.push({ name: 'dashboard' })
+    } catch (error) {
+      const errMessage = error?.response?.data?.message ?? 'Terjadi Kesalahan'
+      hasAlert.value = true
+      alertMessage.value = errMessage
+      alertType.value = 'warning'
+    }
+
+    loading.value = false
+  }
+
+  const logoutUser = async () => {
+    try {
+      if (accessToken.value !== null) {
+        await apiService.post(
+          '/auth/logout',
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken.value}`
+            }
+          }
+        )
+      }
+
+      accessToken.value = null
+      currentUser.value = null
+      me.value = null
+      activeRole.value = null
+      localStorage.setItem('access_token', null)
+      localStorage.setItem('profile', null)
+      localStorage.setItem('activeRole', null)
+    } catch (error) {
+      accessToken.value = null
+      currentUser.value = null
+      me.value = null
+      localStorage.setItem('access_token', null)
+      localStorage.setItem('profile', null)
+      localStorage.setItem('activeRole', null)
+    }
+
+    router.push({ name: 'home' })
+  }
+
+  const registerUser = async (inputUser) => {
+    hasAlert.value = false
+    loading.value = true
+    try {
+      const { data } = await apiService.post('/auth/register', {
+        name: inputUser.name,
+        email: inputUser.email,
+        password: inputUser.password
+      })
+
+      hasAlert.value = true
+      alertType.value = 'success'
+      alertMessage.value = `${data.message}. Silakan Login ke Akun Anda`
+
+      setTimeout(() => {
+        closeDialog()
+      }, 2000)
+      router.push({ name: 'home' })
+    } catch (error) {
+      hasAlert.value = true
+      alertMessage.value = error.response.data.message
+      alertType.value = 'warning'
+    }
+
+    loading.value = false
+  }
+
+  const addProfile = async (inputProfile) => {
+    dialogProfile.value = true
+    loading.value = true
+    try {
+      const { data } = await apiService.post(
+        '/users/profile',
+        {
+          firstname: inputProfile.firstname,
+          lastname: inputProfile.lastname,
+          birthdate: inputProfile.birthdate,
+          phone: inputProfile.phone,
+          bio: inputProfile.bio
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken.value}`
+          }
+        }
+      )
+
+      hasAlert.value = true
+      alertType.value = 'success'
+      alertMessage.value = data.message
+
+      dataUser()
+      setTimeout(() => {
+        closeDialogProfile()
+      }, 500)
+      router.push({ name: 'profile' })
+    } catch (error) {
+      let errMessage = error.response.data.message
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+      hasAlert.value = true
+      alertMessage.value = errMessage
+      alertType.value = 'warning'
+    }
+
+    loading.value = false
+  }
+
+  const editProfile = async (inputProfile) => {
+    dialogProfile.value = true
+    loading.value = true
+    try {
+      const { data } = await apiService.patch(
+        '/users/profile',
+        {
+          firstname: inputProfile.firstname,
+          lastname: inputProfile.lastname,
+          birthdate: inputProfile.birthdate,
+          phone: inputProfile.phone,
+          bio: inputProfile.bio
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken.value}`
+          }
+        }
+      )
+
+      hasAlert.value = true
+      alertType.value = 'success'
+      alertMessage.value = data.message
+
+      dataUser()
+      setTimeout(() => {
+        closeDialogProfile()
+      }, 500)
+      router.push({ name: 'profile' })
+    } catch (error) {
+      let errMessage = error.response.data.message
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+      hasAlert.value = true
+      alertMessage.value = errMessage
+      alertType.value = 'warning'
+    }
+
+    loading.value = false
+  }
+
+  const dataUser = async () => {
+    try {
+      if (accessToken.value !== null) {
+        const profile = await apiService.get('/users/me', {
+          headers: {
+            Authorization: `Bearer ${accessToken.value}`
+          }
+        })
+
+        const profileData = profile.data
+        currentUser.value = profileData.data
+        localStorage.setItem('profile', JSON.stringify(currentUser.value))
+        me.value = profileData.data
+
+        if (profileData.data.roles.length > 0) {
+          localStorage.setItem('activeRole', JSON.stringify(profileData.data.roles[0]))
+          activeRole.value = profileData.data.roles[0]
+        }
+      } else {
+        accessToken.value = null
+        currentUser.value = null
+        localStorage.setItem('access_token', null)
+        localStorage.setItem('profile', null)
+        localStorage.setItem('activeRole', null)
+      }
+    } catch (error) {
+      accessToken.value = null
+      currentUser.value = null
+      localStorage.setItem('access_token', null)
+      localStorage.setItem('profile', null)
+      localStorage.setItem('activeRole', null)
+    }
+  }
+
+  return {
+    loginUser,
+    accessToken,
+    currentUser,
+    dialog,
+    loading,
+    closeDialog,
+    logoutUser,
+    me,
+    dataUser,
+    alertMessage,
+    hasAlert,
+    alertType,
+    registerUser,
+    addProfile,
+    editProfile,
+    dialogProfile,
+    closeDialogProfile,
+    activeRole
+  }
+})

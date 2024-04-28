@@ -1,0 +1,16 @@
+.not-uppercase .v-btn__content {
+  text-transform: none;
+}
+
+.active {
+  font-weight: bold !important;
+  text-decoration: underline !important;
+}
+
+.small-text {
+  font-size: 12px;
+}
+
+.border-blue {
+  border-color: blue;
+}
