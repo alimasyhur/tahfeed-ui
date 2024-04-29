@@ -28,7 +28,8 @@ const router = createRouter({
       name: 'dashboard',
       component: DashboardView,
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
+        requireSuperAdmin: false
       }
     },
     {
@@ -36,7 +37,8 @@ const router = createRouter({
       name: 'role',
       component: RoleView,
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
+        requireSuperAdmin: true
       }
     },
     {
@@ -44,7 +46,8 @@ const router = createRouter({
       name: 'organization',
       component: OrganizationView,
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
+        requireSuperAdmin: true
       }
     },
     {
@@ -52,7 +55,8 @@ const router = createRouter({
       name: 'user',
       component: UserView,
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
+        requireSuperAdmin: true
       }
     },
     {
@@ -60,7 +64,8 @@ const router = createRouter({
       name: 'profile',
       component: ProfileView,
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
+        requireSuperAdmin: false
       }
     }
   ]
@@ -71,6 +76,12 @@ router.beforeEach(async (to, from) => {
   if (to.meta.requiresAuth && userStorage.currentUser == null) {
     return {
       path: '/home'
+    }
+  }
+
+  if (to.meta.requireSuperAdmin && userStorage.activeRole?.role_name !== 'Super Admin') {
+    return {
+      path: 'dashboard'
     }
   }
 })

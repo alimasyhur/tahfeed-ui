@@ -9,55 +9,81 @@
 
     <v-row>
 
-      <v-data-table :headers="headers" :items="desserts" :sort-by="[{ key: 'calories', order: 'asc' }]">
+      <v-data-table :headers="headers" :search="search" :items="filteredItems"
+        :sort-by="[{ key: 'calories', order: 'asc' }]">
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>List Roles</v-toolbar-title>
-            <v-divider class="mx-4" inset vertical></v-divider>
-            <v-spacer></v-spacer>
-            <v-dialog v-model="dialog" max-width="500px">
+            <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
               <template v-slot:activator="{ props }">
                 <v-btn class="mb-2" color="primary" dark v-bind="props">
-                  New Item
+                  <v-icon color="info">mdi-plus</v-icon>
                 </v-btn>
               </template>
               <v-card>
-                <v-card-title>
-                  <span class="text-h5">{{ formTitle }}</span>
-                </v-card-title>
-
+                <v-card :title="formTitle"></v-card>
                 <v-card-text>
                   <v-container>
-                    <v-row>
-                      <v-col cols="12">
-                        <v-text-field v-model="editedItem.name" label="Name"></v-text-field>
-                      </v-col>
-                    </v-row>
+                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
+                      closable close-label="Close Alert"></v-alert>
+                    <v-form v-model="form" @submit.prevent="save">
+                      <v-row>
+                        <v-col cols="12">
+                          <v-text-field v-model="editedItem.name" :rules="required" label="Name" type="text"
+                            :loading="loading" clearable></v-text-field>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col>
+                          <v-btn color="success" size="large" type="submit" variant="elevated" :disabled="!form"
+                            block>Save
+                          </v-btn>
+                        </v-col>
+                        <v-col>
+                          <v-btn color="warning" size="large" type="button" variant="elevated" block
+                            @click="close">Cancel
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-form>
                   </v-container>
                 </v-card-text>
 
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="blue-darken-1" variant="text" @click="close">
-                    Cancel
-                  </v-btn>
-                  <v-btn color="blue-darken-1" variant="text" @click="save">
-                    Save
-                  </v-btn>
-                </v-card-actions>
               </v-card>
             </v-dialog>
             <v-dialog v-model="dialogDelete" max-width="500px">
               <v-card>
                 <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="blue-darken-1" variant="text" @click="closeDelete">Cancel</v-btn>
-                  <v-btn color="blue-darken-1" variant="text" @click="deleteItemConfirm">OK</v-btn>
-                  <v-spacer></v-spacer>
-                </v-card-actions>
+                <v-card-text>
+                  <v-container>
+                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
+                      closable close-label="Close Alert"></v-alert>
+                    <v-form v-model="form" @submit.prevent="deleteItemConfirm">
+                      <p class="ma-6">Apakah Anda yakin Menghapus Role <b>{{ editedItem.name }}</b>?</p>
+                      <v-row>
+                        <v-col>
+                          <v-btn color="success" size="large" type="submit" variant="elevated" block>
+                            Ya
+                          </v-btn>
+                        </v-col>
+                        <v-col>
+                          <v-btn color="warning" size="large" type="button" variant="elevated" block
+                            @click="closeDelete">Tidak
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-form>
+                  </v-container>
+                </v-card-text>
               </v-card>
             </v-dialog>
+
+            <v-divider class="mx-4" vertical></v-divider>
+            <v-spacer></v-spacer>
+
+            <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
+              hide-details></v-text-field>
+
           </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
@@ -69,9 +95,7 @@
           </v-icon>
         </template>
         <template v-slot:no-data>
-          <v-btn color="primary" @click="initialize">
-            Reset
-          </v-btn>
+          no data
         </template>
       </v-data-table>
 
@@ -81,6 +105,8 @@
 </template>
 
 <script>
+import { useRoleStorage } from '@/stores/roleStorage';
+
 export default {
   data: () => ({
     dialog: false,
@@ -93,7 +119,7 @@ export default {
       },
       { title: 'Actions', key: 'actions', sortable: false },
     ],
-    desserts: [],
+    roles: [],
     editedIndex: -1,
     editedItem: {
       name: '',
@@ -101,11 +127,30 @@ export default {
     defaultItem: {
       name: '',
     },
+    search: '',
+    loading: false,
+    alertMessage: 'Terjadi Kesalahan',
+    hasAlert: false,
+    alertType: null,
+    form: false,
+    required: [
+      v => !!v || 'Field is required'
+    ],
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      return this.editedIndex === -1 ? 'New Role' : 'Edit Role'
+    },
+    validForm() {
+      return this.$refs.form.$valid;
+    },
+    filteredItems() {
+      return this.roles.filter(role =>
+        Object.values(role).some(val =>
+          val.toString().toLowerCase().includes(this.search.toLowerCase())
+        )
+      );
     },
   },
 
@@ -123,85 +168,133 @@ export default {
   },
 
   methods: {
-    initialize() {
-      this.desserts = [
-        {
-          name: 'Frozen Yogurt',
-        },
-        {
-          name: 'Ice cream sandwich',
-        },
-        {
-          name: 'Eclair',
-        },
-        {
-          name: 'Cupcake',
-        },
-        {
-          name: 'Gingerbread',
-        },
-        {
-          name: 'Jelly bean',
-        },
-        {
-          name: 'Lollipop',
-        },
-        {
-          name: 'Honeycomb',
-        },
-        {
-          name: 'Donut',
-        },
-        {
-          name: 'KitKat',
-        },
-        {
-          name: 'Bang-Bang',
-        },
-      ]
+    async initialize() {
+      const roleStorage = useRoleStorage()
+      const data = await roleStorage.getRoles()
+      this.roles = data.data
     },
 
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item)
+      this.editedIndex = this.roles.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
 
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item)
+      this.editedIndex = this.roles.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
     },
 
-    deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1)
-      this.closeDelete()
+    async deleteItemConfirm() {
+      const roleStorage = useRoleStorage()
+      const respDelete = await roleStorage.removeRole(this.editedItem)
+
+      this.alertMessage = respDelete.message
+      this.hasAlert = true
+      this.alertType = respDelete.status
+
+      if (respDelete.status == "success") {
+        const data = await roleStorage.getRoles()
+        this.roles = data.data
+        setTimeout(() => {
+          this.dialog = false
+          this.dialogDelete = false
+          this.alertMessage = ''
+          this.hasAlert = false
+          this.alertType = ''
+          this.editedIndex = -1
+          this.editedItem = {
+            name: '',
+          }
+          this.closeDelete()
+        }, 700)
+      }
     },
 
     close() {
       this.dialog = false
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      })
+      this.alertMessage = ''
+      this.hasAlert = false
+      this.alertType = ''
+      this.editedIndex = -1
+      this.editedItem = {
+        name: '',
+      }
     },
 
     closeDelete() {
+      this.dialog = false
       this.dialogDelete = false
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      })
+      this.alertMessage = ''
+      this.hasAlert = false
+      this.alertType = ''
+      this.editedItem = {
+        name: '',
+      }
     },
 
-    save() {
+    async save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem)
+        this.loading = true
+        const roleStorage = useRoleStorage()
+        const respEdited = await roleStorage.editRole(this.editedItem)
+
+        this.alertMessage = respEdited.message
+        this.hasAlert = true
+        this.alertType = respEdited.status
+
+        if (respEdited.status == "success") {
+          const data = await roleStorage.getRoles()
+          this.roles = data.data
+          setTimeout(() => {
+            this.dialog = false
+            this.dialogDelete = false
+            this.alertMessage = ''
+            this.hasAlert = false
+            this.alertType = ''
+            this.editedIndex = -1
+            this.editedItem = {
+              name: '',
+            }
+            this.close()
+          }, 700)
+        }
       } else {
-        this.desserts.push(this.editedItem)
+        this.loading = true
+        const roleStorage = useRoleStorage()
+        const respEdited = await roleStorage.addRole(this.editedItem)
+
+        this.alertMessage = respEdited.message
+        this.hasAlert = true
+        this.alertType = respEdited.status
+
+        if (respEdited.status == "success") {
+          const data = await roleStorage.getRoles()
+          this.roles = data.data
+          setTimeout(() => {
+            this.dialog = false
+            this.dialogDelete = false
+            this.alertMessage = ''
+            this.hasAlert = false
+            this.alertType = ''
+            this.editedIndex = -1
+            this.editedItem = {
+              name: '',
+            }
+            this.close()
+          }, 500)
+        }
+
       }
-      this.close()
+
+      this.loading = false
     },
   },
+  async mounted() {
+    const roleStorage = useRoleStorage()
+    const data = await roleStorage.getRoles()
+    this.roles = data.data
+  }
 }
 </script>

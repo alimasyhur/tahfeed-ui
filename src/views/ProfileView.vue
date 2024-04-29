@@ -203,9 +203,6 @@
                   <th class="text-left">
                     <b>Status Konfirmasi</b>
                   </th>
-                  <th class="text-left">
-                    <b>Action</b>
-                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -216,11 +213,6 @@
                   </th>
                   <th class="text-left">
                     <v-badge :color="role.is_confirmed_label_color" :content="role.is_confirmed_label" inline></v-badge>
-                  </th>
-                  <th class="text-left">
-                    <v-btn small class="not-uppercase" flat>
-                      <v-icon color="info">mdi-pencil</v-icon>
-                    </v-btn>
                   </th>
                 </tr>
               </tbody>
