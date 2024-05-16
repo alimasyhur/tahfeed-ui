@@ -11,8 +11,9 @@
             <div v-if="activeRole?.role_name !== null">
                 <v-list-item v-if="activeRole?.role_name === 'Super Admin'" prepend-icon="mdi-home-group"
                     title="Organization" :to="{ name: 'organization' }" value="organization"></v-list-item>
-                <v-list-item v-if="activeRole?.role_name === 'Super Admin'" prepend-icon="mdi-account-group-outline"
-                    title="User" :to="{ name: 'user' }" value="user"></v-list-item>
+                <v-list-item v-if="(activeRole?.role_name === 'Super Admin' || activeRole?.role_name === 'Admin')"
+                    prepend-icon="mdi-account-group-outline" title="User" :to="{ name: 'user' }"
+                    value="user"></v-list-item>
                 <v-list-item v-if="activeRole?.role_name === 'Super Admin'" prepend-icon="mdi-cog-outline" title="Role"
                     :to="{ name: 'role' }" value="role"></v-list-item>
                 <v-list-item prepend-icon="mdi-account" title="My Profile" :to="{ name: 'profile' }"

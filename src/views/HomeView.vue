@@ -19,7 +19,7 @@
           </v-col>
 
           <v-col cols="6">
-            <v-img :width="500" aspect-ratio="16/9" cover src="/images/landing/tahfeed-target.png"></v-img>
+            <v-img :width="500" aspect-ratio="16/9" cover src="/images/landing/tahfeed-target.svg"></v-img>
           </v-col>
 
         </v-row>
@@ -30,7 +30,7 @@
       <v-col cols="12">
         <v-row>
           <v-col cols="6">
-            <v-img :width="400" aspect-ratio="16/9" cover src="/images/landing/tahfeed-cashback.png"></v-img>
+            <v-img :width="400" aspect-ratio="16/9" cover src="/images/landing/tahfeed-tracker.svg"></v-img>
           </v-col>
 
           <v-col cols="6">

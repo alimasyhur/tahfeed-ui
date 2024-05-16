@@ -91,17 +91,21 @@
         <v-divider></v-divider>
         <v-card-item>
           <v-card-title>
-            <div v-if="(activeRole.role_name == 'Admin' || activeRole.role_name == 'Super Admin')">
-              <v-icon icon="mdi-home-account" end></v-icon>
-              My Organization
-              <v-btn v-if="(me.organization !== null)" small class="not-uppercase" flat
-                @click="openEditOrganization(me.organization)">
-                <v-icon color="info">mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn v-else small class="not-uppercase" flat @click="openCreateOrganization()">
-                <v-icon color="info">mdi-plus</v-icon>
-              </v-btn>
-            </div>
+            <v-row>
+              <v-col cols="3">
+                <v-icon icon="mdi-home-account" end></v-icon>
+                My Organization
+              </v-col>
+              <v-col cols="9" v-if="(activeRole.role_name == 'Admin' || activeRole.role_name == 'Super Admin')">
+                <v-btn v-if="(me.organization !== null)" small class="not-uppercase" flat
+                  @click="openEditOrganization(me.organization)">
+                  <v-icon color="info">mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn v-else small class="not-uppercase" flat @click="openCreateOrganization()">
+                  <v-icon color="info">mdi-plus</v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
 
           </v-card-title>
           <v-card-subtitle>
@@ -195,7 +199,10 @@
               <thead>
                 <tr>
                   <th class="text-left">
-                    <b>Role Name</b>
+                    <b>Role</b>
+                  </th>
+                  <th class="text-left">
+                    <b>Organization</b>
                   </th>
                   <th class="text-left">
                     <b>Status Aktif</b>
@@ -208,6 +215,7 @@
               <tbody>
                 <tr v-for="( role, idx ) in me.roles" :key="idx">
                   <th class="text-left">{{ role.role_name }}</th>
+                  <th class="text-left">{{ role.org_name }}</th>
                   <th class="text-left">
                     <v-badge :color="role.is_active_label_color" :content="role.is_active_label" inline></v-badge>
                   </th>

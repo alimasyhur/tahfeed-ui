@@ -1,91 +1,43 @@
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { apiService } from '@/api'
-import { ref } from 'vue'
 import { useUserStorage } from '@/stores/userStorage'
 
-export const useRoleStorage = defineStore('role', () => {
-  const roles = ref(null)
+export const useUserOrganizationStorage = defineStore('users_orgs', () => {
+  const users = ref(null)
 
   const userStorage = useUserStorage()
 
-  const getRoles = async (filterRole) => {
+  const getUserOrganizations = async (params) => {
     try {
-      const { data } = await apiService.get('/roles', {
+      const { data } = await apiService.get('/roles/users', {
         headers: {
           Authorization: `Bearer ${userStorage.accessToken}`
         },
         params: {
-          filter: {
-            role_name: filterRole
-          }
+          filter: { org_uuid: params.org_uuid }
         }
       })
+      users.value = data
 
-      const roleData = data.data
-
-      roles.value = roleData
       return data
     } catch {
-      roles.value = null
+      users.value = null
     }
   }
 
-  const removeRole = async (inputRole) => {
-    try {
-      const { data } = await apiService.delete(`/roles/${inputRole.uuid}`, {
-        headers: {
-          Authorization: `Bearer ${userStorage.accessToken}`
-        }
-      })
-
-      getRoles()
-      return data
-    } catch (error) {
-      let errMessage = error.response.data.message
-      if (Array.isArray(errMessage)) {
-        errMessage = error.response.data.message[0].name
-      }
-      return {
-        status: error.response.data.status,
-        message: errMessage
-      }
-    }
-  }
-
-  const addRole = async (inputRole) => {
-    try {
-      const { data } = await apiService.post(
-        `roles`,
-        {
-          name: inputRole.name
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${userStorage.accessToken}`
-          }
-        }
-      )
-
-      return data
-    } catch (error) {
-      let errMessage = error.response.data.message
-      if (Array.isArray(errMessage)) {
-        errMessage = error.response.data.message[0].name
-      }
-
-      return {
-        status: error.response.data.status,
-        message: errMessage
-      }
-    }
-  }
-
-  const editRole = async (inputRole) => {
+  const addAdminUserOrganization = async (inputUserOrg) => {
     try {
       const { data } = await apiService.patch(
-        `roles/${inputRole.uuid}`,
+        `/roles/users`,
         {
-          name: inputRole.name
+          email: inputUserOrg.email,
+          user_name: inputUserOrg.user_name,
+          password: inputUserOrg.password,
+          org_uuid: inputUserOrg.org_uuid,
+          role_uuid: inputUserOrg,
+          is_active: inputUserOrg.is_active,
+          is_confirmed: inputUserOrg.is_confirmed
         },
         {
           headers: {
@@ -108,5 +60,42 @@ export const useRoleStorage = defineStore('role', () => {
     }
   }
 
-  return { roles, getRoles, addRole, removeRole, editRole }
+  const editAdminUserOrganization = async (inputUserOrg) => {
+    try {
+      const { data } = await apiService.patch(
+        `/roles/users/${inputUserOrg.uuid}`,
+        {
+          user_name: inputUserOrg.user_name,
+          email: inputUserOrg.email,
+          role_uuid: inputUserOrg.role_uuid,
+          is_active: inputUserOrg.is_active,
+          is_confirmed: inputUserOrg.is_confirmed
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userStorage.accessToken}`
+          }
+        }
+      )
+
+      return data
+    } catch (error) {
+      let errMessage = error.response.data.message
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+
+      return {
+        status: error.response.data.status,
+        message: errMessage
+      }
+    }
+  }
+
+  return {
+    getUserOrganizations,
+    users,
+    editAdminUserOrganization,
+    addAdminUserOrganization
+  }
 })

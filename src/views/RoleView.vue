@@ -1,9 +1,19 @@
 <template>
   <v-container>
-    <v-row>
+    <!-- <v-row>
       <v-col cols="12">
         <h1>Role</h1>
       </v-col>
+    </v-row> -->
+
+    <v-row>
+      <div>
+        <v-breadcrumbs :items="breadcrumbsItems">
+          <template v-slot:divider>
+            <v-icon icon="mdi-chevron-right"></v-icon>
+          </template>
+        </v-breadcrumbs>
+      </div>
     </v-row>
 
 
@@ -16,8 +26,8 @@
             <v-toolbar-title>List Roles</v-toolbar-title>
             <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
               <template v-slot:activator="{ props }">
-                <v-btn class="mb-2" color="primary" dark v-bind="props">
-                  <v-icon color="info">mdi-plus</v-icon>
+                <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="small">
+                  <v-icon>mdi-plus</v-icon> New Role
                 </v-btn>
               </template>
               <v-card>
@@ -118,6 +128,13 @@ export default {
         key: 'name',
       },
       { title: 'Actions', key: 'actions', sortable: false },
+    ],
+    breadcrumbsItems: [
+      {
+        title: 'Roles',
+        disabled: true,
+        href: 'role',
+      }
     ],
     roles: [],
     editedIndex: -1,

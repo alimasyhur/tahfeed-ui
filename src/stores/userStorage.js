@@ -22,6 +22,7 @@ export const useUserStorage = defineStore('user', () => {
   const dialogProfile = ref(false)
   const loading = ref(false)
   const me = ref()
+  const users = ref(null)
   const alertMessage = ref('Terjadi Kesalahan')
   const hasAlert = ref(false)
   const alertType = ref(null)
@@ -264,6 +265,21 @@ export const useUserStorage = defineStore('user', () => {
     }
   }
 
+  const getUsers = async () => {
+    try {
+      const { data } = await apiService.get('/users', {
+        headers: {
+          Authorization: `Bearer ${accessToken.value}`
+        }
+      })
+      users.value = data
+
+      return data
+    } catch {
+      users.value = null
+    }
+  }
+
   return {
     loginUser,
     accessToken,
@@ -282,6 +298,7 @@ export const useUserStorage = defineStore('user', () => {
     editProfile,
     dialogProfile,
     closeDialogProfile,
-    activeRole
+    activeRole,
+    getUsers
   }
 })
