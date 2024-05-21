@@ -280,6 +280,35 @@ export const useUserStorage = defineStore('user', () => {
     }
   }
 
+  const adminResetPassword = async (inputUser) => {
+    try {
+      const { data } = await apiService.post(
+        '/auth/reset-password',
+        {
+          user_uuid: inputUser.user_uuid,
+          new_password: inputUser.new_password
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken.value}`
+          }
+        }
+      )
+
+      return data
+    } catch (error) {
+      let errMessage = error.response.data.message
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+
+      return {
+        status: error.response.data.status,
+        message: errMessage
+      }
+    }
+  }
+
   return {
     loginUser,
     accessToken,
@@ -299,6 +328,7 @@ export const useUserStorage = defineStore('user', () => {
     dialogProfile,
     closeDialogProfile,
     activeRole,
-    getUsers
+    getUsers,
+    adminResetPassword
   }
 })

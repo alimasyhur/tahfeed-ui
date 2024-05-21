@@ -41,7 +41,8 @@
                 <v-btn class="not-uppercase mr-2" color="primary" dark v-bind="props" variant="flat" size="small">
                   <v-icon>mdi-plus</v-icon> New User
                 </v-btn>
-                <v-btn class="not-uppercase" color="success" dark v-bind="props" variant="flat" size="small">
+                <v-btn class="not-uppercase" color="success" dark v-bind="props" variant="flat" size="small"
+                  @click="assignRole">
                   <v-icon>mdi-cog-outline</v-icon> Assign Role
                 </v-btn>
               </template>
@@ -85,6 +86,75 @@
 
               </v-card>
             </v-dialog>
+
+            <v-dialog v-model="dialogResetPassword" width="auto" min-width="500" persistent>
+              <v-card title="Reset Password">
+                <v-card-text>
+                  <v-container>
+                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
+                      closable close-label="Close Alert"></v-alert>
+                    <v-form v-model="form" @submit.prevent="saveResetPassword">
+                      <v-row>
+                        <v-col cols="12">
+
+                          <v-text-field v-model="editedItem.new_password" :rules="required" label="New Password"
+                            type="password" :loading="loading" clearable></v-text-field>
+
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col>
+                          <v-btn color="success" size="large" type="submit" variant="elevated" :disabled="!form"
+                            block>Save
+                          </v-btn>
+                        </v-col>
+                        <v-col>
+                          <v-btn color="warning" size="large" type="button" variant="elevated" block
+                            @click="closeResetPassword">Cancel
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-form>
+                  </v-container>
+                </v-card-text>
+
+              </v-card>
+            </v-dialog>
+
+            <v-dialog v-model="dialogAssignRole" width="auto" min-width="500" persistent>
+              <v-card title="Assign Role">
+                <v-card-text>
+                  <v-container>
+                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
+                      closable close-label="Close Alert"></v-alert>
+                    <v-form v-model="form" @submit.prevent="saveAssignRole">
+                      <v-row>
+                        <v-col cols="12">
+                          <v-select v-model="editedItem.user_uuid" :items="userOptions" item-title="displayText"
+                            item-value="value" label="Select Email"></v-select>
+                          <v-select v-model="editedItem.role_uuid" :items="rolesOptions" item-title="displayText"
+                            item-value="value" label="Select Role"></v-select>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col>
+                          <v-btn color="success" size="large" type="submit" variant="elevated" :disabled="!form"
+                            block>Save
+                          </v-btn>
+                        </v-col>
+                        <v-col>
+                          <v-btn color="warning" size="large" type="button" variant="elevated" block
+                            @click="closeAssignRole">Cancel
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-form>
+                  </v-container>
+                </v-card-text>
+
+              </v-card>
+            </v-dialog>
+
             <v-divider class="mx-4" vertical></v-divider>
             <v-spacer></v-spacer>
 
@@ -94,9 +164,20 @@
           </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
-          <v-icon class="me-2" size="small" @click="editItem(item)">
-            mdi-pencil
-          </v-icon>
+          <v-tooltip text="Edit">
+            <template v-slot:activator="{ props }">
+              <v-icon class="me-2" size="small" @click="editItem(item)" v-bind="props">
+                mdi-pencil
+              </v-icon>
+            </template>
+          </v-tooltip>
+          <v-tooltip text="Reset Password">
+            <template v-slot:activator="{ props }">
+              <v-icon class="me-2" size="small" @click="resetPassword(item)" v-bind="props">
+                mdi-lock-reset
+              </v-icon>
+            </template>
+          </v-tooltip>
         </template>
         <template v-slot:no-data>
           no data
@@ -116,6 +197,8 @@ import { storeToRefs } from 'pinia';
 export default {
   data: () => ({
     dialog: false,
+    dialogResetPassword: false,
+    dialogAssignRole: false,
     headers: [
       {
         title: 'Name',
@@ -154,6 +237,7 @@ export default {
       { value: 1, displayText: 'active' },
     ],
     rolesOptions: [],
+    userOptions: [],
     breadcrumbsItems: [
       {
         title: 'Users',
@@ -165,6 +249,7 @@ export default {
     editedIndex: -1,
     editedItem: {
       uuid: '',
+      user_uuid: '',
       user_name: '',
       email: '',
       role_uuid: '',
@@ -176,6 +261,7 @@ export default {
     },
     defaultItem: {
       uuid: '',
+      user_uuid: '',
       user_name: '',
       email: '',
       role_uuid: '',
@@ -218,6 +304,12 @@ export default {
     dialog(val) {
       val || this.close()
     },
+    dialogResetPassword(val) {
+      val || this.close()
+    },
+    dialogAssignRole(val) {
+      val || this.close()
+    },
   },
 
   created() {
@@ -237,8 +329,38 @@ export default {
       this.dialog = true
     },
 
+    resetPassword(item) {
+      this.editedIndex = this.users.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.dialogResetPassword = true
+    },
+
+    assignRole() {
+      this.editedItem = this.defaultItem
+      this.dialog = false
+      this.dialogAssignRole = true
+    },
+
     close() {
       this.dialog = false
+      this.alertMessage = ''
+      this.hasAlert = false
+      this.alertType = ''
+      this.editedIndex = -1
+      this.editedItem = this.defaultItem
+    },
+
+    closeResetPassword() {
+      this.dialogResetPassword = false
+      this.alertMessage = ''
+      this.hasAlert = false
+      this.alertType = ''
+      this.editedIndex = -1
+      this.editedItem = this.defaultItem
+    },
+
+    closeAssignRole() {
+      this.dialogAssignRole = false
       this.alertMessage = ''
       this.hasAlert = false
       this.alertType = ''
@@ -275,14 +397,15 @@ export default {
         this.loading = true
 
         const userOrgStorage = useUserOrganizationStorage()
-        const respEdited = await userOrgStorage.editAdminUserOrganization(this.editedItem)
+        this.editedItem.org_uuid = this.activeRole.org_uuid;
+        const respEdited = await userOrgStorage.addAdminUserOrganization(this.editedItem)
 
         this.alertMessage = respEdited.message
         this.hasAlert = true
         this.alertType = respEdited.status
 
         if (respEdited.status == "success") {
-          const data = await userStorage.getUsers()
+          const data = await userOrgStorage.getUserOrganizations(this.params)
           this.users = data.data
           setTimeout(() => {
             this.dialog = false
@@ -297,7 +420,69 @@ export default {
       }
       this.loading = false
     },
+
+    async saveResetPassword() {
+      this.loading = true
+
+      const userStorage = useUserStorage()
+      const respEdited = await userStorage.adminResetPassword(this.editedItem)
+
+      console.log('ini resp edit', respEdited)
+
+      const userOrgStorage = useUserOrganizationStorage()
+
+      this.alertMessage = respEdited.message
+      this.hasAlert = true
+      this.alertType = respEdited.status
+
+      if (respEdited.status == "success") {
+        const data = await userOrgStorage.getUserOrganizations(this.params)
+        this.users = data.data
+        setTimeout(() => {
+          this.dialogResetPassword = false
+          this.alertMessage = ''
+          this.hasAlert = false
+          this.alertType = ''
+          this.editedIndex = -1
+          this.editedItem = this.defaultItem
+          this.close()
+        }, 700)
+      }
+
+      this.loading = false
+    },
+
+    async saveAssignRole() {
+      this.loading = true
+
+      const userOrgStorage = useUserOrganizationStorage()
+      this.editedItem.org_uuid = this.activeRole.org_uuid
+      console.log('input', this.editedItem)
+      const respEdited = await userOrgStorage.adminAssignUserRoleOrganization(this.editedItem)
+
+      this.alertMessage = respEdited.message
+      this.hasAlert = true
+      this.alertType = respEdited.status
+
+      if (respEdited.status == "success") {
+        const data = await userOrgStorage.getUserOrganizations(this.params)
+        this.users = data.data
+        setTimeout(() => {
+          this.dialogAssignRole = false
+          this.alertMessage = ''
+          this.hasAlert = false
+          this.alertType = ''
+          this.editedIndex = -1
+          this.editedItem = this.defaultItem
+          this.close()
+        }, 700)
+      }
+
+      this.loading = false
+    },
+
   },
+
   async mounted() {
     const userStorage = useUserStorage()
     const { activeRole } = storeToRefs(userStorage)
@@ -307,8 +492,8 @@ export default {
         org_uuid: activeRole.value.org_uuid,
         role_name: activeRole.value.role_name,
       }
-      this.activeRole = activeRole
     }
+    this.activeRole = activeRole
 
     const userOrgStorage = useUserOrganizationStorage()
     const userOrgData = await userOrgStorage.getUserOrganizations(this.params)
@@ -326,6 +511,18 @@ export default {
     })
 
     this.rolesOptions = rolesOptions
+
+    const userOptionsData = await userOrgStorage.getUserOrganizationOptions({
+      org_uuid: activeRole.value.org_uuid,
+    })
+    const userOptions = userOptionsData.data.map(user => {
+      return {
+        ...user,
+        value: user.uuid,
+        displayText: user.email
+      }
+    })
+    this.userOptions = userOptions
   }
 }
 </script>
