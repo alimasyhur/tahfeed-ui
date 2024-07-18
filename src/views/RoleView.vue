@@ -19,8 +19,8 @@
 
     <v-row>
 
-      <v-data-table :headers="headers" :search="search" :items="filteredItems"
-        :sort-by="[{ key: 'calories', order: 'asc' }]">
+      <v-data-table :headers="headers" :search="search" :items="roles" :items-length="totalItems" :loading="loading"
+        v-model:options="options" @update:options="fetchData" :sort-by="[{ key: 'name', order: 'asc' }]">
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>List Roles</v-toolbar-title>
@@ -145,6 +145,11 @@ export default {
       name: '',
     },
     search: '',
+    totalItems: 0,
+    options: {
+      page: 1,
+      itemsPerPage: 10,
+    },
     loading: false,
     alertMessage: 'Terjadi Kesalahan',
     hasAlert: false,
@@ -180,15 +185,25 @@ export default {
     },
   },
 
-  created() {
-    this.initialize()
-  },
-
   methods: {
-    async initialize() {
+    async fetchData() {
+      this.loading = true;
+
+      const { page, itemsPerPage } = this.options;
+      const params = {
+        page,
+        limit: itemsPerPage,
+        q: this.search,
+        sortOrder: '1',
+        sortField: 'name',
+      };
+
       const roleStorage = useRoleStorage()
-      const data = await roleStorage.getRoles()
+      const data = await roleStorage.getRoles(params)
       this.roles = data.data
+
+      this.totalItems = data.total
+      this.loading = false
     },
 
     editItem(item) {
@@ -212,8 +227,7 @@ export default {
       this.alertType = respDelete.status
 
       if (respDelete.status == "success") {
-        const data = await roleStorage.getRoles()
-        this.roles = data.data
+        this.fetchData()
         setTimeout(() => {
           this.dialog = false
           this.dialogDelete = false
@@ -262,8 +276,7 @@ export default {
         this.alertType = respEdited.status
 
         if (respEdited.status == "success") {
-          const data = await roleStorage.getRoles()
-          this.roles = data.data
+          this.fetchData()
           setTimeout(() => {
             this.dialog = false
             this.dialogDelete = false
@@ -287,8 +300,7 @@ export default {
         this.alertType = respEdited.status
 
         if (respEdited.status == "success") {
-          const data = await roleStorage.getRoles()
-          this.roles = data.data
+          this.fetchData()
           setTimeout(() => {
             this.dialog = false
             this.dialogDelete = false
@@ -309,9 +321,7 @@ export default {
     },
   },
   async mounted() {
-    const roleStorage = useRoleStorage()
-    const data = await roleStorage.getRoles()
-    this.roles = data.data
+    this.fetchData()
   }
 }
 </script>

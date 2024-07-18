@@ -14,11 +14,7 @@ export const useRoleStorage = defineStore('role', () => {
         headers: {
           Authorization: `Bearer ${userStorage.accessToken}`
         },
-        params: {
-          filter: {
-            role_name: filterRole
-          }
-        }
+        params: filterRole
       })
 
       const roleData = data.data

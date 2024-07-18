@@ -14,9 +14,7 @@ export const useUserOrganizationStorage = defineStore('users_orgs', () => {
         headers: {
           Authorization: `Bearer ${userStorage.accessToken}`
         },
-        params: {
-          filter: { org_uuid: params.org_uuid }
-        }
+        params: params
       })
       users.value = data
 

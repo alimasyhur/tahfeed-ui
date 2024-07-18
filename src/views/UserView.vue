@@ -347,8 +347,8 @@ export default {
       };
 
       if (activeRole.value.role_name === 'Admin') {
-        params.org_uuid = activeRole.value.org_uuid
-        params.role_name = activeRole.value.role_name
+        params.filter.org_uuid = activeRole.value.org_uuid
+        params.filter.role_name = activeRole.value.role_name
       }
 
       if (this.search !== "") {

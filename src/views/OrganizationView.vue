@@ -18,7 +18,8 @@
     </v-row>
 
     <v-row>
-      <v-data-table :headers="headers" :search="search" :items="filteredItems"
+      <v-data-table :headers="headers" :search="search" :items="organizations" :items-length="totalItems"
+        :loading="loading" v-model:options="options" @update:options="fetchData"
         :sort-by="[{ key: 'name', order: 'asc' }]">
         <template v-slot:item.is_active="{ item }">
           <v-badge :color="item.is_active_label_color" :content="item.is_active_label">
@@ -181,6 +182,11 @@ export default {
       is_active: '',
     },
     search: '',
+    totalItems: 0,
+    options: {
+      page: 1,
+      itemsPerPage: 10,
+    },
     loading: false,
     alertMessage: 'Terjadi Kesalahan',
     hasAlert: false,
@@ -213,18 +219,29 @@ export default {
     },
   },
 
-  created() {
-    this.initialize()
-  },
-
   methods: {
     detailOrganization(slug) {
       this.$router.push({ path: `/organization/${slug}` });
     },
-    async initialize() {
+
+    async fetchData() {
+      this.loading = true;
+
+      const { page, itemsPerPage } = this.options;
+      const params = {
+        page,
+        limit: itemsPerPage,
+        q: this.search,
+        sortOrder: '1',
+        sortField: 'name',
+      };
+
       const orgStorage = useOrganizationStorage()
-      const data = await orgStorage.getOrganizations()
+      const data = await orgStorage.getOrganizations(params)
       this.organizations = data.data
+
+      this.totalItems = data.total
+      this.loading = false
     },
 
     editItem(item) {
@@ -253,8 +270,7 @@ export default {
         this.alertType = respEdited.status
 
         if (respEdited.status == "success") {
-          const data = await orgStorage.getOrganizations()
-          this.organizations = data.data
+          this.fetchData()
           setTimeout(() => {
             this.dialog = false
             this.alertMessage = ''
@@ -275,8 +291,7 @@ export default {
         this.alertType = respEdited.status
 
         if (respEdited.status == "success") {
-          const data = await orgStorage.getOrganizations()
-          this.organizations = data.data
+          this.fetchData()
           setTimeout(() => {
             this.dialog = false
             this.alertMessage = ''
@@ -292,9 +307,7 @@ export default {
     },
   },
   async mounted() {
-    const orgStorage = useOrganizationStorage()
-    const data = await orgStorage.getOrganizations()
-    this.organizations = data.data
+    this.fetchData()
   }
 }
 </script>
