@@ -17,8 +17,8 @@
     </v-row>
 
     <v-row>
-      <v-data-table :headers="headers" :search="search" :items="filteredItems"
-        :sort-by="[{ key: 'name', order: 'asc' }]">
+      <v-data-table :headers="headers" :search="search" :items="users" :items-length="totalItems" :loading="loading"
+        v-model:options="options" @update:options="fetchData" :sort-by="[{ key: 'name', order: 'asc' }]">
         <template v-slot:item.is_active="{ item }">
           <v-badge :color="item.is_active_label_color" :content="item.is_active_label">
             <template v-slot:badge>
@@ -62,6 +62,8 @@
                             label="Password" type="password" :loading="loading" clearable></v-text-field>
                           <v-select v-model="editedItem.role_uuid" :items="rolesOptions" item-title="displayText"
                             item-value="value" label="Select Role"></v-select>
+                          <v-select v-model="editedItem.org_uuid" :items="orgOptions" item-title="displayText"
+                            item-value="value" label="Select Organization"></v-select>
                           <v-select v-model="editedItem.is_confirmed" :items="statusConfirmationOptions"
                             item-title="displayText" item-value="value" label="Select status confirmation"></v-select>
                           <v-select v-model="editedItem.is_active" :items="statusActiveOptions" item-title="displayText"
@@ -134,6 +136,8 @@
                             item-value="value" label="Select Email"></v-select>
                           <v-select v-model="editedItem.role_uuid" :items="rolesOptions" item-title="displayText"
                             item-value="value" label="Select Role"></v-select>
+                          <v-select v-model="editedItem.org_uuid" :items="orgOptions" item-title="displayText"
+                            item-value="value" label="Select Organization"></v-select>
                         </v-col>
                       </v-row>
                       <v-row>
@@ -193,6 +197,7 @@ import { useUserStorage } from '@/stores/userStorage';
 import { useUserOrganizationStorage } from '@/stores/userOrganizationStorage';
 import { useRoleStorage } from '@/stores/roleStorage';
 import { storeToRefs } from 'pinia';
+import { useOrganizationStorage } from '@/stores/organizationStorage';
 
 export default {
   data: () => ({
@@ -237,6 +242,7 @@ export default {
       { value: 1, displayText: 'active' },
     ],
     rolesOptions: [],
+    orgOptions: [],
     userOptions: [],
     breadcrumbsItems: [
       {
@@ -272,6 +278,11 @@ export default {
       is_confirmed: '',
     },
     search: '',
+    totalItems: 0,
+    options: {
+      page: 1,
+      itemsPerPage: 10,
+    },
     loading: false,
     alertMessage: 'Terjadi Kesalahan',
     hasAlert: false,
@@ -310,17 +321,129 @@ export default {
     dialogAssignRole(val) {
       val || this.close()
     },
-  },
-
-  created() {
-    this.initialize()
+    options: {
+      handler() {
+        this.fetchData();
+      },
+      deep: true,
+    },
   },
 
   methods: {
-    async initialize() {
+
+    async fetchData() {
+      this.loading = true;
+
       const userStorage = useUserStorage()
-      const data = await userStorage.getUsers()
+      const { activeRole } = storeToRefs(userStorage)
+
+      const { page, itemsPerPage } = this.options;
+      const params = {
+        page,
+        limit: itemsPerPage,
+        q: this.search,
+        sortOrder: '1',
+        sortField: 'name',
+      };
+
+      if (activeRole.value.role_name === 'Admin') {
+        params.org_uuid = activeRole.value.org_uuid
+        params.role_name = activeRole.value.role_name
+      }
+
+      if (this.search !== "") {
+        params.q = this.search;
+      }
+
+      const userOrgStorage = useUserOrganizationStorage()
+      const data = await userOrgStorage.getUserOrganizations(params)
+
       this.users = data.data
+      this.totalItems = data.total
+      this.loading = false
+    },
+
+    async fetchUserOrganizationOptions() {
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+      const userOrgStorage = useUserOrganizationStorage()
+
+      const params = {}
+      if (activeRole.value.role_name === 'Admin') {
+        params.org_uuid = activeRole.value.org_uuid
+      }
+
+      const userOptionsData = await userOrgStorage.getUserOrganizationOptions(params)
+      const userOptions = userOptionsData.data.map(user => {
+        return {
+          ...user,
+          value: user.uuid,
+          displayText: `${user.email} (${user.name})`
+        }
+      })
+
+      return userOptions
+    },
+
+    async fetchOrganizationOptions() {
+      const orgStorage = useOrganizationStorage()
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+
+      if (activeRole.value.constant_value === 2) {
+        return [{
+          value: activeRole.value.org_uuid,
+          displayText: activeRole.value.org_name,
+        }]
+      }
+
+      const orgOptionsData = await orgStorage.getOrganizations()
+      const orgOptions = orgOptionsData.data.map(org => {
+        return {
+          ...org,
+          value: org.uuid,
+          displayText: org.name,
+        }
+      })
+
+      return orgOptions
+    },
+
+    async fetchRoleOptions() {
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+
+      this.loading = true;
+      const { page, itemsPerPage } = this.options;
+      const params = {
+        page,
+        limit: itemsPerPage,
+        q: this.search,
+        sortOrder: '1',
+        sortField: 'name',
+      };
+
+      if (activeRole.value.role_name === 'Admin') {
+        params.org_uuid = activeRole.value.org_uuid
+        params.role_name = activeRole.value.role_name
+      }
+
+      if (this.search !== "") {
+        params.q = this.search;
+      }
+
+      const roleStorage = useRoleStorage()
+      const data = await roleStorage.getRoles(params)
+      const rolesData = data.data
+      const rolesOptions = rolesData.map(role => {
+        return {
+          ...role,
+          value: role.uuid,
+          displayText: role.name,
+        }
+      })
+
+      return rolesOptions
     },
 
     editItem(item) {
@@ -380,8 +503,7 @@ export default {
         this.alertType = respEdited.status
 
         if (respEdited.status == "success") {
-          const data = await userOrgStorage.getUserOrganizations(this.params)
-          this.users = data.data
+          this.fetchData()
           setTimeout(() => {
             this.dialog = false
             this.alertMessage = ''
@@ -393,11 +515,16 @@ export default {
           }, 700)
         }
       } else {
-        this.editedItem.org_uuid = this.activeRole.org_uuid;
+        const userStorage = useUserStorage()
+        const { activeRole } = storeToRefs(userStorage)
+
         this.loading = true
 
+        if (activeRole.value.role_name === 'Admin') {
+          this.editedItem.org_uuid = activeRole.value.org_uuid;
+        }
+
         const userOrgStorage = useUserOrganizationStorage()
-        this.editedItem.org_uuid = this.activeRole.org_uuid;
         const respEdited = await userOrgStorage.addAdminUserOrganization(this.editedItem)
 
         this.alertMessage = respEdited.message
@@ -405,8 +532,7 @@ export default {
         this.alertType = respEdited.status
 
         if (respEdited.status == "success") {
-          const data = await userOrgStorage.getUserOrganizations(this.params)
-          this.users = data.data
+          this.fetchData()
           setTimeout(() => {
             this.dialog = false
             this.alertMessage = ''
@@ -427,15 +553,12 @@ export default {
       const userStorage = useUserStorage()
       const respEdited = await userStorage.adminResetPassword(this.editedItem)
 
-      const userOrgStorage = useUserOrganizationStorage()
-
       this.alertMessage = respEdited.message
       this.hasAlert = true
       this.alertType = respEdited.status
 
       if (respEdited.status == "success") {
-        const data = await userOrgStorage.getUserOrganizations(this.params)
-        this.users = data.data
+        this.fetchData()
         setTimeout(() => {
           this.dialogResetPassword = false
           this.alertMessage = ''
@@ -453,9 +576,14 @@ export default {
     async saveAssignRole() {
       this.loading = true
 
-      const userOrgStorage = useUserOrganizationStorage()
-      this.editedItem.org_uuid = this.activeRole.org_uuid
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
 
+      if (activeRole.value.role_name === 'Admin') {
+        this.editedItem.org_uuid = activeRole.value.org_uuid;
+      }
+
+      const userOrgStorage = useUserOrganizationStorage()
       const respEdited = await userOrgStorage.adminAssignUserRoleOrganization(this.editedItem)
 
       this.alertMessage = respEdited.message
@@ -463,8 +591,7 @@ export default {
       this.alertType = respEdited.status
 
       if (respEdited.status == "success") {
-        const data = await userOrgStorage.getUserOrganizations(this.params)
-        this.users = data.data
+        this.fetchData()
         setTimeout(() => {
           this.dialogAssignRole = false
           this.alertMessage = ''
@@ -482,45 +609,10 @@ export default {
   },
 
   async mounted() {
-    const userStorage = useUserStorage()
-    const { activeRole } = storeToRefs(userStorage)
-
-    if (activeRole.value.role_name === 'Admin') {
-      this.params = {
-        org_uuid: activeRole.value.org_uuid,
-        role_name: activeRole.value.role_name,
-      }
-    }
-    this.activeRole = activeRole
-
-    const userOrgStorage = useUserOrganizationStorage()
-    const userOrgData = await userOrgStorage.getUserOrganizations(this.params)
-    this.users = userOrgData.data
-
-    const roleStorage = useRoleStorage()
-    const data = await roleStorage.getRoles(this.params)
-    const rolesData = data.data
-    const rolesOptions = rolesData.map(role => {
-      return {
-        ...role,
-        value: role.uuid,
-        displayText: role.name,
-      }
-    })
-
-    this.rolesOptions = rolesOptions
-
-    const userOptionsData = await userOrgStorage.getUserOrganizationOptions({
-      org_uuid: activeRole.value.org_uuid,
-    })
-    const userOptions = userOptionsData.data.map(user => {
-      return {
-        ...user,
-        value: user.uuid,
-        displayText: user.email
-      }
-    })
-    this.userOptions = userOptions
+    this.fetchData()
+    this.rolesOptions = await this.fetchRoleOptions()
+    this.userOptions = await this.fetchUserOrganizationOptions()
+    this.orgOptions = await this.fetchOrganizationOptions()
   }
 }
 </script>

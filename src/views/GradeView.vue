@@ -221,16 +221,7 @@ export default {
     },
   },
 
-  // created() {
-  // this.initialize()
-  // },
-
   methods: {
-    // async initialize() {
-    //   const gradeStorage = useGradeStorage()
-    //   const data = await gradeStorage.getGrades()
-    //   this.grades = data.data
-    // },
 
     async fetchData() {
       this.loading = true;
