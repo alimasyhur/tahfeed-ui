@@ -96,7 +96,7 @@
                 <v-icon icon="mdi-home-account" end></v-icon>
                 My Organization
               </v-col>
-              <v-col cols="9" v-if="(activeRole.role_name == 'Admin' || activeRole.role_name == 'Super Admin')">
+              <v-col cols="9" v-if="isSuperAdminOrAdmin()">
                 <v-btn v-if="(me.organization !== null)" small class="not-uppercase" flat
                   @click="openEditOrganization(me.organization)">
                   <v-icon color="info">mdi-pencil</v-icon>
@@ -245,7 +245,8 @@ import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue';
 
 const userStorage = useUserStorage()
-const { me, dialogProfile, activeRole } = storeToRefs(userStorage)
+const { me, dialogProfile } = storeToRefs(userStorage)
+const { isSuperAdminOrAdmin } = userStorage
 
 const organizationStorage = useOrganizationStorage()
 const { dialogOrganization } = storeToRefs(organizationStorage)

@@ -427,8 +427,6 @@ export default {
       const userStorage = useUserStorage()
       const respEdited = await userStorage.adminResetPassword(this.editedItem)
 
-      console.log('ini resp edit', respEdited)
-
       const userOrgStorage = useUserOrganizationStorage()
 
       this.alertMessage = respEdited.message
@@ -457,7 +455,7 @@ export default {
 
       const userOrgStorage = useUserOrganizationStorage()
       this.editedItem.org_uuid = this.activeRole.org_uuid
-      console.log('input', this.editedItem)
+
       const respEdited = await userOrgStorage.adminAssignUserRoleOrganization(this.editedItem)
 
       this.alertMessage = respEdited.message

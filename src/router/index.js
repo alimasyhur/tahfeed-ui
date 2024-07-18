@@ -7,6 +7,7 @@ import UserView from '@/views/UserView.vue'
 import { useUserStorage } from '@/stores/userStorage'
 import ProfileView from '@/views/ProfileView.vue'
 import OrganizationDetailView from '@/views/OrganizationDetailView.vue'
+import GradeView from '@/views/GradeView.vue'
 
 const routes = [
   {
@@ -53,6 +54,16 @@ const routes = [
       breadcrumb: 'Organization',
       requiresAuth: true,
       requireSuperAdmin: true
+    }
+  },
+  {
+    path: '/grade',
+    name: 'grade',
+    component: GradeView,
+    meta: {
+      breadcrumb: 'Grade',
+      requiresAuth: true,
+      requireSuperAdmin: false
     }
   },
   {

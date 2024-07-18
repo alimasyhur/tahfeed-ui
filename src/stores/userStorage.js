@@ -18,6 +18,22 @@ export const useUserStorage = defineStore('user', () => {
     localStorage.getItem('activeRole') ? JSON.parse(localStorage.getItem('activeRole')) : null
   )
 
+  const isSuperAdmin = ref(() => {
+    const activeRole = localStorage.getItem('activeRole')
+      ? JSON.parse(localStorage.getItem('activeRole'))
+      : null
+
+    return activeRole?.constant_value === 1
+  })
+
+  const isSuperAdminOrAdmin = ref(() => {
+    const activeRole = localStorage.getItem('activeRole')
+      ? JSON.parse(localStorage.getItem('activeRole'))
+      : null
+
+    return [1, 2].includes(activeRole?.constant_value)
+  })
+
   const dialog = ref(false)
   const dialogProfile = ref(false)
   const loading = ref(false)
@@ -328,6 +344,8 @@ export const useUserStorage = defineStore('user', () => {
     dialogProfile,
     closeDialogProfile,
     activeRole,
+    isSuperAdmin,
+    isSuperAdminOrAdmin,
     getUsers,
     adminResetPassword
   }

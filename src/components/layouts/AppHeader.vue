@@ -7,7 +7,7 @@
     <v-spacer></v-spacer>
     <v-btn :to="{ name: 'home' }" class="not-uppercase" v-if="(userStorage.currentUser == null)">Home</v-btn>
     <template v-slot:append v-if="userStorage.currentUser">
-      <b style="color: green">{{ activeRole.org_name }} <span>({{ activeRole.role_name }})</span></b>
+      <small><b style="color: green">{{ activeRole.org_name }} <span>({{ activeRole.role_name }})</span></b></small>
     </template>
     <v-btn target="#" class="not-uppercase ml-2" @click="openLogin()"
       v-if="(userStorage.currentUser == null)">Login</v-btn>
@@ -35,9 +35,7 @@ import InputLogin from '../forms/InputLogin.vue';
 
 const userStorage = useUserStorage()
 
-const { activeRole } = storeToRefs(userStorage)
-
-const { dialog } = storeToRefs(userStorage)
+const { dialog, activeRole } = storeToRefs(userStorage)
 
 const openLogin = () => {
   dialog.value = true
