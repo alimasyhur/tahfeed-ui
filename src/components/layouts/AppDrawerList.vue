@@ -6,20 +6,9 @@
         <v-divider></v-divider>
 
         <v-list density="compact" nav>
-            <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard" :to="{ name: 'dashboard' }"
-                value="dashboard"></v-list-item>
-            <div v-if="activeRole?.role_name !== null">
-                <v-list-item v-if="isSuperAdmin()" prepend-icon="mdi-home-group" title="Organization"
-                    :to="{ name: 'organization' }" value="organization"></v-list-item>
-                <v-list-item v-if="isSuperAdminOrAdmin()" prepend-icon="mdi-account-group-outline" title="User"
-                    :to="{ name: 'user' }" value="user"></v-list-item>
-                <v-list-item v-if="isSuperAdmin()" prepend-icon="mdi-cog-outline" title="Role" :to="{ name: 'role' }"
-                    value="role"></v-list-item>
-                <v-list-item v-if="isSuperAdminOrAdmin()" prepend-icon="mdi-star" title="Grade" :to="{ name: 'grade' }"
-                    value="grade"></v-list-item>
-                <v-list-item prepend-icon="mdi-account" title="My Profile" :to="{ name: 'profile' }"
-                    value="profile"></v-list-item>
-            </div>
+            <v-list-item v-for="(menu, idx) in menuDrawer" :key="idx" :prepend-icon="menu.icon" :title="menu.title"
+                :to="{ name: menu.toRoute }" :value="menu.toValue">
+            </v-list-item>
         </v-list>
 
         <template v-slot:append>
@@ -31,21 +20,84 @@
     </v-navigation-drawer>
 </template>
 
-
-<script setup>
+<script>
 import { useUserStorage } from '@/stores/userStorage'
 import { storeToRefs } from 'pinia';
-import { onMounted } from 'vue';
+import { reactive } from 'vue';
 
-const userStorage = useUserStorage()
+export default {
+    props: {
+        key: Number,
+    },
+    setup(props) {
+        console.log('wkwk props: ', props)
+        const userStorage = useUserStorage()
 
-const { isSuperAdmin, isSuperAdminOrAdmin } = userStorage
+        const { isSuperAdmin, isSuperAdminOrAdmin } = userStorage
 
-const { activeRole } = storeToRefs(userStorage)
+        const { activeRole } = storeToRefs(userStorage)
 
-const { logoutUser } = userStorage
+        const { logoutUser } = userStorage
 
-onMounted(() => {
-    userStorage.dataUser()
-})
+        let menuDrawerData = [
+            {
+                icon: 'mdi-view-dashboard',
+                title: 'Dashboard',
+                toRoute: 'dashboard',
+                toValue: 'dashboard',
+            }
+        ]
+
+        if (isSuperAdmin()) {
+            const adminMenuDrawerData = [{
+                icon: 'mdi-home-group',
+                title: 'Organization',
+                toRoute: 'organization',
+                toValue: 'organization',
+            },
+            {
+                icon: 'mdi-cog-outline',
+                title: 'Role',
+                toRoute: 'role',
+                toValue: 'role',
+            }]
+            menuDrawerData = menuDrawerData.concat(adminMenuDrawerData)
+        }
+
+        if (isSuperAdminOrAdmin()) {
+            const adminMenuDrawerData = [
+                {
+                    icon: 'mdi-account-group-outline',
+                    title: 'User',
+                    toRoute: 'user',
+                    toValue: 'user',
+                },
+                {
+                    icon: 'mdi-star',
+                    title: 'Grade',
+                    toRoute: 'grade',
+                    toValue: 'grade',
+                }]
+            menuDrawerData = menuDrawerData.concat(adminMenuDrawerData)
+        }
+
+        menuDrawerData = menuDrawerData.concat([{
+            icon: 'mdi-account',
+            title: 'My Profile',
+            toRoute: 'profile',
+            toValue: 'profile',
+        }])
+
+        const menuDrawer = reactive(menuDrawerData)
+
+        return {
+            userStorage,
+            isSuperAdmin,
+            isSuperAdminOrAdmin,
+            activeRole,
+            menuDrawer,
+            logoutUser,
+        }
+    }
+}
 </script>

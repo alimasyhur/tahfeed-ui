@@ -124,6 +124,8 @@
 
 <script>
 import { useGradeStorage } from '@/stores/gradeStorage';
+import { useUserStorage } from '@/stores/userStorage';
+import { storeToRefs } from 'pinia';
 
 export default {
   data: () => ({
@@ -225,6 +227,8 @@ export default {
 
     async fetchData() {
       this.loading = true;
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
       const { page, itemsPerPage } = this.options;
       const params = {
         page,
@@ -233,6 +237,12 @@ export default {
         sortOrder: '1',
         sortField: 'name',
       };
+
+      if (activeRole.value.role_name === 'Admin') {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid,
+        }
+      }
 
       if (this.search !== "") {
         params.q = this.search;

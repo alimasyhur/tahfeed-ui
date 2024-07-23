@@ -37,7 +37,10 @@ export const useUserStorage = defineStore('user', () => {
   const dialog = ref(false)
   const dialogProfile = ref(false)
   const loading = ref(false)
-  const me = ref()
+  const me = ref(
+    localStorage.getItem('profile') ? JSON.parse(localStorage.getItem('profile')) : null
+  )
+  const selectedRole = ref(localStorage.getItem('selectedRole') ?? 0)
   const users = ref(null)
   const alertMessage = ref('Terjadi Kesalahan')
   const hasAlert = ref(false)
@@ -69,29 +72,19 @@ export const useUserStorage = defineStore('user', () => {
       accessToken.value = data.access_token
       localStorage.setItem('access_token', accessToken.value)
 
-      const profile = await apiService.get('/users/me', {
-        headers: {
-          Authorization: `Bearer ${accessToken.value}`
-        }
-      })
-
-      const profileData = profile.data
-      currentUser.value = profileData.data
-      localStorage.setItem('profile', JSON.stringify(currentUser.value))
-      me.value = profileData.data
-
-      if (profileData.data.roles.length > 0) {
-        localStorage.setItem('activeRole', JSON.stringify(profileData.data.roles[0]))
-        activeRole.value = profileData.data.roles[0]
-      }
+      console.log('login response: ', accessToken.value)
 
       hasAlert.value = true
       alertType.value = 'success'
       alertMessage.value = data.message
 
+      console.log('calling dataUser: ')
+      await dataUser()
+
       setTimeout(() => {
         closeDialog()
       }, 500)
+
       router.push({ name: 'dashboard' })
     } catch (error) {
       const errMessage = error?.response?.data?.message ?? 'Terjadi Kesalahan'
@@ -249,10 +242,12 @@ export const useUserStorage = defineStore('user', () => {
 
   const dataUser = async () => {
     try {
-      if (accessToken.value !== null) {
+      const token = localStorage.getItem('access_token')
+      console.log('dataUser token: ', token)
+      if (token !== null) {
         const profile = await apiService.get('/users/me', {
           headers: {
-            Authorization: `Bearer ${accessToken.value}`
+            Authorization: `Bearer ${token}`
           }
         })
 
@@ -262,8 +257,11 @@ export const useUserStorage = defineStore('user', () => {
         me.value = profileData.data
 
         if (profileData.data.roles.length > 0) {
-          localStorage.setItem('activeRole', JSON.stringify(profileData.data.roles[0]))
-          activeRole.value = profileData.data.roles[0]
+          console.log('wkwk selectedRole: ', selectedRole.value)
+
+          const roleData = profileData.data.roles[selectedRole.value]
+          localStorage.setItem('activeRole', JSON.stringify(roleData))
+          activeRole.value = roleData
         }
       } else {
         accessToken.value = null
@@ -347,6 +345,7 @@ export const useUserStorage = defineStore('user', () => {
     isSuperAdmin,
     isSuperAdminOrAdmin,
     getUsers,
-    adminResetPassword
+    adminResetPassword,
+    selectedRole
   }
 })
