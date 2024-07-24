@@ -40,7 +40,7 @@ export const useUserStorage = defineStore('user', () => {
   const me = ref(
     localStorage.getItem('profile') ? JSON.parse(localStorage.getItem('profile')) : null
   )
-  const selectedRole = ref(localStorage.getItem('selectedRole') ?? 0)
+  const selectedRole = ref(0)
   const users = ref(null)
   const alertMessage = ref('Terjadi Kesalahan')
   const hasAlert = ref(false)
@@ -114,16 +114,18 @@ export const useUserStorage = defineStore('user', () => {
       currentUser.value = null
       me.value = null
       activeRole.value = null
-      localStorage.setItem('access_token', null)
-      localStorage.setItem('profile', null)
-      localStorage.setItem('activeRole', null)
+      // localStorage.setItem('access_token', null)
+      // localStorage.setItem('profile', null)
+      // localStorage.setItem('activeRole', null)
+      localStorage.clear()
     } catch (error) {
       accessToken.value = null
       currentUser.value = null
       me.value = null
-      localStorage.setItem('access_token', null)
-      localStorage.setItem('profile', null)
-      localStorage.setItem('activeRole', null)
+      // localStorage.setItem('access_token', null)
+      // localStorage.setItem('profile', null)
+      // localStorage.setItem('activeRole', null)
+      localStorage.clear()
     }
 
     router.push({ name: 'home' })

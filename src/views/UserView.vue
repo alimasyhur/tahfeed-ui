@@ -62,8 +62,8 @@
                             label="Password" type="password" :loading="loading" clearable></v-text-field>
                           <v-select v-model="editedItem.role_uuid" :items="rolesOptions" item-title="displayText"
                             item-value="value" label="Select Role"></v-select>
-                          <v-select v-model="editedItem.org_uuid" :items="orgOptions" item-title="displayText"
-                            item-value="value" label="Select Organization"></v-select>
+                          <v-select v-if="isSuperAdminRole" v-model="editedItem.org_uuid" :items="orgOptions"
+                            item-title="displayText" item-value="value" label="Select Organization"></v-select>
                           <v-select v-model="editedItem.is_confirmed" :items="statusConfirmationOptions"
                             item-title="displayText" item-value="value" label="Select status confirmation"></v-select>
                           <v-select v-model="editedItem.is_active" :items="statusActiveOptions" item-title="displayText"
@@ -136,8 +136,8 @@
                             item-value="value" label="Select Email"></v-select>
                           <v-select v-model="editedItem.role_uuid" :items="rolesOptions" item-title="displayText"
                             item-value="value" label="Select Role"></v-select>
-                          <v-select v-model="editedItem.org_uuid" :items="orgOptions" item-title="displayText"
-                            item-value="value" label="Select Organization"></v-select>
+                          <v-select v-if="isSuperAdminRole" v-model="editedItem.org_uuid" :items="orgOptions"
+                            item-title="displayText" item-value="value" label="Select Organization"></v-select>
                         </v-col>
                       </v-row>
                       <v-row>
@@ -283,6 +283,7 @@ export default {
       page: 1,
       itemsPerPage: 10,
     },
+    isSuperAdminRole: false,
     loading: false,
     alertMessage: 'Terjadi Kesalahan',
     hasAlert: false,
@@ -332,10 +333,14 @@ export default {
   methods: {
 
     async fetchData() {
-      this.loading = true;
-
       const userStorage = useUserStorage()
       const { activeRole } = storeToRefs(userStorage)
+
+      this.loading = true;
+
+      if (activeRole.value.constant_value === 1) {
+        this.isSuperAdminRole = true
+      }
 
       const { page, itemsPerPage } = this.options;
       const params = {
@@ -494,6 +499,15 @@ export default {
     },
 
     async save() {
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+
+      this.loading = true
+
+      if (activeRole.value.constant_value === 2) {
+        this.editedItem.org_uuid = activeRole.value.org_uuid;
+      }
+
       if (this.editedIndex > -1) {
         this.loading = true
 
@@ -517,14 +531,7 @@ export default {
           }, 700)
         }
       } else {
-        const userStorage = useUserStorage()
-        const { activeRole } = storeToRefs(userStorage)
-
         this.loading = true
-
-        if (activeRole.value.role_name === 'Admin') {
-          this.editedItem.org_uuid = activeRole.value.org_uuid;
-        }
 
         const userOrgStorage = useUserOrganizationStorage()
         const respEdited = await userOrgStorage.addAdminUserOrganization(this.editedItem)

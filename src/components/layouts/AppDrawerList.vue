@@ -32,7 +32,6 @@ export default {
     setup(props) {
         console.log('wkwk props: ', props)
         const userStorage = useUserStorage()
-
         const { isSuperAdmin, isSuperAdminOrAdmin } = userStorage
 
         const { activeRole } = storeToRefs(userStorage)

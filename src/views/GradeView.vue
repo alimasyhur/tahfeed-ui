@@ -50,6 +50,10 @@
                           <v-text-field v-model="editedItem.period" :rules="required" label="Tahun Angkatan" type="text"
                             :loading="loading" clearable></v-text-field>
                         </v-col>
+                        <v-col cols="12" v-if="isSuperAdminRole">
+                          <v-select v-model="editedItem.org_uuid" :items="orgOptions" item-title="displayText"
+                            item-value="value" label="Select Organization"></v-select>
+                        </v-col>
                       </v-row>
                       <v-row>
                         <v-col>
@@ -126,6 +130,7 @@
 import { useGradeStorage } from '@/stores/gradeStorage';
 import { useUserStorage } from '@/stores/userStorage';
 import { storeToRefs } from 'pinia';
+import { useOrganizationStorage } from '@/stores/organizationStorage';
 
 export default {
   data: () => ({
@@ -182,6 +187,8 @@ export default {
       page: 1,
       itemsPerPage: 10,
     },
+    isSuperAdminRole: false,
+    orgOptions: [],
     loading: false,
     alertMessage: 'Terjadi Kesalahan',
     hasAlert: false,
@@ -229,6 +236,7 @@ export default {
       this.loading = true;
       const userStorage = useUserStorage()
       const { activeRole } = storeToRefs(userStorage)
+      const { isSuperAdmin } = userStorage
       const { page, itemsPerPage } = this.options;
       const params = {
         page,
@@ -238,7 +246,9 @@ export default {
         sortField: 'name',
       };
 
-      if (activeRole.value.role_name === 'Admin') {
+      this.isSuperAdminRole = isSuperAdmin(activeRole.value)
+
+      if (activeRole.value.constant_value === 2) {
         params.filter = {
           org_uuid: activeRole.value.org_uuid,
         }
@@ -254,6 +264,30 @@ export default {
       this.grades = data.data
       this.totalItems = data.data.total
       this.loading = false
+    },
+
+    async fetchOrganizationOptions() {
+      const orgStorage = useOrganizationStorage()
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+
+      if (activeRole.value.constant_value === 2) {
+        return [{
+          value: activeRole.value.org_uuid,
+          displayText: activeRole.value.org_name,
+        }]
+      }
+
+      const orgOptionsData = await orgStorage.getOrganizations()
+      const orgOptions = orgOptionsData.data.map(org => {
+        return {
+          ...org,
+          value: org.uuid,
+          displayText: org.name,
+        }
+      })
+
+      return orgOptions
     },
 
     editItem(item) {
@@ -310,6 +344,14 @@ export default {
     },
 
     async save() {
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+      const { isAdmin } = userStorage
+
+      if (isAdmin(activeRole.value)) {
+        this.editedItem.org_uuid = activeRole.value.org_uuid
+      }
+
       if (this.editedIndex > -1) {
         this.loading = true
         const gradeStorage = useGradeStorage()
@@ -362,6 +404,7 @@ export default {
   },
   async mounted() {
     this.fetchData()
+    this.orgOptions = await this.fetchOrganizationOptions()
   }
 }
 </script>

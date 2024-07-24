@@ -82,13 +82,12 @@ export const useGradeStorage = defineStore('grade', () => {
 
   const editGrade = async (inputGrade) => {
     try {
-      const orgUUID = userStorage.activeRole.org_uuid
       const { data } = await apiService.patch(
         `grades/${inputGrade.uuid}`,
         {
           name: inputGrade.name,
           description: inputGrade.description,
-          org_uuid: orgUUID,
+          org_uuid: inputGrade.org_uuid,
           period: inputGrade.period
         },
         {

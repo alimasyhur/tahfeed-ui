@@ -9,17 +9,6 @@
   </v-app>
 </template>
 
-<!-- <script setup>
-import { RouterView } from "vue-router"
-import Header from "./components/layouts/AppHeader.vue"
-import Sidebar from "./components/layouts/AppDrawerList.vue"
-import Footer from "./components/layouts/AppFooter.vue"
-import { ref } from "vue";
-
-const rail = ref(false)
-const drawer = ref(true)
-</script> -->
-
 <script>
 import { RouterView } from "vue-router"
 import AppHeader from "./components/layouts/AppHeader.vue"
