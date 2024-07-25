@@ -51,59 +51,76 @@
   </v-dialog>
 </template>
 
-<script>
+<script setup>
 import { useUserStorage } from '@/stores/userStorage';
 import { storeToRefs } from 'pinia'
-import { onMounted, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router'
+import { onBeforeMount, onMounted, onUnmounted, ref } from 'vue';
+import eventBus from "@/stores/eventBus"
+// import { useRouter } from 'vue-router';
 
 import InputLogin from '../forms/InputLogin.vue';
+// const router = useRouter()
 
-export default {
-  components: {
-    InputLogin,
-  },
-  setup(props, { emit }) {
-    const userStorage = useUserStorage()
-    const router = useRouter()
+const userStorage = useUserStorage()
 
-    const { dialog, activeRole, me, selectedRole } = storeToRefs(userStorage)
+const { getMenu, setSelectedRole } = userStorage
 
-    const openLogin = () => {
-      dialog.value = true
-    }
+const { dialog, selectedRole, activeRole, me } = storeToRefs(userStorage)
 
-    const menu = ref(false)
-    console.log('header activeRole: ', activeRole.value)
-
-    const myRoleList = reactive(me?.value?.roles)
-
-    const handleSwitchRole = (idx) => {
-      selectedRole.value = idx
-      const changedRole = myRoleList[idx]
-      activeRole.value.org_name = changedRole.org_name
-      activeRole.value.role_name = changedRole.role_name
-      console.log('emit clicked')
-      localStorage.setItem('activeRole', JSON.stringify(changedRole))
-      emit('dataUpdated', activeRole.value);
-      router.push({ name: 'dashboard' })
-    };
-
-    onMounted(() => {
-      userStorage.dataUser()
-    })
-
-    return {
-      userStorage,
-      openLogin,
-      menu,
-      myRoleList,
-      dialog,
-      me,
-      activeRole,
-      handleSwitchRole,
-    }
-  }
+const openLogin = () => {
+  dialog.value = true
 }
+
+const menu = ref(false)
+
+const myRoleList = ref({})
+const listMenu = ref({})
+
+const handleSwitchRole = (idx) => {
+  selectedRole.value = idx
+  setSelectedRole(idx)
+  const changedRole = myRoleList.value[idx]
+  activeRole.value = changedRole
+  localStorage.setItem('activeRole', JSON.stringify(changedRole))
+  listMenu.value = getMenu(activeRole.value)
+  const newData = {
+    activeRole: changedRole,
+    listMenu: listMenu.value,
+    myRoleList
+  }
+
+  eventBus.emit('dataSwitchRole', newData)
+};
+
+const updateUserData = (userData) => {
+  activeRole.value = userData.activeRole
+  myRoleList.value = userData.myRoleList
+  listMenu.value = getMenu(userData.activeRole)
+};
+
+onMounted(() => {
+  if (userStorage?.accessToken !== 'null') {
+    userStorage.dataUser()
+    const myActiveRole = activeRole.value
+    const listMenu = getMenu(myActiveRole)
+    myRoleList.value = me?.value.roles
+    const initData = {
+      activeRole: myActiveRole,
+      myRoleList: myRoleList.value,
+      listMenu
+    }
+
+    eventBus.emit('dataSwitchRole', initData);
+  }
+})
+
+onBeforeMount(() => {
+  eventBus.on('dataUpdated', updateUserData);
+})
+
+onUnmounted(() => {
+  eventBus.off('dataSwitchRole', updateUserData);
+  eventBus.off('dataUpdated', updateUserData);
+})
 
 </script>

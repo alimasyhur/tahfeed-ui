@@ -1,8 +1,8 @@
 <template>
   <v-app ref="app" class="rounded rounded-md">
-    <AppHeader @dataUpdated="onDataUpdated" />
+    <AppHeader />
     <v-main class="bg-grey-lighten-4" style="min-height: 600px;">
-      <Sidebar v-model="drawer" :rail="rail" :key="drawerKey" />
+      <Sidebar v-model="drawer" :rail="rail" />
       <RouterView />
     </v-main>
     <AppFooter />
@@ -25,20 +25,16 @@ export default {
   },
   setup() {
     const drawerKey = ref(0);
-
-    const onDataUpdated = (newData) => {
-      console.log('wkwk newData: ', newData)
-      drawerKey.value += 1;
-    };
+    const newData = ref({})
 
     const rail = ref(false)
     const drawer = ref(true)
 
     return {
       drawerKey,
-      onDataUpdated,
       rail,
       drawer,
+      newData
     };
   },
 };

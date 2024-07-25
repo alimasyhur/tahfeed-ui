@@ -18,13 +18,15 @@ export const useUserStorage = defineStore('user', () => {
     localStorage.getItem('activeRole') ? JSON.parse(localStorage.getItem('activeRole')) : null
   )
 
-  const isSuperAdmin = ref(() => {
-    const activeRole = localStorage.getItem('activeRole')
-      ? JSON.parse(localStorage.getItem('activeRole'))
-      : null
+  const selectedRole = ref(localStorage.getItem('selectedRole') ?? 0)
 
+  const setSelectedRole = (selectedRole) => {
+    localStorage.setItem('selectedRole', selectedRole)
+  }
+
+  const isSuperAdmin = (activeRole) => {
     return activeRole?.constant_value === 1
-  })
+  }
 
   const isSuperAdminOrAdmin = ref(() => {
     const activeRole = localStorage.getItem('activeRole')
@@ -40,7 +42,7 @@ export const useUserStorage = defineStore('user', () => {
   const me = ref(
     localStorage.getItem('profile') ? JSON.parse(localStorage.getItem('profile')) : null
   )
-  const selectedRole = ref(0)
+
   const users = ref(null)
   const alertMessage = ref('Terjadi Kesalahan')
   const hasAlert = ref(false)
@@ -60,6 +62,64 @@ export const useUserStorage = defineStore('user', () => {
     alertType.value = 'error'
   }
 
+  const getMenu = (actRole) => {
+    let menuDrawerData = [
+      {
+        icon: 'mdi-view-dashboard',
+        title: 'Dashboard',
+        toRoute: 'dashboard',
+        toValue: 'dashboard'
+      }
+    ]
+
+    if (actRole?.constant_value === 1) {
+      const adminMenuDrawerData = [
+        {
+          icon: 'mdi-home-group',
+          title: 'Organization',
+          toRoute: 'organization',
+          toValue: 'organization'
+        },
+        {
+          icon: 'mdi-cog-outline',
+          title: 'Role',
+          toRoute: 'role',
+          toValue: 'role'
+        }
+      ]
+      menuDrawerData = menuDrawerData.concat(adminMenuDrawerData)
+    }
+
+    if ([1, 2].includes(actRole?.constant_value)) {
+      const adminMenuDrawerData = [
+        {
+          icon: 'mdi-account-group-outline',
+          title: 'User',
+          toRoute: 'user',
+          toValue: 'user'
+        },
+        {
+          icon: 'mdi-star',
+          title: 'Grade',
+          toRoute: 'grade',
+          toValue: 'grade'
+        }
+      ]
+      menuDrawerData = menuDrawerData.concat(adminMenuDrawerData)
+    }
+
+    menuDrawerData = menuDrawerData.concat([
+      {
+        icon: 'mdi-account',
+        title: 'My Profile',
+        toRoute: 'profile',
+        toValue: 'profile'
+      }
+    ])
+
+    return menuDrawerData
+  }
+
   const loginUser = async (inputUser) => {
     hasAlert.value = false
     loading.value = true
@@ -72,13 +132,11 @@ export const useUserStorage = defineStore('user', () => {
       accessToken.value = data.access_token
       localStorage.setItem('access_token', accessToken.value)
 
-      console.log('login response: ', accessToken.value)
-
       hasAlert.value = true
       alertType.value = 'success'
       alertMessage.value = data.message
 
-      console.log('calling dataUser: ')
+      setSelectedRole(0)
       await dataUser()
 
       setTimeout(() => {
@@ -86,6 +144,7 @@ export const useUserStorage = defineStore('user', () => {
       }, 500)
 
       router.push({ name: 'dashboard' })
+      return
     } catch (error) {
       const errMessage = error?.response?.data?.message ?? 'Terjadi Kesalahan'
       hasAlert.value = true
@@ -94,6 +153,7 @@ export const useUserStorage = defineStore('user', () => {
     }
 
     loading.value = false
+    return
   }
 
   const logoutUser = async () => {
@@ -114,6 +174,7 @@ export const useUserStorage = defineStore('user', () => {
       currentUser.value = null
       me.value = null
       activeRole.value = null
+      selectedRole.value = 0
       // localStorage.setItem('access_token', null)
       // localStorage.setItem('profile', null)
       // localStorage.setItem('activeRole', null)
@@ -122,6 +183,8 @@ export const useUserStorage = defineStore('user', () => {
       accessToken.value = null
       currentUser.value = null
       me.value = null
+      activeRole.value = null
+      selectedRole.value = 0
       // localStorage.setItem('access_token', null)
       // localStorage.setItem('profile', null)
       // localStorage.setItem('activeRole', null)
@@ -245,7 +308,6 @@ export const useUserStorage = defineStore('user', () => {
   const dataUser = async () => {
     try {
       const token = localStorage.getItem('access_token')
-      console.log('dataUser token: ', token)
       if (token !== null) {
         const profile = await apiService.get('/users/me', {
           headers: {
@@ -259,8 +321,6 @@ export const useUserStorage = defineStore('user', () => {
         me.value = profileData.data
 
         if (profileData.data.roles.length > 0) {
-          console.log('wkwk selectedRole: ', selectedRole.value)
-
           const roleData = profileData.data.roles[selectedRole.value]
           localStorage.setItem('activeRole', JSON.stringify(roleData))
           activeRole.value = roleData
@@ -348,6 +408,8 @@ export const useUserStorage = defineStore('user', () => {
     isSuperAdminOrAdmin,
     getUsers,
     adminResetPassword,
-    selectedRole
+    selectedRole,
+    getMenu,
+    setSelectedRole
   }
 })

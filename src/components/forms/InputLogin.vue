@@ -32,10 +32,11 @@
 import { ref, reactive } from "vue";
 import { useUserStorage } from "@/stores/userStorage";
 import { storeToRefs } from "pinia";
+import eventBus from "@/stores/eventBus"
 
 const userStorage = useUserStorage()
 
-const { loginUser, closeDialog } = userStorage
+const { loginUser, closeDialog, getMenu } = userStorage
 
 const form = ref(false)
 
@@ -45,10 +46,25 @@ const user = reactive({
   password: null,
 })
 
-const { loading, hasAlert, alertMessage, alertType } = storeToRefs(userStorage)
+const { loading, hasAlert, alertMessage, alertType, me, activeRole, selectedRole } = storeToRefs(userStorage)
 
 const onSubmit = () => {
-  loginUser(user)
+  loginUser(user).then(() => {
+    const myRoleList = me?.value?.roles
+    const changedRole = myRoleList[selectedRole.value]
+
+    activeRole.value = changedRole
+
+    const listMenu = getMenu(changedRole)
+
+    const newData = {
+      activeRole: changedRole,
+      listMenu,
+      myRoleList
+    }
+
+    eventBus.emit('dataUpdated', newData);
+  })
 }
 
 const required = (v) => {
