@@ -320,8 +320,5 @@ export default {
       this.loading = false
     },
   },
-  async mounted() {
-    this.fetchData()
-  }
 }
 </script>

@@ -103,6 +103,18 @@ export const useUserStorage = defineStore('user', () => {
           title: 'Grade',
           toRoute: 'grade',
           toValue: 'grade'
+        },
+        {
+          icon: 'mdi-human',
+          title: 'Teacher',
+          toRoute: 'teacher',
+          toValue: 'teacher'
+        },
+        {
+          icon: 'mdi-human-male-board-poll',
+          title: 'Class',
+          toRoute: 'kelas',
+          toValue: 'kelas'
         }
       ]
       menuDrawerData = menuDrawerData.concat(adminMenuDrawerData)

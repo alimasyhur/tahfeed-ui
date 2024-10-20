@@ -19,15 +19,15 @@
 
     <v-row>
 
-      <v-data-table :headers="headers" :search="search" :items="grades" :items-length="totalItems" :loading="loading"
+      <v-data-table :headers="headers" :search="search" :items="teachers" :items-length="totalItems" :loading="loading"
         v-model:options="options" @update:options="fetchData" :sort-by="[{ key: 'calories', order: 'asc' }]">
         <template v-slot:top>
           <v-toolbar flat>
-            <v-toolbar-title>List Grades</v-toolbar-title>
+            <v-toolbar-title>List Teachers</v-toolbar-title>
             <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
               <template v-slot:activator="{ props }">
                 <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="small">
-                  <v-icon>mdi-plus</v-icon> New Grade
+                  <v-icon>mdi-plus</v-icon> New Teacher
                 </v-btn>
               </template>
               <v-card>
@@ -39,16 +39,32 @@
                     <v-form v-model="form" @submit.prevent="save">
                       <v-row>
                         <v-col cols="12">
-                          <v-text-field v-model="editedItem.name" :rules="required" label="Name" type="text"
+                          <v-text-field v-model="editedItem.nik" :rules="required" label="NIK" type="text"
                             :loading="loading" clearable></v-text-field>
                         </v-col>
                         <v-col cols="12">
-                          <v-text-field v-model="editedItem.description" :rules="required" label="Description"
-                            type="text" :loading="loading" clearable></v-text-field>
+                          <v-text-field v-model="editedItem.firstname" :rules="required" label="First Name" type="text"
+                            :loading="loading" clearable></v-text-field>
                         </v-col>
                         <v-col cols="12">
-                          <v-text-field v-model="editedItem.period" :rules="required" label="Tahun Angkatan" type="text"
+                          <v-text-field v-model="editedItem.lastname" :rules="required" label="Last Name" type="text"
                             :loading="loading" clearable></v-text-field>
+                        </v-col>
+                        <v-col cols="12">
+                          <v-text-field v-model="editedItem.birthdate" :rules="required" label="Birthdate" type="text"
+                            :loading="loading" clearable></v-text-field>
+                        </v-col>
+                        <v-col cols="12">
+                          <v-text-field v-model="editedItem.phone" :rules="required" label="Phone" type="text"
+                            :loading="loading" clearable></v-text-field>
+                        </v-col>
+                        <v-col cols="12">
+                          <v-text-field v-model="editedItem.bio" :rules="required" label="Bio" type="text"
+                            :loading="loading" clearable></v-text-field>
+                        </v-col>
+                        <v-col cols="12">
+                          <v-select v-model="editedItem.user_uuid" :items="userOptions" item-title="displayText"
+                            item-value="value" label="Select User"></v-select>
                         </v-col>
                         <v-col cols="12" v-if="isSuperAdminRole">
                           <v-select v-model="editedItem.org_uuid" :items="orgOptions" item-title="displayText"
@@ -81,7 +97,7 @@
                     <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
                       closable close-label="Close Alert"></v-alert>
                     <v-form v-model="form" @submit.prevent="deleteItemConfirm">
-                      <p class="ma-6">Apakah Anda yakin Menghapus Grade <b>{{ editedItem.name }}</b>?</p>
+                      <p class="ma-6">Apakah Anda yakin Menghapus Teacher <b>{{ editedItem.name }}</b>?</p>
                       <v-row>
                         <v-col>
                           <v-btn color="success" size="large" type="submit" variant="elevated" block>
@@ -127,10 +143,11 @@
 </template>
 
 <script>
-import { useGradeStorage } from '@/stores/gradeStorage';
+import { useTeacherStorage } from '@/stores/teacherStorage';
 import { useUserStorage } from '@/stores/userStorage';
 import { storeToRefs } from 'pinia';
 import { useOrganizationStorage } from '@/stores/organizationStorage';
+import { useUserOrganizationStorage } from '@/stores/userOrganizationStorage';
 
 export default {
   data: () => ({
@@ -138,17 +155,25 @@ export default {
     dialogDelete: false,
     headers: [
       {
-        title: 'Name',
+        title: 'NIK',
         align: 'start',
-        key: 'name',
+        key: 'nik',
       },
       {
-        title: 'Description',
-        key: 'description',
+        title: 'First Name',
+        key: 'firstname',
       },
       {
-        title: 'Period',
-        key: 'period',
+        title: 'Last Name',
+        key: 'lastname',
+      },
+      {
+        title: 'Birthdate',
+        key: 'birthdate',
+      },
+      {
+        title: 'Phone',
+        key: 'phone',
       },
       {
         title: 'Organization',
@@ -158,28 +183,36 @@ export default {
     ],
     breadcrumbsItems: [
       {
-        title: 'Grades',
+        title: 'Teachers',
         disabled: true,
-        href: 'grade',
+        href: 'teacher',
       }
     ],
-    grades: [],
+    teachers: [],
     editedIndex: -1,
     editedItem: {
       uuid: '',
-      name: '',
-      description: '',
+      user_uuid: '',
       org_uuid: '',
       org_name: '',
-      period: '',
+      nik: '',
+      firstname: '',
+      lastname: '',
+      birthdate: '',
+      phone: '',
+      bio: '',
     },
     defaultItem: {
       uuid: '',
-      name: '',
-      description: '',
+      user_uuid: '',
       org_uuid: '',
       org_name: '',
-      period: '',
+      nik: '',
+      firstname: '',
+      lastname: '',
+      birthdate: '',
+      phone: '',
+      bio: '',
     },
     search: '',
     totalItems: 0,
@@ -189,6 +222,7 @@ export default {
     },
     isSuperAdminRole: false,
     orgOptions: [],
+    userOptions: [],
     loading: false,
     alertMessage: 'Terjadi Kesalahan',
     hasAlert: false,
@@ -201,14 +235,14 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'New Grade' : 'Edit Grade'
+      return this.editedIndex === -1 ? 'New Teacher' : 'Edit Teacher'
     },
     validForm() {
       return this.$refs.form.$valid;
     },
     filteredItems() {
-      return this.grades.filter(grade =>
-        Object.values(grade).some(val =>
+      return this.teachers.filter(teacher =>
+        Object.values(teacher).some(val =>
           val.toString().toLowerCase().includes(this.search.toLowerCase())
         )
       );
@@ -218,6 +252,8 @@ export default {
   watch: {
     async dialog(val) {
       this.orgOptions = await this.fetchOrganizationOptions()
+      this.userOptions = await this.fetchUserOrganizationOptions()
+
       return val || this.close()
     },
     dialogDelete(val) {
@@ -244,7 +280,7 @@ export default {
         limit: itemsPerPage,
         q: this.search,
         sortOrder: '1',
-        sortField: 'name',
+        sortField: 'firstname',
       };
 
       this.isSuperAdminRole = isSuperAdmin(activeRole.value)
@@ -259,10 +295,10 @@ export default {
         params.q = this.search;
       }
 
-      const gradeStorage = useGradeStorage()
-      const data = await gradeStorage.getGrades(params)
+      const teacherStorage = useTeacherStorage()
+      const data = await teacherStorage.getTeachers(params)
 
-      this.grades = data.data
+      this.teachers = data.data
       this.totalItems = data.data.total
       this.loading = false
     },
@@ -291,21 +327,43 @@ export default {
       return orgOptions
     },
 
+    async fetchUserOrganizationOptions() {
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+      const userOrgStorage = useUserOrganizationStorage()
+
+      const params = {}
+      if (activeRole.value.role_name === 'Admin') {
+        params.org_uuid = activeRole.value.org_uuid
+      }
+
+      const userOptionsData = await userOrgStorage.getUserOrganizationOptions(params)
+      const userOptions = userOptionsData.data.map(user => {
+        return {
+          ...user,
+          value: user.uuid,
+          displayText: `${user.email} (${user.name})`
+        }
+      })
+
+      return userOptions
+    },
+
     editItem(item) {
-      this.editedIndex = this.grades.indexOf(item)
+      this.editedIndex = this.teachers.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
 
     deleteItem(item) {
-      this.editedIndex = this.grades.indexOf(item)
+      this.editedIndex = this.teachers.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
     },
 
     async deleteItemConfirm() {
-      const gradeStorage = useGradeStorage()
-      const respDelete = await gradeStorage.removeGrade(this.editedItem)
+      const teacherStorage = useTeacherStorage()
+      const respDelete = await teacherStorage.removeTeacher(this.editedItem)
 
       this.alertMessage = respDelete.message
       this.hasAlert = true
@@ -355,8 +413,8 @@ export default {
 
       if (this.editedIndex > -1) {
         this.loading = true
-        const gradeStorage = useGradeStorage()
-        const respEdited = await gradeStorage.editGrade(this.editedItem)
+        const teacherStorage = useTeacherStorage()
+        const respEdited = await teacherStorage.editTeacher(this.editedItem)
 
         this.alertMessage = respEdited.message
         this.hasAlert = true
@@ -377,8 +435,8 @@ export default {
         }
       } else {
         this.loading = true
-        const gradeStorage = useGradeStorage()
-        const respEdited = await gradeStorage.addGrade(this.editedItem)
+        const teacherStorage = useTeacherStorage()
+        const respEdited = await teacherStorage.addTeacher(this.editedItem)
 
         this.alertMessage = respEdited.message
         this.hasAlert = true
@@ -404,7 +462,6 @@ export default {
     },
   },
   async mounted() {
-
   }
 }
 </script>

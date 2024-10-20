@@ -19,15 +19,15 @@
 
     <v-row>
 
-      <v-data-table :headers="headers" :search="search" :items="grades" :items-length="totalItems" :loading="loading"
+      <v-data-table :headers="headers" :search="search" :items="kelases" :items-length="totalItems" :loading="loading"
         v-model:options="options" @update:options="fetchData" :sort-by="[{ key: 'calories', order: 'asc' }]">
         <template v-slot:top>
           <v-toolbar flat>
-            <v-toolbar-title>List Grades</v-toolbar-title>
+            <v-toolbar-title>List Kelas</v-toolbar-title>
             <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
               <template v-slot:activator="{ props }">
                 <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="small">
-                  <v-icon>mdi-plus</v-icon> New Grade
+                  <v-icon>mdi-plus</v-icon> New Kelas
                 </v-btn>
               </template>
               <v-card>
@@ -47,12 +47,16 @@
                             type="text" :loading="loading" clearable></v-text-field>
                         </v-col>
                         <v-col cols="12">
-                          <v-text-field v-model="editedItem.period" :rules="required" label="Tahun Angkatan" type="text"
-                            :loading="loading" clearable></v-text-field>
+                          <v-select v-model="editedItem.teacher_uuid" :items="teacherOptions" item-title="displayText"
+                            item-value="value" label="Select Teacher"></v-select>
                         </v-col>
                         <v-col cols="12" v-if="isSuperAdminRole">
                           <v-select v-model="editedItem.org_uuid" :items="orgOptions" item-title="displayText"
                             item-value="value" label="Select Organization"></v-select>
+                        </v-col>
+                        <v-col cols="12">
+                          <v-select v-model="editedItem.grade_uuid" :items="gradeOptions" item-title="displayText"
+                            item-value="value" label="Select Grade"></v-select>
                         </v-col>
                       </v-row>
                       <v-row>
@@ -81,7 +85,7 @@
                     <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
                       closable close-label="Close Alert"></v-alert>
                     <v-form v-model="form" @submit.prevent="deleteItemConfirm">
-                      <p class="ma-6">Apakah Anda yakin Menghapus Grade <b>{{ editedItem.name }}</b>?</p>
+                      <p class="ma-6">Apakah Anda yakin Menghapus Kelas <b>{{ editedItem.name }}</b>?</p>
                       <v-row>
                         <v-col>
                           <v-btn color="success" size="large" type="submit" variant="elevated" block>
@@ -127,10 +131,12 @@
 </template>
 
 <script>
-import { useGradeStorage } from '@/stores/gradeStorage';
+import { useTeacherStorage } from '@/stores/teacherStorage';
+import { useKelasStorage } from '@/stores/kelasStorage';
 import { useUserStorage } from '@/stores/userStorage';
 import { storeToRefs } from 'pinia';
 import { useOrganizationStorage } from '@/stores/organizationStorage';
+import { useGradeStorage } from '@/stores/gradeStorage';
 
 export default {
   data: () => ({
@@ -158,12 +164,12 @@ export default {
     ],
     breadcrumbsItems: [
       {
-        title: 'Grades',
+        title: 'Kelas',
         disabled: true,
-        href: 'grade',
+        href: 'kelas',
       }
     ],
-    grades: [],
+    kelases: [],
     editedIndex: -1,
     editedItem: {
       uuid: '',
@@ -189,6 +195,8 @@ export default {
     },
     isSuperAdminRole: false,
     orgOptions: [],
+    gradeOptions: [],
+    teacherOptions: [],
     loading: false,
     alertMessage: 'Terjadi Kesalahan',
     hasAlert: false,
@@ -201,14 +209,14 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'New Grade' : 'Edit Grade'
+      return this.editedIndex === -1 ? 'New Kelas' : 'Edit Kelas'
     },
     validForm() {
       return this.$refs.form.$valid;
     },
     filteredItems() {
-      return this.grades.filter(grade =>
-        Object.values(grade).some(val =>
+      return this.kelases.filter(kelas =>
+        Object.values(kelas).some(val =>
           val.toString().toLowerCase().includes(this.search.toLowerCase())
         )
       );
@@ -218,13 +226,16 @@ export default {
   watch: {
     async dialog(val) {
       this.orgOptions = await this.fetchOrganizationOptions()
+      this.gradeOptions = await this.fetchGradeOptions()
+      this.teacherOptions = await this.fetchTeacherOptions()
+
       return val || this.close()
     },
     dialogDelete(val) {
       val || this.closeDelete()
     },
     options: {
-      handler() {
+      async handler() {
         // this.fetchData();
       },
       deep: true,
@@ -259,10 +270,10 @@ export default {
         params.q = this.search;
       }
 
-      const gradeStorage = useGradeStorage()
-      const data = await gradeStorage.getGrades(params)
+      const kelasStorage = useKelasStorage()
+      const data = await kelasStorage.getKelases(params)
 
-      this.grades = data.data
+      this.kelases = data.data
       this.totalItems = data.data.total
       this.loading = false
     },
@@ -291,21 +302,73 @@ export default {
       return orgOptions
     },
 
+
+    async fetchTeacherOptions() {
+      const teacherStorage = useTeacherStorage()
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+
+      if (activeRole.value.constant_value === 2) {
+        return [{
+          value: activeRole.value.org_uuid,
+          displayText: activeRole.value.org_name,
+        }]
+      }
+
+      const orgOptionsData = await teacherStorage.getTeachers()
+      const teacherOptions = orgOptionsData.data.map(org => {
+        return {
+          ...org,
+          value: org.uuid,
+          displayText: `${org.firstname} ${org.lastname} (${org.nik})`,
+        }
+      })
+
+      return teacherOptions
+    },
+
+    async fetchGradeOptions() {
+      const gradeStorage = useGradeStorage()
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+
+      const params = {
+        limit: 100000,
+        sortOrder: '1',
+        sortField: 'period',
+      };
+
+      params.filter = {
+        org_uuid: activeRole.value.org_uuid,
+      }
+
+      const gradeOptionsData = await gradeStorage.getGrades(params)
+      const gradeOptions = gradeOptionsData.data.map(org => {
+        return {
+          ...org,
+          value: org.uuid,
+          displayText: org.name,
+        }
+      })
+
+      return gradeOptions
+    },
+
     editItem(item) {
-      this.editedIndex = this.grades.indexOf(item)
+      this.editedIndex = this.kelases.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
 
     deleteItem(item) {
-      this.editedIndex = this.grades.indexOf(item)
+      this.editedIndex = this.kelases.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
     },
 
     async deleteItemConfirm() {
-      const gradeStorage = useGradeStorage()
-      const respDelete = await gradeStorage.removeGrade(this.editedItem)
+      const kelasStorage = useKelasStorage()
+      const respDelete = await kelasStorage.removeKelas(this.editedItem)
 
       this.alertMessage = respDelete.message
       this.hasAlert = true
@@ -355,8 +418,8 @@ export default {
 
       if (this.editedIndex > -1) {
         this.loading = true
-        const gradeStorage = useGradeStorage()
-        const respEdited = await gradeStorage.editGrade(this.editedItem)
+        const kelasStorage = useKelasStorage()
+        const respEdited = await kelasStorage.editKelas(this.editedItem)
 
         this.alertMessage = respEdited.message
         this.hasAlert = true
@@ -377,8 +440,8 @@ export default {
         }
       } else {
         this.loading = true
-        const gradeStorage = useGradeStorage()
-        const respEdited = await gradeStorage.addGrade(this.editedItem)
+        const kelasStorage = useKelasStorage()
+        const respEdited = await kelasStorage.addKelas(this.editedItem)
 
         this.alertMessage = respEdited.message
         this.hasAlert = true
@@ -403,8 +466,8 @@ export default {
       this.loading = false
     },
   },
-  async mounted() {
-
-  }
+  // async mounted() {
+  // this.fetchData()
+  // }
 }
 </script>

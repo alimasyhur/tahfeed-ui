@@ -322,12 +322,6 @@ export default {
     dialogAssignRole(val) {
       val || this.close()
     },
-    options: {
-      handler() {
-        this.fetchData();
-      },
-      deep: true,
-    },
   },
 
   methods: {
@@ -618,7 +612,6 @@ export default {
   },
 
   async mounted() {
-    this.fetchData()
     this.rolesOptions = await this.fetchRoleOptions()
     this.userOptions = await this.fetchUserOrganizationOptions()
     this.orgOptions = await this.fetchOrganizationOptions()

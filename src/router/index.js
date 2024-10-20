@@ -8,6 +8,8 @@ import { useUserStorage } from '@/stores/userStorage'
 import ProfileView from '@/views/ProfileView.vue'
 import OrganizationDetailView from '@/views/OrganizationDetailView.vue'
 import GradeView from '@/views/GradeView.vue'
+import TeacherView from '@/views/TeacherView.vue'
+import KelasView from '@/views/KelasView.vue'
 
 const routes = [
   {
@@ -91,6 +93,26 @@ const routes = [
     component: OrganizationDetailView,
     meta: {
       breadcrumb: 'Detail'
+    }
+  },
+  {
+    path: '/teacher',
+    name: 'teacher',
+    component: TeacherView,
+    meta: {
+      breadcrumb: 'Teacher',
+      requiresAuth: true,
+      requireSuperAdmin: false
+    }
+  },
+  {
+    path: '/kelas',
+    name: 'kelas',
+    component: KelasView,
+    meta: {
+      breadcrumb: 'Class',
+      requiresAuth: true,
+      requireSuperAdmin: false
     }
   }
 ]

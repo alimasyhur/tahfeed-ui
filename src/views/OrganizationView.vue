@@ -217,6 +217,12 @@ export default {
     dialog(val) {
       val || this.close()
     },
+    options: {
+      async handler() {
+        // this.fetchData();
+      },
+      deep: true,
+    },
   },
 
   methods: {
@@ -306,8 +312,5 @@ export default {
       this.loading = false
     },
   },
-  async mounted() {
-    this.fetchData()
-  }
 }
 </script>

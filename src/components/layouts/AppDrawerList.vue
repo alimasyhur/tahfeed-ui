@@ -7,7 +7,7 @@
         <v-list density="compact" nav>
             <!-- {{ listMenu }} -->
             <v-list-item v-for="(menu, idx) in listMenu" :key="idx" :prepend-icon="menu.icon" :title="menu.title"
-                :to="{ name: menu.toRoute }" :value="menu.toValue" active-class="active-link" exact>
+                :to="{ name: menu.toRoute }" :value="menu.toValue">
             </v-list-item>
         </v-list>
 
@@ -22,7 +22,7 @@
 
 <script setup>
 import { useUserStorage } from '@/stores/userStorage'
-import { onBeforeMount, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { onBeforeMount, onMounted, onUnmounted, ref } from 'vue';
 import eventBus from "@/stores/eventBus"
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -60,10 +60,3 @@ onUnmounted(() => {
 })
 
 </script>
-
-<style>
-.active-link {
-    font-weight: bold;
-    color: red;
-}
-</style>
