@@ -114,11 +114,34 @@ export const useKelasStorage = defineStore('kelas', () => {
     }
   }
 
+  const showKelasByUUID = async (uuid) => {
+    try {
+      const { data } = await apiService.get(`/kelases/${uuid}`, {
+        headers: {
+          Authorization: `Bearer ${userStorage.accessToken}`
+        }
+      })
+
+      return data
+    } catch (error) {
+      let errMessage = error.response.data.message
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+
+      return {
+        status: error.response.data.status,
+        message: errMessage
+      }
+    }
+  }
+
   return {
     kelases,
     getKelases,
     removeKelas,
     addKelas,
-    editKelas
+    editKelas,
+    showKelasByUUID
   }
 })

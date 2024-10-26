@@ -10,6 +10,7 @@ import OrganizationDetailView from '@/views/OrganizationDetailView.vue'
 import GradeView from '@/views/GradeView.vue'
 import TeacherView from '@/views/TeacherView.vue'
 import KelasView from '@/views/KelasView.vue'
+import KelasDetailView from '@/views/KelasDetailView.vue'
 
 const routes = [
   {
@@ -113,6 +114,13 @@ const routes = [
       breadcrumb: 'Class',
       requiresAuth: true,
       requireSuperAdmin: false
+    }
+  },
+  {
+    path: '/kelas/:slug',
+    component: KelasDetailView,
+    meta: {
+      breadcrumb: 'Detail'
     }
   }
 ]

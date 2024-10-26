@@ -43,7 +43,7 @@ const updateDrawerItems = (userData) => {
 const updateSwitchItems = (userData) => {
     listMenu.value = userData.listMenu
     activeRole.value = userData.activeRole
-    router.push({ name: 'dashboard' })
+    // router.push({ name: 'dashboard' })
 };
 
 onBeforeMount(() => {

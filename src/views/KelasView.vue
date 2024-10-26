@@ -113,6 +113,9 @@
           </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
+          <v-icon class="me-2" size="small" @click="detailKelas(item.uuid)">
+            mdi-eye
+          </v-icon>
           <v-icon class="me-2" size="small" @click="editItem(item)">
             mdi-pencil
           </v-icon>
@@ -243,6 +246,9 @@ export default {
   },
 
   methods: {
+    detailKelas(slug) {
+      this.$router.push({ path: `/kelas/${slug}` });
+    },
 
     async fetchData() {
       this.loading = true;
