@@ -9,6 +9,7 @@ import ProfileView from '@/views/ProfileView.vue'
 import OrganizationDetailView from '@/views/OrganizationDetailView.vue'
 import GradeView from '@/views/GradeView.vue'
 import TeacherView from '@/views/TeacherView.vue'
+import StudentView from '@/views/StudentView.vue'
 import KelasView from '@/views/KelasView.vue'
 import KelasDetailView from '@/views/KelasDetailView.vue'
 
@@ -102,6 +103,16 @@ const routes = [
     component: TeacherView,
     meta: {
       breadcrumb: 'Teacher',
+      requiresAuth: true,
+      requireSuperAdmin: false
+    }
+  },
+  {
+    path: '/student',
+    name: 'student',
+    component: StudentView,
+    meta: {
+      breadcrumb: 'Student',
       requiresAuth: true,
       requireSuperAdmin: false
     }

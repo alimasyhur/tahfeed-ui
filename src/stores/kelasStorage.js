@@ -8,14 +8,16 @@ export const useKelasStorage = defineStore('kelas', () => {
 
   const userStorage = useUserStorage()
 
-  const getKelases = async (filterKelas) => {
+  const getKelases = async (params) => {
     try {
       const { data } = await apiService.get('/kelases', {
         headers: {
           Authorization: `Bearer ${userStorage.accessToken}`
         },
-        params: filterKelas
+        params
       })
+
+      console.log('wkwk filterKelas: ', params)
 
       const kelasData = data.data
 
@@ -136,12 +138,86 @@ export const useKelasStorage = defineStore('kelas', () => {
     }
   }
 
+  const getKelasStudents = async (filterKelasStudents) => {
+    try {
+      const kelasUUID = filterKelasStudents.filter.kelas_uuid
+      const { data } = await apiService.get(`/kelases/${kelasUUID}/students`, {
+        headers: {
+          Authorization: `Bearer ${userStorage.accessToken}`
+        },
+        params: filterKelasStudents
+      })
+
+      const kelasData = data.data
+
+      kelases.value = kelasData
+      return data
+    } catch {
+      kelases.value = null
+    }
+  }
+
+  const assignStudent = async (inputAssign) => {
+    try {
+      const { data } = await apiService.post(
+        `kelases/assign`,
+        {
+          student_uuid: inputAssign.student_uuid,
+          kelas_uuid: inputAssign.kelas_uuid,
+          org_uuid: inputAssign.org_uuid
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userStorage.accessToken}`
+          }
+        }
+      )
+
+      return data
+    } catch (error) {
+      let errMessage = error.response.data.message
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+
+      return {
+        status: error.response.data.status,
+        message: errMessage
+      }
+    }
+  }
+
+  const removeKelasStudent = async (inputKelasStudent) => {
+    try {
+      const { data } = await apiService.delete(`/kelases-students/${inputKelasStudent.uuid}`, {
+        headers: {
+          Authorization: `Bearer ${userStorage.accessToken}`
+        }
+      })
+
+      getKelasStudents()
+      return data
+    } catch (error) {
+      let errMessage = error.response.data.message
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+      return {
+        status: error.response.data.status,
+        message: errMessage
+      }
+    }
+  }
+
   return {
     kelases,
     getKelases,
     removeKelas,
     addKelas,
     editKelas,
-    showKelasByUUID
+    showKelasByUUID,
+    getKelasStudents,
+    assignStudent,
+    removeKelasStudent
   }
 })

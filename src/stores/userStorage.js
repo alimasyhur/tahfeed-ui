@@ -111,6 +111,12 @@ export const useUserStorage = defineStore('user', () => {
           toValue: 'teacher'
         },
         {
+          icon: 'mdi-account-multiple',
+          title: 'Student',
+          toRoute: 'student',
+          toValue: 'student'
+        },
+        {
           icon: 'mdi-human-male-board-poll',
           title: 'Class',
           toRoute: 'kelas',
