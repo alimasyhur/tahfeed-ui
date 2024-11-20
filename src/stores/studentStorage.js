@@ -50,9 +50,9 @@ export const useStudentStorage = defineStore('student', () => {
 
   const addStudent = async (inputStudent) => {
     try {
-      console.log('contoh: ', inputStudent)
       const payload = {
         org_uuid: inputStudent.org_uuid,
+        grade_uuid: inputStudent.grade_uuid,
         nik: inputStudent.nik,
         nis: inputStudent.nis,
         firstname: inputStudent.firstname,
@@ -88,9 +88,9 @@ export const useStudentStorage = defineStore('student', () => {
 
   const editStudent = async (inputStudent) => {
     try {
-      console.log('inputStudent: ', inputStudent)
       const payload = {
         org_uuid: inputStudent.org_uuid,
+        grade_uuid: inputStudent.grade_uuid,
         nik: inputStudent.nik,
         nis: inputStudent.nis,
         firstname: inputStudent.firstname,

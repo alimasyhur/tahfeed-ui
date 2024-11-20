@@ -70,6 +70,10 @@
                           <v-select v-model="editedItem.user_uuid" :items="userOptions" item-title="displayText"
                             item-value="value" label="Select User"></v-select>
                         </v-col>
+                        <v-col cols="12">
+                          <v-select v-model="editedItem.grade_uuid" :items="gradeOptions" item-title="displayText"
+                            item-value="value" label="Select Grade"></v-select>
+                        </v-col>
                         <v-col cols="12" v-if="isSuperAdminRole">
                           <v-select v-model="editedItem.org_uuid" :items="orgOptions" item-title="displayText"
                             item-value="value" label="Select Organization"></v-select>
@@ -152,6 +156,7 @@ import { useUserStorage } from '@/stores/userStorage';
 import { storeToRefs } from 'pinia';
 import { useOrganizationStorage } from '@/stores/organizationStorage';
 import { useUserOrganizationStorage } from '@/stores/userOrganizationStorage';
+import { useGradeStorage } from '@/stores/gradeStorage';
 
 export default {
   data: () => ({
@@ -187,6 +192,10 @@ export default {
         title: 'Organization',
         key: 'org_name',
       },
+      {
+        title: 'Angkatan',
+        key: 'grade_period',
+      },
       { title: 'Actions', key: 'actions', sortable: false },
     ],
     breadcrumbsItems: [
@@ -202,7 +211,9 @@ export default {
       uuid: '',
       user_uuid: '',
       org_uuid: '',
+      grade_uuid: '',
       org_name: '',
+      grade_period: '',
       nik: '',
       nis: '',
       firstname: '',
@@ -215,7 +226,9 @@ export default {
       uuid: '',
       user_uuid: '',
       org_uuid: '',
+      grade_uuid: '',
       org_name: '',
+      grade_period: '',
       nik: '',
       nis: '',
       firstname: '',
@@ -233,6 +246,7 @@ export default {
     isSuperAdminRole: false,
     orgOptions: [],
     userOptions: [],
+    gradeOptions: [],
     loading: false,
     alertMessage: 'Terjadi Kesalahan',
     hasAlert: false,
@@ -263,6 +277,7 @@ export default {
     async dialog(val) {
       this.orgOptions = await this.fetchOrganizationOptions()
       this.userOptions = await this.fetchUserOrganizationOptions()
+      this.gradeOptions = await this.fetchGradeOptions()
 
       return val || this.close()
     },
@@ -357,6 +372,28 @@ export default {
       })
 
       return userOptions
+    },
+
+    async fetchGradeOptions() {
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+      const gradeStorage = useGradeStorage()
+
+      const params = {}
+      if (activeRole.value.role_name === 'Admin') {
+        params.org_uuid = activeRole.value.org_uuid
+      }
+
+      const gradeOptionsData = await gradeStorage.getGrades(params)
+      const gradeOptions = gradeOptionsData.data.map(grade => {
+        return {
+          ...grade,
+          value: grade.uuid,
+          displayText: `${grade.name} (${grade.period})`
+        }
+      })
+
+      return gradeOptions
     },
 
     editItem(item) {
