@@ -228,6 +228,40 @@
           </v-card-subtitle>
         </v-card-item>
 
+
+        <v-divider></v-divider>
+
+        <v-card-item>
+          <v-card-title>
+            <v-icon icon="mdi-cog-outline" end></v-icon>
+            My Qur'an Templates
+          </v-card-title>
+          <v-card-subtitle>
+            <v-table density="compact">
+              <thead>
+                <tr>
+                  <th class="text-left">
+                    <b>Name</b>
+                  </th>
+                  <th class="text-left">
+                    <b>Description</b>
+                  </th>
+                  <th class="text-left">
+                    <b>Organization</b>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="( quran, idx ) in me.qurans" :key="idx">
+                  <th class="text-left">{{ quran.name }}</th>
+                  <th class="text-left">{{ quran.description }}</th>
+                  <th class="text-left">{{ quran.organization_name }}</th>
+                </tr>
+              </tbody>
+            </v-table>
+          </v-card-subtitle>
+        </v-card-item>
+
         <v-card-text>
         </v-card-text>
       </v-card>

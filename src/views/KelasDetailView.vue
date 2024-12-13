@@ -67,6 +67,14 @@
                 </tr>
                 <tr>
                   <th class="text-left">
+                    <b>Total Juz Target</b>
+                  </th>
+                  <th class="text-left">
+                    {{ kelas.total_juz_target }}
+                  </th>
+                </tr>
+                <tr>
+                  <th class="text-left">
                     <b>Teacher NIK</b>
                   </th>
                   <th class="text-left">
@@ -79,6 +87,30 @@
                   </th>
                   <th class="text-left">
                     {{ kelas.teacher_firstname + ' ' + kelas.teacher_lastname }}
+                  </th>
+                </tr>
+                <tr>
+                  <th class="text-left">
+                    <b>Status</b>
+                  </th>
+                  <th class="text-left">
+                    {{ kelas.status }}
+                  </th>
+                </tr>
+                <tr>
+                  <th class="text-left">
+                    <b>Start Date</b>
+                  </th>
+                  <th class="text-left">
+                    {{ kelas.start_date }}
+                  </th>
+                </tr>
+                <tr>
+                  <th class="text-left">
+                    <b>End Date</b>
+                  </th>
+                  <th class="text-left">
+                    {{ kelas.end_date }}
                   </th>
                 </tr>
                 <!-- <tr>
@@ -113,7 +145,8 @@
                 <v-toolbar-title>List Students</v-toolbar-title>
                 <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
                   <template v-slot:activator="{ props }">
-                    <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="small">
+                    <v-btn v-if="(kelas.status !== 'finished') && isSuperAdminOrAdminRole" class="not-uppercase"
+                      color="primary" dark v-bind="props" variant="flat" size="small">
                       <v-icon>mdi-plus</v-icon> Add Student
                     </v-btn>
                   </template>
@@ -184,7 +217,8 @@
               </v-toolbar>
             </template>
             <template v-slot:item.actions="{ item }">
-              <v-icon size="small" @click="deleteItem(item)">
+              <v-icon v-if="(kelas.status !== 'finished') && isSuperAdminOrAdminRole" size="small"
+                @click="deleteItem(item)">
                 mdi-delete
               </v-icon>
             </template>
@@ -274,6 +308,7 @@ export default {
       lastname: '',
       birthdate: '',
       phone: '',
+      total_juz_target: null,
     },
     defaultItem: {
       uuid: '',
@@ -293,6 +328,7 @@ export default {
       lastname: '',
       birthdate: '',
       phone: '',
+      total_juz_target: null,
     },
     search: '',
     totalItems: 0,
@@ -301,6 +337,7 @@ export default {
       itemsPerPage: 10,
     },
     isSuperAdminRole: false,
+    isSuperAdminOrAdminRole: false,
     orgOptions: [],
     userOptions: [],
     studentOptions: [],
@@ -312,6 +349,7 @@ export default {
     required: [
       v => !!v || 'Field is required'
     ],
+    activeRole: null,
     // end
   }),
 
@@ -370,7 +408,7 @@ export default {
       this.loading = true;
       const userStorage = useUserStorage()
       const { activeRole } = storeToRefs(userStorage)
-      const { isSuperAdmin } = userStorage
+      const { isSuperAdmin, isSuperAdminOrAdmin } = userStorage
       const { page, itemsPerPage } = this.options;
       const params = {
         page,
@@ -381,12 +419,15 @@ export default {
       };
 
       this.isSuperAdminRole = isSuperAdmin(activeRole.value)
+      this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
 
       if (activeRole.value.constant_value === 2) {
         params.filter = {
           org_uuid: activeRole.value.org_uuid,
         }
       }
+
+      this.activeRole = activeRole.value
 
       if (this.search !== "") {
         params.q = this.search;

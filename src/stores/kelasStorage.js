@@ -17,8 +17,6 @@ export const useKelasStorage = defineStore('kelas', () => {
         params
       })
 
-      console.log('wkwk filterKelas: ', params)
-
       const kelasData = data.data
 
       kelases.value = kelasData
@@ -50,17 +48,18 @@ export const useKelasStorage = defineStore('kelas', () => {
     }
   }
 
-  const addKelas = async (inputRole) => {
+  const addKelas = async (inputKelas) => {
     try {
       const { data } = await apiService.post(
         `kelases`,
         {
-          name: inputRole.name,
-          description: inputRole.description,
-          org_uuid: inputRole.org_uuid,
-          period: inputRole.period,
-          grade_uuid: inputRole.grade_uuid,
-          teacher_uuid: inputRole.teacher_uuid
+          name: inputKelas.name,
+          description: inputKelas.description,
+          org_uuid: inputKelas.org_uuid,
+          period: inputKelas.period,
+          grade_uuid: inputKelas.grade_uuid,
+          teacher_uuid: inputKelas.teacher_uuid,
+          total_juz_target: inputKelas.total_juz_target
         },
         {
           headers: {
@@ -93,8 +92,87 @@ export const useKelasStorage = defineStore('kelas', () => {
           org_uuid: inputKelas.org_uuid,
           period: inputKelas.period,
           grade_uuid: inputKelas.grade_uuid,
-          teacher_uuid: inputKelas.teacher_uuid
+          teacher_uuid: inputKelas.teacher_uuid,
+          total_juz_target: inputKelas.total_juz_target
         },
+        {
+          headers: {
+            Authorization: `Bearer ${userStorage.accessToken}`
+          }
+        }
+      )
+
+      return data
+    } catch (error) {
+      let errMessage = error.response.data.message
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+
+      return {
+        status: error.response.data.status,
+        message: errMessage
+      }
+    }
+  }
+
+  const startKelas = async (inputKelas) => {
+    try {
+      const { data } = await apiService.patch(
+        `kelases/${inputKelas.uuid}/activate`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${userStorage.accessToken}`
+          }
+        }
+      )
+
+      return data
+    } catch (error) {
+      let errMessage = error.response.data.message
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+
+      return {
+        status: error.response.data.status,
+        message: errMessage
+      }
+    }
+  }
+
+  const endKelas = async (inputKelas) => {
+    try {
+      const { data } = await apiService.patch(
+        `kelases/${inputKelas.uuid}/stop`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${userStorage.accessToken}`
+          }
+        }
+      )
+
+      return data
+    } catch (error) {
+      let errMessage = error.response.data.message
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+
+      return {
+        status: error.response.data.status,
+        message: errMessage
+      }
+    }
+  }
+
+  const reactivateKelas = async (inputKelas) => {
+    try {
+      const { data } = await apiService.patch(
+        `kelases/${inputKelas.uuid}/reactivate`,
+        {},
         {
           headers: {
             Authorization: `Bearer ${userStorage.accessToken}`
@@ -215,6 +293,9 @@ export const useKelasStorage = defineStore('kelas', () => {
     removeKelas,
     addKelas,
     editKelas,
+    startKelas,
+    endKelas,
+    reactivateKelas,
     showKelasByUUID,
     getKelasStudents,
     assignStudent,

@@ -26,7 +26,8 @@
             <v-toolbar-title>List Kelas</v-toolbar-title>
             <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
               <template v-slot:activator="{ props }">
-                <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="small">
+                <v-btn v-if="isSuperAdminOrAdminRole" class="not-uppercase" color="primary" dark v-bind="props"
+                  variant="flat" size="small">
                   <v-icon>mdi-plus</v-icon> New Kelas
                 </v-btn>
               </template>
@@ -45,6 +46,10 @@
                         <v-col cols="12">
                           <v-text-field v-model="editedItem.description" :rules="required" label="Description"
                             type="text" :loading="loading" clearable></v-text-field>
+                        </v-col>
+                        <v-col cols="12">
+                          <v-text-field v-model="editedItem.total_juz_target" :rules="required" label="Total Juz Target"
+                            type="number" :loading="loading" clearable></v-text-field>
                         </v-col>
                         <v-col cols="12">
                           <v-select v-model="editedItem.teacher_uuid" :items="teacherOptions" item-title="displayText"
@@ -104,6 +109,93 @@
               </v-card>
             </v-dialog>
 
+            <v-dialog v-model="dialogStart" max-width="500px">
+              <v-card>
+                <v-card-title class="text-h5">Are you sure want to start this class?</v-card-title>
+                <v-card-text>
+                  <v-container>
+                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
+                      closable close-label="Close Alert"></v-alert>
+                    <v-form v-model="form" @submit.prevent="startItemConfirm">
+                      <p class="ma-6">Dengan memulai kelas ini, maka Anda mengijinkan aktifitas kelas dapat dimulai.
+                        Apakah Anda yakin akan memulai Kelas <b>{{ editedItem.name }}</b> ini?</p>
+                      <v-row>
+                        <v-col>
+                          <v-btn color="success" size="large" type="submit" variant="elevated" block>
+                            Ya
+                          </v-btn>
+                        </v-col>
+                        <v-col>
+                          <v-btn color="warning" size="large" type="button" variant="elevated" block
+                            @click="closeStart">Tidak
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-form>
+                  </v-container>
+                </v-card-text>
+              </v-card>
+            </v-dialog>
+
+            <v-dialog v-model="dialogEnd" max-width="500px">
+              <v-card>
+                <v-card-title class="text-h5">Are you sure want to end this class?</v-card-title>
+                <v-card-text>
+                  <v-container>
+                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
+                      closable close-label="Close Alert"></v-alert>
+                    <v-form v-model="form" @submit.prevent="endItemConfirm">
+                      <p class="ma-6">Dengan mengakhiri kelas ini, maka Anda sudah tidak dapat melakukan aktifitas di
+                        kelas ini.
+                        Apakah Anda yakin akan mengakhiri Kelas <b>{{ editedItem.name }}</b> ini?</p>
+                      <v-row>
+                        <v-col>
+                          <v-btn color="success" size="large" type="submit" variant="elevated" block>
+                            Ya
+                          </v-btn>
+                        </v-col>
+                        <v-col>
+                          <v-btn color="warning" size="large" type="button" variant="elevated" block
+                            @click="closeEnd">Tidak
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-form>
+                  </v-container>
+                </v-card-text>
+              </v-card>
+            </v-dialog>
+
+            <v-dialog v-model="dialogReactivate" max-width="500px">
+              <v-card>
+                <v-card-title class="text-h5">Are you sure want to reactivate this class?</v-card-title>
+                <v-card-text>
+                  <v-container>
+                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
+                      closable close-label="Close Alert"></v-alert>
+                    <v-form v-model="form" @submit.prevent="reactivateItemConfirm">
+                      <p class="ma-6">Dengan mengaktifkan kembali kelas ini, maka Anda dapat melakukan aktifitas kembali
+                        di
+                        kelas ini.
+                        Apakah Anda yakin akan mengaktifkan kembali Kelas <b>{{ editedItem.name }}</b> ini?</p>
+                      <v-row>
+                        <v-col>
+                          <v-btn color="success" size="large" type="submit" variant="elevated" block>
+                            Ya
+                          </v-btn>
+                        </v-col>
+                        <v-col>
+                          <v-btn color="warning" size="large" type="button" variant="elevated" block
+                            @click="closeReactivate">Tidak
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </v-form>
+                  </v-container>
+                </v-card-text>
+              </v-card>
+            </v-dialog>
+
             <v-divider class="mx-4" vertical></v-divider>
             <v-spacer></v-spacer>
 
@@ -113,13 +205,26 @@
           </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
+          <v-icon v-if="(item.status === 'not_started') && isSuperAdminOrAdminRole" class="me-2" size="small"
+            @click="startItem(item)">
+            mdi-play
+          </v-icon>
+          <v-icon v-if="(item.status === 'finished') && isSuperAdminOrAdminRole" class="me-2" size="small"
+            @click="reactivateItem(item)">
+            mdi-replay
+          </v-icon>
+          <v-icon v-if="(item.status === 'active') && isSuperAdminOrAdminRole" class="me-2" size="small"
+            @click="endItem(item)">
+            mdi-stop
+          </v-icon>
           <v-icon class="me-2" size="small" @click="detailKelas(item.uuid)">
             mdi-eye
           </v-icon>
-          <v-icon class="me-2" size="small" @click="editItem(item)">
+          <v-icon v-if="isSuperAdminOrAdminRole" class="me-2" size="small" @click="editItem(item)">
             mdi-pencil
           </v-icon>
-          <v-icon size="small" @click="deleteItem(item)">
+          <v-icon v-if="(item.status === 'not_started') && isSuperAdminOrAdminRole" size="small"
+            @click="deleteItem(item)">
             mdi-delete
           </v-icon>
         </template>
@@ -140,31 +245,16 @@ import { useUserStorage } from '@/stores/userStorage';
 import { storeToRefs } from 'pinia';
 import { useOrganizationStorage } from '@/stores/organizationStorage';
 import { useGradeStorage } from '@/stores/gradeStorage';
+import moment from 'moment';
 
 export default {
   data: () => ({
     dialog: false,
     dialogDelete: false,
-    headers: [
-      {
-        title: 'Name',
-        align: 'start',
-        key: 'name',
-      },
-      {
-        title: 'Description',
-        key: 'description',
-      },
-      {
-        title: 'Period',
-        key: 'period',
-      },
-      {
-        title: 'Organization',
-        key: 'org_name',
-      },
-      { title: 'Actions', key: 'actions', sortable: false },
-    ],
+    dialogStart: false,
+    dialogEnd: false,
+    dialogReactivate: false,
+    headers: [],
     breadcrumbsItems: [
       {
         title: 'Kelas',
@@ -181,6 +271,7 @@ export default {
       org_uuid: '',
       org_name: '',
       period: '',
+      total_juz_target: null,
     },
     defaultItem: {
       uuid: '',
@@ -189,6 +280,7 @@ export default {
       org_uuid: '',
       org_name: '',
       period: '',
+      total_juz_target: null,
     },
     search: '',
     totalItems: 0,
@@ -197,6 +289,7 @@ export default {
       itemsPerPage: 10,
     },
     isSuperAdminRole: false,
+    isSuperAdminOrAdminRole: false,
     orgOptions: [],
     gradeOptions: [],
     teacherOptions: [],
@@ -208,6 +301,7 @@ export default {
     required: [
       v => !!v || 'Field is required'
     ],
+    activeRole: null,
   }),
 
   computed: {
@@ -237,6 +331,15 @@ export default {
     dialogDelete(val) {
       val || this.closeDelete()
     },
+    dialogStart(val) {
+      val || this.closeStart()
+    },
+    dialogEnd(val) {
+      val || this.closeEnd()
+    },
+    dialogReactivate(val) {
+      val || this.closeReactivate()
+    },
     options: {
       async handler() {
         // this.fetchData();
@@ -254,7 +357,7 @@ export default {
       this.loading = true;
       const userStorage = useUserStorage()
       const { activeRole } = storeToRefs(userStorage)
-      const { isSuperAdmin } = userStorage
+      const { isSuperAdmin, isSuperAdminOrAdmin } = userStorage
       const { page, itemsPerPage } = this.options;
       const params = {
         page,
@@ -264,12 +367,24 @@ export default {
       };
 
       this.isSuperAdminRole = isSuperAdmin(activeRole.value)
+      this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
 
       if (activeRole.value.constant_value === 2) {
         params.filter = Object.values({
           org_uuid: activeRole.value.org_uuid
         })
       }
+
+      if (activeRole.value.constant_value === 3) {
+        const query = {
+          org_uuid: activeRole.value.org_uuid,
+          teacher_uuid: activeRole.value.teacher_uuid,
+        }
+        params.filter = query
+      }
+
+      this.activeRole = activeRole.value
+      this.headers = this.getHeaders(activeRole.value.constant_value)
 
       if (this.search !== "") {
         params.q = this.search;
@@ -278,12 +393,95 @@ export default {
       const kelasStorage = useKelasStorage()
       const data = await kelasStorage.getKelases(params)
 
-      console.log('wkwk data', data);
-
       this.kelases = data.data
       this.totalItems = data.data.total
       this.loading = false
     },
+
+    getHeaders(activeRole) {
+      let headers = [];
+      if (activeRole === 1) {
+        const superAdminHeader = [
+          {
+            title: 'Name',
+            align: 'start',
+            key: 'name',
+          },
+          {
+            title: 'Description',
+            key: 'description',
+          },
+          {
+            title: 'Period',
+            key: 'period',
+          },
+          {
+            title: 'Status',
+            key: 'status',
+          },
+          {
+            title: 'Organization',
+            key: 'org_name',
+          },
+          { title: 'Actions', key: 'actions', sortable: false },
+        ]
+
+        headers = headers.concat(superAdminHeader)
+      }
+
+      if (activeRole === 2) {
+        const adminHeader = [
+          {
+            title: 'Name',
+            align: 'start',
+            key: 'name',
+          },
+          {
+            title: 'Description',
+            key: 'description',
+          },
+          {
+            title: 'Period',
+            key: 'period',
+          },
+          {
+            title: 'Status',
+            key: 'status',
+          },
+          { title: 'Actions', key: 'actions', sortable: false },
+        ]
+
+        headers = headers.concat(adminHeader)
+      }
+
+      if (activeRole === 3) {
+        const adminHeader = [
+          {
+            title: 'Name',
+            align: 'start',
+            key: 'name',
+          },
+          {
+            title: 'Description',
+            key: 'description',
+          },
+          {
+            title: 'Period',
+            key: 'period',
+          },
+          {
+            title: 'Status',
+            key: 'status',
+          },
+          { title: 'Actions', key: 'actions', sortable: false },
+        ]
+
+        headers = headers.concat(adminHeader)
+      }
+
+      return headers
+    },
+
 
     async fetchOrganizationOptions() {
       const orgStorage = useOrganizationStorage()
@@ -315,19 +513,19 @@ export default {
       const userStorage = useUserStorage()
       const { activeRole } = storeToRefs(userStorage)
 
+      const params = {};
       if (activeRole.value.constant_value === 2) {
-        return [{
-          value: activeRole.value.org_uuid,
-          displayText: activeRole.value.org_name,
-        }]
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid,
+        }
       }
 
-      const orgOptionsData = await teacherStorage.getTeachers()
-      const teacherOptions = orgOptionsData.data.map(org => {
+      const orgOptionsData = await teacherStorage.getTeachers(params);
+      const teacherOptions = orgOptionsData.data.map(teacher => {
         return {
-          ...org,
-          value: org.uuid,
-          displayText: `${org.firstname} ${org.lastname} (${org.nik})`,
+          ...teacher,
+          value: teacher.uuid,
+          displayText: `${teacher.firstname} ${teacher.lastname} (${teacher.nik})`,
         }
       })
 
@@ -373,6 +571,24 @@ export default {
       this.dialogDelete = true
     },
 
+    startItem(item) {
+      this.editedIndex = this.kelases.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.dialogStart = true
+    },
+
+    endItem(item) {
+      this.editedIndex = this.kelases.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.dialogEnd = true
+    },
+
+    reactivateItem(item) {
+      this.editedIndex = this.kelases.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.dialogReactivate = true
+    },
+
     async deleteItemConfirm() {
       const kelasStorage = useKelasStorage()
       const respDelete = await kelasStorage.removeKelas(this.editedItem)
@@ -396,6 +612,81 @@ export default {
       }
     },
 
+    async startItemConfirm() {
+      const kelasStorage = useKelasStorage()
+      const respDelete = await kelasStorage.startKelas(this.editedItem)
+
+      this.alertMessage = respDelete.message
+      this.hasAlert = true
+      this.alertType = respDelete.status
+
+      if (respDelete.status == "success") {
+        this.fetchData()
+        setTimeout(() => {
+          this.dialog = false
+          this.dialogDelete = false
+          this.dialogStart = false
+          this.dialogReactivate = false
+          this.alertMessage = ''
+          this.hasAlert = false
+          this.alertType = ''
+          this.editedIndex = -1
+          this.editedItem = this.defaultItem
+          this.closeStart()
+        }, 700)
+      }
+    },
+
+    async endItemConfirm() {
+      const kelasStorage = useKelasStorage()
+      const respDelete = await kelasStorage.endKelas(this.editedItem)
+
+      this.alertMessage = respDelete.message
+      this.hasAlert = true
+      this.alertType = respDelete.status
+
+      if (respDelete.status == "success") {
+        this.fetchData()
+        setTimeout(() => {
+          this.dialog = false
+          this.dialogDelete = false
+          this.dialogStart = false
+          this.dialogReactivate = false
+          this.alertMessage = ''
+          this.hasAlert = false
+          this.alertType = ''
+          this.editedIndex = -1
+          this.editedItem = this.defaultItem
+          this.closeStart()
+        }, 700)
+      }
+    },
+
+    async reactivateItemConfirm() {
+      const kelasStorage = useKelasStorage()
+      const respDelete = await kelasStorage.reactivateKelas(this.editedItem)
+
+      this.alertMessage = respDelete.message
+      this.hasAlert = true
+      this.alertType = respDelete.status
+
+      if (respDelete.status == "success") {
+        this.fetchData()
+        setTimeout(() => {
+          this.dialog = false
+          this.dialogDelete = false
+          this.dialogStart = false
+          this.dialogReactivate = false
+          this.alertMessage = ''
+          this.hasAlert = false
+          this.alertType = ''
+          this.editedIndex = -1
+          this.editedItem = this.defaultItem
+          this.closeStart()
+        }, 700)
+      }
+    },
+
     close() {
       this.dialog = false
       this.alertMessage = ''
@@ -408,6 +699,42 @@ export default {
     closeDelete() {
       this.dialog = false
       this.dialogDelete = false
+      this.dialogStart = false
+      this.dialogEnd = false
+      this.alertMessage = ''
+      this.hasAlert = false
+      this.alertType = ''
+      this.editedItem = this.defaultItem
+    },
+
+    closeStart() {
+      this.dialog = false
+      this.dialogDelete = false
+      this.dialogStart = false
+      this.dialogEnd = false
+      this.alertMessage = ''
+      this.hasAlert = false
+      this.alertType = ''
+      this.editedItem = this.defaultItem
+    },
+
+    closeEnd() {
+      this.dialog = false
+      this.dialogDelete = false
+      this.dialogStart = false
+      this.dialogEnd = false
+      this.alertMessage = ''
+      this.hasAlert = false
+      this.alertType = ''
+      this.editedItem = this.defaultItem
+    },
+
+    closeReactivate() {
+      this.dialog = false
+      this.dialogDelete = false
+      this.dialogStart = false
+      this.dialogEnd = false
+      this.dialogReactivate = false
       this.alertMessage = ''
       this.hasAlert = false
       this.alertType = ''
@@ -415,7 +742,6 @@ export default {
     },
 
     async save() {
-      console.log('clicked');
       const userStorage = useUserStorage()
       const { activeRole } = storeToRefs(userStorage)
 

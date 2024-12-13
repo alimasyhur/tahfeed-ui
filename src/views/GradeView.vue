@@ -136,26 +136,7 @@ export default {
   data: () => ({
     dialog: false,
     dialogDelete: false,
-    headers: [
-      {
-        title: 'Name',
-        align: 'start',
-        key: 'name',
-      },
-      {
-        title: 'Description',
-        key: 'description',
-      },
-      {
-        title: 'Period',
-        key: 'period',
-      },
-      {
-        title: 'Organization',
-        key: 'org_name',
-      },
-      { title: 'Actions', key: 'actions', sortable: false },
-    ],
+    headers: [],
     breadcrumbsItems: [
       {
         title: 'Grades',
@@ -255,6 +236,8 @@ export default {
         }
       }
 
+      this.headers = this.getHeaders(activeRole.value.constant_value)
+
       if (this.search !== "") {
         params.q = this.search;
       }
@@ -266,6 +249,58 @@ export default {
       this.totalItems = data.data.total
       this.loading = false
     },
+
+    getHeaders(activeRole) {
+      let headers = [];
+      if (activeRole === 1) {
+        const superAdminHeader = [
+          {
+            title: 'Name',
+            align: 'start',
+            key: 'name',
+          },
+          {
+            title: 'Description',
+            key: 'description',
+          },
+          {
+            title: 'Period',
+            key: 'period',
+          },
+          {
+            title: 'Organization',
+            key: 'org_name',
+          },
+          { title: 'Actions', key: 'actions', sortable: false },
+        ]
+
+        headers = headers.concat(superAdminHeader)
+      }
+
+      if (activeRole === 2) {
+        const adminHeader = [
+          {
+            title: 'Name',
+            align: 'start',
+            key: 'name',
+          },
+          {
+            title: 'Description',
+            key: 'description',
+          },
+          {
+            title: 'Period',
+            key: 'period',
+          },
+          { title: 'Actions', key: 'actions', sortable: false },
+        ]
+
+        headers = headers.concat(adminHeader)
+      }
+
+      return headers
+    },
+
 
     async fetchOrganizationOptions() {
       const orgStorage = useOrganizationStorage()
@@ -345,7 +380,6 @@ export default {
     },
 
     async save() {
-      console.log('clicked');
       const userStorage = useUserStorage()
       const { activeRole } = storeToRefs(userStorage)
 

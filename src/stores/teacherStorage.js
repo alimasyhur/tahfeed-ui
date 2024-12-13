@@ -87,8 +87,6 @@ export const useTeacherStorage = defineStore('teacher', () => {
 
   const editTeacher = async (inputTeacher) => {
     try {
-      console.log('input teacher: ', inputTeacher)
-
       const { data } = await apiService.patch(
         `teachers/${inputTeacher.uuid}`,
         {

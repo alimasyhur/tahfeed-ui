@@ -204,34 +204,7 @@ export default {
     dialog: false,
     dialogResetPassword: false,
     dialogAssignRole: false,
-    headers: [
-      {
-        title: 'Name',
-        align: 'start',
-        key: 'user_name',
-      },
-      {
-        title: 'Email',
-        key: 'email',
-      },
-      {
-        title: 'Role',
-        key: 'role_name',
-      },
-      {
-        title: 'Organization',
-        key: 'org_name',
-      },
-      {
-        title: 'Status Aktif',
-        key: 'is_active',
-      },
-      {
-        title: 'Status Konfirmasi',
-        key: 'is_confirmed',
-      },
-      { title: 'Actions', key: 'actions', sortable: false },
-    ],
+    headers: [],
     statusConfirmationOptions: [
       { value: 0, displayText: 'not confirmed' },
       { value: 1, displayText: 'confirmed' },
@@ -352,6 +325,8 @@ export default {
         }
       }
 
+      this.headers = this.getHeaders(activeRole.value.constant_value)
+
       if (this.search !== "") {
         params.q = this.search;
       }
@@ -362,6 +337,73 @@ export default {
       this.users = data.data
       this.totalItems = data.total
       this.loading = false
+    },
+
+    getHeaders(activeRole) {
+      let headers = [];
+      if (activeRole === 1) {
+        const superAdminHeader = [
+          {
+            title: 'Name',
+            align: 'start',
+            key: 'user_name',
+          },
+          {
+            title: 'Email',
+            key: 'email',
+          },
+          {
+            title: 'Role',
+            key: 'role_name',
+          },
+          {
+            title: 'Organization',
+            key: 'org_name',
+          },
+          {
+            title: 'Status Aktif',
+            key: 'is_active',
+          },
+          {
+            title: 'Status Konfirmasi',
+            key: 'is_confirmed',
+          },
+          { title: 'Actions', key: 'actions', sortable: false },
+        ]
+
+        headers = headers.concat(superAdminHeader)
+      }
+
+      if (activeRole === 2) {
+        const adminHeader = [
+          {
+            title: 'Name',
+            align: 'start',
+            key: 'user_name',
+          },
+          {
+            title: 'Email',
+            key: 'email',
+          },
+          {
+            title: 'Role',
+            key: 'role_name',
+          },
+          {
+            title: 'Status Aktif',
+            key: 'is_active',
+          },
+          {
+            title: 'Status Konfirmasi',
+            key: 'is_confirmed',
+          },
+          { title: 'Actions', key: 'actions', sortable: false },
+        ]
+
+        headers = headers.concat(adminHeader)
+      }
+
+      return headers
     },
 
     async fetchUserOrganizationOptions() {

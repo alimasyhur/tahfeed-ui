@@ -126,6 +126,30 @@ export const useUserStorage = defineStore('user', () => {
       menuDrawerData = menuDrawerData.concat(adminMenuDrawerData)
     }
 
+    if ([3].includes(actRole?.constant_value)) {
+      const teacherMenuDrawerData = [
+        {
+          icon: 'mdi-human',
+          title: 'Teacher',
+          toRoute: 'teacher',
+          toValue: 'teacher'
+        },
+        {
+          icon: 'mdi-account-multiple',
+          title: 'Student',
+          toRoute: 'student',
+          toValue: 'student'
+        },
+        {
+          icon: 'mdi-human-male-board-poll',
+          title: 'Class',
+          toRoute: 'kelas',
+          toValue: 'kelas'
+        }
+      ]
+      menuDrawerData = menuDrawerData.concat(teacherMenuDrawerData)
+    }
+
     menuDrawerData = menuDrawerData.concat([
       {
         icon: 'mdi-account',

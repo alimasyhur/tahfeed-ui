@@ -18,7 +18,6 @@
 
 
     <v-row>
-
       <v-data-table :headers="headers" :search="search" :items="teachers" :items-length="totalItems" :loading="loading"
         v-model:options="options" @update:options="fetchData" :sort-by="[{ key: 'calories', order: 'asc' }]">
         <template v-slot:top>
@@ -26,7 +25,8 @@
             <v-toolbar-title>List Teachers</v-toolbar-title>
             <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
               <template v-slot:activator="{ props }">
-                <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="small">
+                <v-btn v-if="isSuperAdminOrAdminRole" class="not-uppercase" color="primary" dark v-bind="props"
+                  variant="flat" size="small">
                   <v-icon>mdi-plus</v-icon> New Teacher
                 </v-btn>
               </template>
@@ -125,10 +125,10 @@
           </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
-          <v-icon class="me-2" size="small" @click="editItem(item)">
+          <v-icon v-if="isSuperAdminOrAdminRole" class="me-2" size="small" @click="editItem(item)">
             mdi-pencil
           </v-icon>
-          <v-icon size="small" @click="deleteItem(item)">
+          <v-icon v-if="isSuperAdminOrAdminRole" size="small" @click="deleteItem(item)">
             mdi-delete
           </v-icon>
         </template>
@@ -153,34 +153,7 @@ export default {
   data: () => ({
     dialog: false,
     dialogDelete: false,
-    headers: [
-      {
-        title: 'NIK',
-        align: 'start',
-        key: 'nik',
-      },
-      {
-        title: 'First Name',
-        key: 'firstname',
-      },
-      {
-        title: 'Last Name',
-        key: 'lastname',
-      },
-      {
-        title: 'Birthdate',
-        key: 'birthdate',
-      },
-      {
-        title: 'Phone',
-        key: 'phone',
-      },
-      {
-        title: 'Organization',
-        key: 'org_name',
-      },
-      { title: 'Actions', key: 'actions', sortable: false },
-    ],
+    headers: [],
     breadcrumbsItems: [
       {
         title: 'Teachers',
@@ -221,6 +194,7 @@ export default {
       itemsPerPage: 10,
     },
     isSuperAdminRole: false,
+    isSuperAdminOrAdminRole: false,
     orgOptions: [],
     userOptions: [],
     loading: false,
@@ -231,6 +205,7 @@ export default {
     required: [
       v => !!v || 'Field is required'
     ],
+    activeRole: null,
   }),
 
   computed: {
@@ -273,7 +248,7 @@ export default {
       this.loading = true;
       const userStorage = useUserStorage()
       const { activeRole } = storeToRefs(userStorage)
-      const { isSuperAdmin } = userStorage
+      const { isSuperAdmin, isSuperAdminOrAdmin } = userStorage
       const { page, itemsPerPage } = this.options;
       const params = {
         page,
@@ -284,12 +259,16 @@ export default {
       };
 
       this.isSuperAdminRole = isSuperAdmin(activeRole.value)
+      this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
 
       if (activeRole.value.constant_value === 2) {
         params.filter = {
           org_uuid: activeRole.value.org_uuid,
         }
       }
+
+      this.activeRole = activeRole.value
+      this.headers = this.getHeaders(activeRole.value.constant_value)
 
       if (this.search !== "") {
         params.q = this.search;
@@ -301,6 +280,101 @@ export default {
       this.teachers = data.data
       this.totalItems = data.data.total
       this.loading = false
+    },
+
+    getHeaders(activeRole) {
+      let headers = [];
+      if (activeRole === 1) {
+        const superAdminHeader = [
+          {
+            title: 'NIK',
+            align: 'start',
+            key: 'nik',
+          },
+          {
+            title: 'First Name',
+            key: 'firstname',
+          },
+          {
+            title: 'Last Name',
+            key: 'lastname',
+          },
+          {
+            title: 'Birthdate',
+            key: 'birthdate',
+          },
+          {
+            title: 'Phone',
+            key: 'phone',
+          },
+          {
+            title: 'Organization',
+            key: 'org_name',
+          },
+          { title: 'Actions', key: 'actions', sortable: false },
+        ]
+
+        headers = headers.concat(superAdminHeader)
+      }
+
+      if (activeRole === 2) {
+        const adminHeader = [
+          {
+            title: 'NIK',
+            align: 'start',
+            key: 'nik',
+          },
+          {
+            title: 'First Name',
+            key: 'firstname',
+          },
+          {
+            title: 'Last Name',
+            key: 'lastname',
+          },
+          {
+            title: 'Birthdate',
+            key: 'birthdate',
+          },
+          {
+            title: 'Phone',
+            key: 'phone',
+          },
+          { title: 'Actions', key: 'actions', sortable: false },
+        ]
+
+        headers = headers.concat(adminHeader)
+      }
+
+      if (activeRole === 3) {
+        const adminHeader = [
+          {
+            title: 'NIK',
+            align: 'start',
+            key: 'nik',
+          },
+          {
+            title: 'First Name',
+            key: 'firstname',
+          },
+          {
+            title: 'Last Name',
+            key: 'lastname',
+          },
+          {
+            title: 'Birthdate',
+            key: 'birthdate',
+          },
+          {
+            title: 'Phone',
+            key: 'phone',
+          },
+        ]
+
+        headers = headers.concat(adminHeader)
+      }
+
+      return headers
     },
 
     async fetchOrganizationOptions() {
@@ -403,7 +477,6 @@ export default {
     },
 
     async save() {
-      console.log('clicked');
       const userStorage = useUserStorage()
       const { activeRole } = storeToRefs(userStorage)
 

@@ -19,7 +19,8 @@
           </v-col>
 
           <v-col cols="6">
-            <v-img :width="500" aspect-ratio="16/9" cover src="/images/landing/tahfeed-target.svg"></v-img>
+            <v-img :width="500" aspect-ratio="16/9" cover class="rounded-image"
+              src="/images/landing/tahfeed-target.svg"></v-img>
           </v-col>
 
         </v-row>
@@ -30,7 +31,8 @@
       <v-col cols="12">
         <v-row>
           <v-col cols="6">
-            <v-img :width="400" aspect-ratio="16/9" cover src="/images/landing/tahfeed-tracker.svg"></v-img>
+            <v-img :ml="5" :width="500" aspect-ratio="16/9" cover class="rounded-image"
+              src="/images/landing/tahfeed-tracker.svg"></v-img>
           </v-col>
 
           <v-col cols="6">
@@ -102,3 +104,21 @@ const clients = ref([
   },
 ])
 </script> -->
+
+<style>
+.rounded-image {
+  border-radius: 16px;
+  /* Rounds the corners */
+  filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.1));
+  /* Adds blur and shadow */
+  overflow: hidden;
+  /* Ensures the rounded edges crop the image */
+  transition: all 0.3s ease-in-out;
+  /* Smooth hover effect */
+}
+
+.rounded-image:hover {
+  filter: drop-shadow(0px 6px 10px rgba(0, 0, 0, 0.15)) blur(0.5px);
+  /* Hover effect for dynamic styling */
+}
+</style>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Background abstract shape -->
+  <path
+    d="M50,50 L150,50 L200,150 L350,120 L300,200 L250,350 L150,300 L100,250 Z"
+    fill="#e3f2fd"
+    stroke="#2196f3"
+    stroke-width="5"
+  />
+  
+  <!-- 3D Book Icon -->
+  <rect x="120" y="120" width="160" height="100" rx="12" ry="12" fill="#ffffff" stroke="#2196f3" stroke-width="4" />
+  <line x1="120" y1="160" x2="280" y2="160" stroke="#2196f3" stroke-width="2" />
+  <line x1="200" y1="120" x2="200" y2="220" stroke="#2196f3" stroke-width="2" />
+  <!-- 3D Effect -->
+  <polygon points="120,220 130,230 270,230 260,220" fill="#81d4fa" />
+  
+  <!-- Progress Tracker -->
+  <circle cx="200" cy="80" r="40" fill="#ffffff" stroke="#2196f3" stroke-width="4" />
+  <text x="200" y="90" font-family="Arial, sans-serif" font-size="20" fill="#2196f3" text-anchor="middle">
+    75%
+  </text>
+
+  <!-- Target Arrow -->
+  <polygon points="260,270 280,250 300,260 280,280" fill="#2196f3" />
+  
+  <!-- Shadow Effect -->
+  <ellipse cx="200" cy="330" rx="130" ry="20" fill="rgba(0, 0, 0, 0.1)" />
+
+  <!-- Main Text -->
+  <text x="200" y="350" font-family="Arial, sans-serif" font-size="16" fill="#2196f3" text-anchor="middle">
+    Feed Your Iman with Memorizing Qur'an
+  </text>
+  
+  <!-- Subtext: Platform for Tracking -->
+  <text x="200" y="370" font-family="Arial, sans-serif" font-size="12" fill="#2196f3" text-anchor="middle">
+    Track Your Progress with Tahfeed - Easy, Trackable, Manageable
+  </text>
+</svg>
