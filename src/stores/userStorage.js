@@ -121,6 +121,12 @@ export const useUserStorage = defineStore('user', () => {
           title: 'Class',
           toRoute: 'kelas',
           toValue: 'kelas'
+        },
+        {
+          icon: 'mdi-human-male-board-poll',
+          title: 'Report',
+          toRoute: 'report',
+          toValue: 'report'
         }
       ]
       menuDrawerData = menuDrawerData.concat(adminMenuDrawerData)
@@ -145,6 +151,12 @@ export const useUserStorage = defineStore('user', () => {
           title: 'Class',
           toRoute: 'kelas',
           toValue: 'kelas'
+        },
+        {
+          icon: 'mdi-chart-timeline',
+          title: 'Report',
+          toRoute: 'report',
+          toValue: 'report'
         }
       ]
       menuDrawerData = menuDrawerData.concat(teacherMenuDrawerData)
