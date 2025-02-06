@@ -23,12 +23,12 @@
         v-model:options="options" @update:options="fetchData" :sort-by="[{ key: 'calories', order: 'asc' }]">
         <template v-slot:top>
           <v-toolbar flat>
-            <v-toolbar-title>List Report</v-toolbar-title>
+            <v-toolbar-title>List Summary</v-toolbar-title>
             <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
               <template v-slot:activator="{ props }">
-                <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="small">
-                  <v-icon>mdi-plus</v-icon> New Report
-                </v-btn>
+                <!-- <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="small">
+                  <v-icon>mdi-plus</v-icon> New Summary
+                </v-btn> -->
               </template>
               <v-card>
                 <v-card :title="formTitle"></v-card>
@@ -94,97 +94,6 @@
 
               </v-card>
             </v-dialog>
-            <v-dialog v-model="dialogDelete" max-width="500px">
-              <v-card>
-                <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
-                <v-card-text>
-                  <v-container>
-                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
-                      closable close-label="Close Alert"></v-alert>
-                    <v-form v-model="form" @submit.prevent="deleteItemConfirm">
-                      <p class="ma-6">Apakah Anda yakin Menghapus Report <b>{{ editedItem.type_report }} - {{
-                        editedItem.student_fullname }}</b>?</p>
-                      <v-row>
-                        <v-col>
-                          <v-btn color="success" size="large" type="submit" variant="elevated" block>
-                            Ya
-                          </v-btn>
-                        </v-col>
-                        <v-col>
-                          <v-btn color="warning" size="large" type="button" variant="elevated" block
-                            @click="closeDelete">Tidak
-                          </v-btn>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-container>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
-
-            <v-dialog v-model="dialogLock" max-width="500px">
-              <v-card>
-                <v-card-title class="text-h5">Are you sure want to lock this report?</v-card-title>
-                <v-card-text>
-                  <v-container>
-                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
-                      closable close-label="Close Alert"></v-alert>
-                    <v-form v-model="form" @submit.prevent="lockItemConfirm">
-                      <p class="ma-6">Dengan mengunci report ini, Anda sudah tidak dapat membukanya kembali. Dan report
-                        menjadi
-                        final.
-                        Apakah Anda yakin akan mengunci Report <b>{{ editedItem.type_report }} - {{
-                          editedItem.student_fullname
-                          }}</b> ini?</p>
-                      <v-row>
-                        <v-col>
-                          <v-btn color="success" size="large" type="submit" variant="elevated" block>
-                            Ya
-                          </v-btn>
-                        </v-col>
-                        <v-col>
-                          <v-btn color="warning" size="large" type="button" variant="elevated" block
-                            @click="closeLock">Tidak
-                          </v-btn>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-container>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
-
-            <v-dialog v-model="dialogUnlock" max-width="500px">
-              <v-card>
-                <v-card-title class="text-h5">Are you sure want to unlock this report?</v-card-title>
-                <v-card-text>
-                  <v-container>
-                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
-                      closable close-label="Close Alert"></v-alert>
-                    <v-form v-model="form" @submit.prevent="unlockItemConfirm">
-                      <p class="ma-6">Dengan membuka kunci report ini, Report akan menjadi tidak final dan dapat
-                        dimodifikasi
-                        kembali.
-                        Apakah Anda yakin akan membuka kunci Report <b>{{ editedItem.type_report }} - {{
-                          editedItem.student_fullname
-                          }}</b> ini?</p>
-                      <v-row>
-                        <v-col>
-                          <v-btn color="success" size="large" type="submit" variant="elevated" block>
-                            Ya
-                          </v-btn>
-                        </v-col>
-                        <v-col>
-                          <v-btn color="warning" size="large" type="button" variant="elevated" block
-                            @click="closeUnlock">Tidak
-                          </v-btn>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-container>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
 
             <v-divider class="mx-4" vertical></v-divider>
             <v-spacer></v-spacer>
@@ -195,20 +104,8 @@
           </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
-          <v-icon v-if="!item.is_locked" class="me-2" size="small" @click="lockItem(item)">
-            mdi-lock-open-variant-outline
-          </v-icon>
-          <v-icon v-if="item.is_locked" class="me-2" size="small" @click="unlockItem(item)">
-            mdi-lock-outline
-          </v-icon>
-          <!-- <v-icon class="me-2" size="small" @click="detailReport(item.uuid)">
+          <v-icon class="me-2" size="small" @click="detailReport(item.uuid)">
             mdi-eye
-          </v-icon> -->
-          <v-icon v-if="!item.is_locked" class="me-2" size="small" @click="editItem(item)">
-            mdi-pencil
-          </v-icon>
-          <v-icon v-if="!item.is_locked" size="small" @click="deleteItem(item)">
-            mdi-delete
           </v-icon>
         </template>
         <template v-slot:no-data>
@@ -269,9 +166,9 @@ export default {
     headers: [],
     breadcrumbsItems: [
       {
-        title: 'Report',
+        title: 'Summary',
         disabled: true,
-        href: 'report',
+        href: 'summary',
       }
     ],
     reports: [],
@@ -286,10 +183,8 @@ export default {
       start_page_uuid: '',
       end_juz_uuid: '',
       end_page_uuid: '',
-      date_input: '',
       name: '',
       description: '',
-      type_report: '',
       note: '',
       is_locked: '',
       locked_at: '',
@@ -313,10 +208,8 @@ export default {
       start_page_uuid: '',
       end_juz_uuid: '',
       end_page_uuid: '',
-      date_input: '',
       name: '',
       description: '',
-      type_report: '',
       note: '',
       is_locked: '',
       locked_at: '',
@@ -469,24 +362,8 @@ export default {
             key: 'student_nis',
           },
           {
-            title: 'Date',
-            key: 'date_input',
-          },
-          {
             title: 'Name',
             key: 'student_fullname',
-          },
-          {
-            title: 'Type',
-            key: 'type_report',
-          },
-          {
-            title: 'Start Page',
-            key: 'start_juz_page_name',
-          },
-          {
-            title: 'End Page',
-            key: 'end_juz_page_name',
           },
           {
             title: 'Total',
@@ -505,29 +382,8 @@ export default {
       if (activeRole === 2) {
         const adminHeader = [
           {
-            title: 'NIS',
-            align: 'start',
-            key: 'student_nis',
-          },
-          {
-            title: 'Date',
-            key: 'date_input',
-          },
-          {
             title: 'Name',
             key: 'student_fullname',
-          },
-          {
-            title: 'Type',
-            key: 'type_report',
-          },
-          {
-            title: 'Start Page',
-            key: 'start_juz_page_name',
-          },
-          {
-            title: 'End Page',
-            key: 'end_juz_page_name',
           },
           {
             title: 'Total',
@@ -547,24 +403,8 @@ export default {
             key: 'student_nis',
           },
           {
-            title: 'Date',
-            key: 'date_input',
-          },
-          {
             title: 'Name',
             key: 'student_fullname',
-          },
-          {
-            title: 'Type',
-            key: 'type_report',
-          },
-          {
-            title: 'Start Page',
-            key: 'start_juz_page_name',
-          },
-          {
-            title: 'End Page',
-            key: 'end_juz_page_name',
           },
           {
             title: 'Total',

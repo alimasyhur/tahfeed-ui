@@ -127,6 +127,12 @@ export const useUserStorage = defineStore('user', () => {
           title: 'Report',
           toRoute: 'report',
           toValue: 'report'
+        },
+        {
+          icon: 'mdi-chart-bar',
+          title: 'Summary',
+          toRoute: 'summary',
+          toValue: 'summary'
         }
       ]
       menuDrawerData = menuDrawerData.concat(adminMenuDrawerData)
@@ -157,6 +163,12 @@ export const useUserStorage = defineStore('user', () => {
           title: 'Report',
           toRoute: 'report',
           toValue: 'report'
+        },
+        {
+          icon: 'mdi-chart-bar',
+          title: 'Summary',
+          toRoute: 'summary',
+          toValue: 'summary'
         }
       ]
       menuDrawerData = menuDrawerData.concat(teacherMenuDrawerData)

@@ -13,6 +13,7 @@ import StudentView from '@/views/StudentView.vue'
 import KelasView from '@/views/KelasView.vue'
 import KelasDetailView from '@/views/KelasDetailView.vue'
 import ReportView from '@/views/ReportView.vue'
+import SummaryView from '@/views/SummaryView.vue'
 
 const routes = [
   {
@@ -141,6 +142,16 @@ const routes = [
     component: ReportView,
     meta: {
       breadcrumb: 'Report',
+      requiresAuth: true,
+      requireSuperAdmin: false
+    }
+  },
+  {
+    path: '/summary',
+    name: 'summary',
+    component: SummaryView,
+    meta: {
+      breadcrumb: 'Summary',
       requiresAuth: true,
       requireSuperAdmin: false
     }

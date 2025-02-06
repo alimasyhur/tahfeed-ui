@@ -142,12 +142,31 @@ export const useStudentStorage = defineStore('student', () => {
     }
   }
 
+  const getKelasStudentOptions = async (filterStudent) => {
+    try {
+      const { data } = await apiService.get('/students/options', {
+        headers: {
+          Authorization: `Bearer ${userStorage.accessToken}`
+        },
+        params: filterStudent
+      })
+
+      const studentData = data.data
+
+      students.value = studentData
+      return data
+    } catch {
+      students.value = null
+    }
+  }
+
   return {
     students,
     getStudents,
     removeStudent,
     addStudent,
     editStudent,
-    getStudentOptions
+    getStudentOptions,
+    getKelasStudentOptions
   }
 })

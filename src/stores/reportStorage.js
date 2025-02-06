@@ -50,15 +50,26 @@ export const useReportStorage = defineStore('report', () => {
 
   const addReport = async (inputReport) => {
     try {
+      console.log('cek2: ', inputReport)
+
       const { data } = await apiService.post(
         `reports`,
         {
+          date_input: inputReport.date_input,
+          teacher_uuid: inputReport.teacher_uuid,
+          kelas_uuid: inputReport.kelas_uuid,
+          start_juz_uuid: inputReport.start_juz_uuid,
+          start_page_uuid: inputReport.start_page_uuid,
+          end_juz_uuid: inputReport.end_juz_uuid,
+          end_page_uuid: inputReport.end_page_uuid,
           name: inputReport.name,
+          note: inputReport.note,
+          type_report: inputReport.type_report,
           description: inputReport.description,
+          student_uuid: inputReport.student_uuid,
           org_uuid: inputReport.org_uuid,
           period: inputReport.period,
           grade_uuid: inputReport.grade_uuid,
-          teacher_uuid: inputReport.teacher_uuid,
           total_juz_target: inputReport.total_juz_target
         },
         {
