@@ -135,7 +135,7 @@
                         final.
                         Apakah Anda yakin akan mengunci Report <b>{{ editedItem.type_report }} - {{
                           editedItem.student_fullname
-                          }}</b> ini?</p>
+                        }}</b> ini?</p>
                       <v-row>
                         <v-col>
                           <v-btn color="success" size="large" type="submit" variant="elevated" block>
@@ -167,7 +167,7 @@
                         kembali.
                         Apakah Anda yakin akan membuka kunci Report <b>{{ editedItem.type_report }} - {{
                           editedItem.student_fullname
-                          }}</b> ini?</p>
+                        }}</b> ini?</p>
                       <v-row>
                         <v-col>
                           <v-btn color="success" size="large" type="submit" variant="elevated" block>
@@ -431,9 +431,10 @@ export default {
       this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
 
       if (activeRole.value.constant_value === 2) {
-        params.filter = Object.values({
+        const query = {
           org_uuid: activeRole.value.org_uuid
-        })
+        }
+        params.filter = query
       }
 
       if (activeRole.value.constant_value === 3) {

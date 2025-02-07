@@ -316,9 +316,10 @@ export default {
       this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
 
       if (activeRole.value.constant_value === 2) {
-        params.filter = Object.values({
-          org_uuid: activeRole.value.org_uuid,
-        })
+        const query = {
+          org_uuid: activeRole.value.org_uuid
+        }
+        params.filter = query
       }
 
       this.activeRole = activeRole.value

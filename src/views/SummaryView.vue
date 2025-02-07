@@ -19,8 +19,9 @@
 
     <v-row>
 
-      <v-data-table :headers="headers" :search="search" :items="reports" :items-length="totalItems" :loading="loading"
-        v-model:options="options" @update:options="fetchData" :sort-by="[{ key: 'calories', order: 'asc' }]">
+      <v-data-table :headers="headers" :search="search" :items="achievements" :items-length="totalItems"
+        :loading="loading" v-model:options="options" @update:options="fetchData"
+        :sort-by="[{ key: 'calories', order: 'asc' }]">
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>List Summary</v-toolbar-title>
@@ -104,9 +105,9 @@
           </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
-          <v-icon class="me-2" size="small" @click="detailReport(item.uuid)">
+          <!-- <v-icon class="me-2" size="small" @click="detailReport(item.uuid)">
             mdi-eye
-          </v-icon>
+          </v-icon> -->
         </template>
         <template v-slot:no-data>
           no data
@@ -119,14 +120,15 @@
 </template>
 
 <script>
-import { useTeacherStorage } from '@/stores/teacherStorage';
-import { useReportStorage } from '@/stores/reportStorage';
-import { useStudentStorage } from '@/stores/studentStorage';
+// import { useTeacherStorage } from '@/stores/teacherStorage';
+// import { useReportStorage } from '@/stores/reportStorage';
+import { useSummaryStorage } from '@/stores/summaryStorage';
+// import { useStudentStorage } from '@/stores/studentStorage';
 import { useUserStorage } from '@/stores/userStorage';
 import { storeToRefs } from 'pinia';
-import { useOrganizationStorage } from '@/stores/organizationStorage';
-import { useGradeStorage } from '@/stores/gradeStorage';
-import { useQuranStorage } from '@/stores/quranStorage';
+// import { useOrganizationStorage } from '@/stores/organizationStorage';
+// import { useGradeStorage } from '@/stores/gradeStorage';
+// import { useQuranStorage } from '@/stores/quranStorage';
 
 export default {
   data: () => ({
@@ -263,13 +265,13 @@ export default {
 
   watch: {
     async dialog(val) {
-      this.orgOptions = await this.fetchOrganizationOptions()
-      this.gradeOptions = await this.fetchGradeOptions()
-      this.teacherOptions = await this.fetchTeacherOptions()
-      this.juzOptions = await this.fetchJuzOptions()
-      this.pageOptions = await this.fetchPageOptions()
-      this.studentOptions = await this.fetchKelasStudentOptions()
-      this.typeOptions = await this.fetchReportTypeOptions()
+      // this.orgOptions = await this.fetchOrganizationOptions()
+      // this.gradeOptions = await this.fetchGradeOptions()
+      // this.teacherOptions = await this.fetchTeacherOptions()
+      // this.juzOptions = await this.fetchJuzOptions()
+      // this.pageOptions = await this.fetchPageOptions()
+      // this.studentOptions = await this.fetchKelasStudentOptions()
+      // this.typeOptions = await this.fetchReportTypeOptions()
 
       return val || this.close()
     },
@@ -304,7 +306,7 @@ export default {
       this.selectedItem = null;
     },
     detailReport(slug) {
-      this.$router.push({ path: `/report/${slug}` });
+      this.$router.push({ path: `/summary/${slug}` });
     },
 
     async fetchData() {
@@ -324,9 +326,10 @@ export default {
       this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
 
       if (activeRole.value.constant_value === 2) {
-        params.filter = Object.values({
+        const query = {
           org_uuid: activeRole.value.org_uuid
-        })
+        }
+        params.filter = query
       }
 
       if (activeRole.value.constant_value === 3) {
@@ -344,10 +347,12 @@ export default {
         params.q = this.search;
       }
 
-      const reportStorage = useReportStorage()
-      const data = await reportStorage.getReports(params)
+      console.log('params: ', params)
 
-      this.reports = data.data
+      const summaryStorage = useSummaryStorage()
+      const data = await summaryStorage.getAchievement(params)
+
+      this.achievements = data.data
       this.totalItems = data.data.total
       this.loading = false
     },
@@ -359,21 +364,25 @@ export default {
           {
             title: 'NIS',
             align: 'start',
-            key: 'student_nis',
+            key: 'nis',
           },
           {
             title: 'Name',
-            key: 'student_fullname',
+            key: 'fullname',
           },
           {
-            title: 'Total',
+            title: 'Total Hafalan',
             key: 'total',
           },
           {
-            title: 'Organization',
-            key: 'org_uuid',
+            title: 'Grade',
+            key: 'grade_name',
           },
-          { title: 'Actions', key: 'actions', sortable: false },
+          {
+            title: 'Organization',
+            key: 'organization_name',
+          },
+          // { title: 'Actions', key: 'actions', sortable: false },
         ]
 
         headers = headers.concat(superAdminHeader)
@@ -382,14 +391,23 @@ export default {
       if (activeRole === 2) {
         const adminHeader = [
           {
-            title: 'Name',
-            key: 'student_fullname',
+            title: 'NIS',
+            align: 'start',
+            key: 'nis',
           },
           {
-            title: 'Total',
+            title: 'Name',
+            key: 'fullname',
+          },
+          {
+            title: 'Total Hafalan',
             key: 'total',
           },
-          { title: 'Actions', key: 'actions', sortable: false },
+          {
+            title: 'Grade',
+            key: 'grade_name',
+          },
+          // { title: 'Actions', key: 'actions', sortable: false },
         ]
 
         headers = headers.concat(adminHeader)
@@ -400,17 +418,21 @@ export default {
           {
             title: 'NIS',
             align: 'start',
-            key: 'student_nis',
+            key: 'nis',
           },
           {
             title: 'Name',
-            key: 'student_fullname',
+            key: 'fullname',
           },
           {
-            title: 'Total',
+            title: 'Total Hafalan',
             key: 'total',
           },
-          { title: 'Actions', key: 'actions', sortable: false },
+          {
+            title: 'Grade',
+            key: 'grade_name',
+          },
+          // { title: 'Actions', key: 'actions', sortable: false },
         ]
 
         headers = headers.concat(adminHeader)
@@ -419,400 +441,399 @@ export default {
       return headers
     },
 
+    // async fetchOrganizationOptions() {
+    //   const orgStorage = useOrganizationStorage()
+    //   const userStorage = useUserStorage()
+    //   const { activeRole } = storeToRefs(userStorage)
 
-    async fetchOrganizationOptions() {
-      const orgStorage = useOrganizationStorage()
-      const userStorage = useUserStorage()
-      const { activeRole } = storeToRefs(userStorage)
+    //   if (activeRole.value.constant_value === 2) {
+    //     return [{
+    //       value: activeRole.value.org_uuid,
+    //       displayText: activeRole.value.org_name,
+    //     }]
+    //   }
 
-      if (activeRole.value.constant_value === 2) {
-        return [{
-          value: activeRole.value.org_uuid,
-          displayText: activeRole.value.org_name,
-        }]
-      }
+    //   const orgOptionsData = await orgStorage.getOrganizations()
+    //   const orgOptions = orgOptionsData.data.map(org => {
+    //     return {
+    //       ...org,
+    //       value: org.uuid,
+    //       displayText: org.name,
+    //     }
+    //   })
 
-      const orgOptionsData = await orgStorage.getOrganizations()
-      const orgOptions = orgOptionsData.data.map(org => {
-        return {
-          ...org,
-          value: org.uuid,
-          displayText: org.name,
-        }
-      })
+    //   return orgOptions
+    // },
 
-      return orgOptions
-    },
+    // async fetchTeacherOptions() {
+    //   const teacherStorage = useTeacherStorage()
+    //   const userStorage = useUserStorage()
+    //   const { activeRole } = storeToRefs(userStorage)
 
-    async fetchTeacherOptions() {
-      const teacherStorage = useTeacherStorage()
-      const userStorage = useUserStorage()
-      const { activeRole } = storeToRefs(userStorage)
+    //   const params = {};
+    //   if (activeRole.value.constant_value === 2) {
+    //     params.filter = {
+    //       org_uuid: activeRole.value.org_uuid,
+    //     }
+    //   }
 
-      const params = {};
-      if (activeRole.value.constant_value === 2) {
-        params.filter = {
-          org_uuid: activeRole.value.org_uuid,
-        }
-      }
+    //   const orgOptionsData = await teacherStorage.getTeachers(params);
+    //   const teacherOptions = orgOptionsData.data.map(teacher => {
+    //     return {
+    //       ...teacher,
+    //       value: teacher.uuid,
+    //       displayText: `${teacher.firstname} ${teacher.lastname} (${teacher.nik})`,
+    //     }
+    //   })
 
-      const orgOptionsData = await teacherStorage.getTeachers(params);
-      const teacherOptions = orgOptionsData.data.map(teacher => {
-        return {
-          ...teacher,
-          value: teacher.uuid,
-          displayText: `${teacher.firstname} ${teacher.lastname} (${teacher.nik})`,
-        }
-      })
+    //   return teacherOptions
+    // },
 
-      return teacherOptions
-    },
+    // async fetchKelasStudentOptions() {
+    //   const studentStorage = useStudentStorage()
+    //   const userStorage = useUserStorage()
+    //   const { me, activeRole } = storeToRefs(userStorage)
 
-    async fetchKelasStudentOptions() {
-      const studentStorage = useStudentStorage()
-      const userStorage = useUserStorage()
-      const { me, activeRole } = storeToRefs(userStorage)
+    //   console.log('wkwkwk')
+    //   console.log('me: ', me)
+    //   console.log('fetch active role teacher_uuid: ', activeRole.value.teacher_uuid)
+    //   console.log('fetch active role kelas_uuid: ', me.value.kelas.uuid)
+    //   console.log('fetch active role org_uuid: ', me.value.kelas.org_uuid)
 
-      console.log('wkwkwk')
-      console.log('me: ', me)
-      console.log('fetch active role teacher_uuid: ', activeRole.value.teacher_uuid)
-      console.log('fetch active role kelas_uuid: ', me.value.kelas.uuid)
-      console.log('fetch active role org_uuid: ', me.value.kelas.org_uuid)
+    //   const params = {
+    //     limit: 100000,
+    //     sortOrder: '1',
+    //     sortField: 'period',
+    //   };
 
-      const params = {
-        limit: 100000,
-        sortOrder: '1',
-        sortField: 'period',
-      };
+    //   params.filter = {
+    //     org_uuid: activeRole.value.org_uuid,
+    //     kelas_uuid: me.value.kelas.uuid,
+    //   }
 
-      params.filter = {
-        org_uuid: activeRole.value.org_uuid,
-        kelas_uuid: me.value.kelas.uuid,
-      }
+    //   const studentOptionsData = await studentStorage.getKelasStudentOptions(params)
+    //   const studentOptions = studentOptionsData.data.map(student => {
+    //     const textToDisplay = `${student.firstname} ${student.lastname} (${student.nik})`
+    //     return {
+    //       ...student,
+    //       value: student.uuid,
+    //       displayText: textToDisplay,
+    //     }
+    //   })
 
-      const studentOptionsData = await studentStorage.getKelasStudentOptions(params)
-      const studentOptions = studentOptionsData.data.map(student => {
-        const textToDisplay = `${student.firstname} ${student.lastname} (${student.nik})`
-        return {
-          ...student,
-          value: student.uuid,
-          displayText: textToDisplay,
-        }
-      })
+    //   return studentOptions
+    // },
 
-      return studentOptions
-    },
+    // async fetchReportTypeOptions() {
+    //   return [
+    //     {
+    //       value: 'ziyadah',
+    //       displayText: 'ziyadah',
+    //     },
+    //     {
+    //       value: 'murojaah',
+    //       displayText: 'murojaah',
+    //     },
+    //   ];
+    // },
 
-    async fetchReportTypeOptions() {
-      return [
-        {
-          value: 'ziyadah',
-          displayText: 'ziyadah',
-        },
-        {
-          value: 'murojaah',
-          displayText: 'murojaah',
-        },
-      ];
-    },
+    // async fetchGradeOptions() {
+    //   const gradeStorage = useGradeStorage()
+    //   const userStorage = useUserStorage()
+    //   const { activeRole } = storeToRefs(userStorage)
 
-    async fetchGradeOptions() {
-      const gradeStorage = useGradeStorage()
-      const userStorage = useUserStorage()
-      const { activeRole } = storeToRefs(userStorage)
+    //   const params = {
+    //     limit: 100000,
+    //     sortOrder: '1',
+    //     sortField: 'period',
+    //   };
 
-      const params = {
-        limit: 100000,
-        sortOrder: '1',
-        sortField: 'period',
-      };
+    //   params.filter = {
+    //     org_uuid: activeRole.value.org_uuid,
+    //   }
 
-      params.filter = {
-        org_uuid: activeRole.value.org_uuid,
-      }
+    //   const gradeOptionsData = await gradeStorage.getGrades(params)
+    //   const gradeOptions = gradeOptionsData.data.map(org => {
+    //     return {
+    //       ...org,
+    //       value: org.uuid,
+    //       displayText: org.name,
+    //     }
+    //   })
 
-      const gradeOptionsData = await gradeStorage.getGrades(params)
-      const gradeOptions = gradeOptionsData.data.map(org => {
-        return {
-          ...org,
-          value: org.uuid,
-          displayText: org.name,
-        }
-      })
+    //   return gradeOptions
+    // },
 
-      return gradeOptions
-    },
+    // async fetchJuzOptions() {
+    //   const quranStorage = useQuranStorage()
+    //   const userStorage = useUserStorage()
+    //   const { activeRole } = storeToRefs(userStorage)
 
-    async fetchJuzOptions() {
-      const quranStorage = useQuranStorage()
-      const userStorage = useUserStorage()
-      const { activeRole } = storeToRefs(userStorage)
+    //   if (activeRole.value.constant_value === 2) {
+    //     return [{
+    //       value: activeRole.value.org_uuid,
+    //       displayText: activeRole.value.org_name,
+    //     }]
+    //   }
 
-      if (activeRole.value.constant_value === 2) {
-        return [{
-          value: activeRole.value.org_uuid,
-          displayText: activeRole.value.org_name,
-        }]
-      }
+    //   const quranOptionsData = await quranStorage.getJuzes()
 
-      const quranOptionsData = await quranStorage.getJuzes()
+    //   const juzOptions = quranOptionsData.data.map(juz => {
+    //     return {
+    //       ...juz,
+    //       value: juz.uuid,
+    //       displayText: juz.name,
+    //     }
+    //   })
 
-      const juzOptions = quranOptionsData.data.map(juz => {
-        return {
-          ...juz,
-          value: juz.uuid,
-          displayText: juz.name,
-        }
-      })
+    //   return juzOptions
+    // },
 
-      return juzOptions
-    },
+    // async fetchPageOptions() {
+    //   const quranStorage = useQuranStorage()
+    //   const userStorage = useUserStorage()
+    //   const { activeRole } = storeToRefs(userStorage)
 
-    async fetchPageOptions() {
-      const quranStorage = useQuranStorage()
-      const userStorage = useUserStorage()
-      const { activeRole } = storeToRefs(userStorage)
+    //   if (activeRole.value.constant_value === 2) {
+    //     return [{
+    //       value: activeRole.value.org_uuid,
+    //       displayText: activeRole.value.org_name,
+    //     }]
+    //   }
 
-      if (activeRole.value.constant_value === 2) {
-        return [{
-          value: activeRole.value.org_uuid,
-          displayText: activeRole.value.org_name,
-        }]
-      }
+    //   const quranOptionsData = await quranStorage.getPages()
 
-      const quranOptionsData = await quranStorage.getPages()
+    //   const pageOptions = quranOptionsData.data.map(page => {
+    //     return {
+    //       ...page,
+    //       value: page.uuid,
+    //       displayText: page.name,
+    //     }
+    //   })
 
-      const pageOptions = quranOptionsData.data.map(page => {
-        return {
-          ...page,
-          value: page.uuid,
-          displayText: page.name,
-        }
-      })
+    //   return pageOptions
+    // },
 
-      return pageOptions
-    },
+    // editItem(item) {
+    //   this.editedIndex = this.reports.indexOf(item)
+    //   this.editedItem = Object.assign({}, item)
+    //   this.dialog = true
+    // },
 
-    editItem(item) {
-      this.editedIndex = this.reports.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialog = true
-    },
+    // deleteItem(item) {
+    //   this.editedIndex = this.reports.indexOf(item)
+    //   this.editedItem = Object.assign({}, item)
+    //   this.dialogDelete = true
+    // },
 
-    deleteItem(item) {
-      this.editedIndex = this.reports.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogDelete = true
-    },
+    // lockItem(item) {
+    //   this.editedIndex = this.reports.indexOf(item)
+    //   this.editedItem = Object.assign({}, item)
+    //   this.dialogLock = true
+    // },
 
-    lockItem(item) {
-      this.editedIndex = this.reports.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogLock = true
-    },
+    // unlockItem(item) {
+    //   this.editedIndex = this.reports.indexOf(item)
+    //   this.editedItem = Object.assign({}, item)
+    //   this.dialogUnlock = true
+    // },
 
-    unlockItem(item) {
-      this.editedIndex = this.reports.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogUnlock = true
-    },
+    // async deleteItemConfirm() {
+    //   const reportStorage = useReportStorage()
+    //   const respDelete = await reportStorage.removeReport(this.editedItem)
 
-    async deleteItemConfirm() {
-      const reportStorage = useReportStorage()
-      const respDelete = await reportStorage.removeReport(this.editedItem)
+    //   this.alertMessage = respDelete.message
+    //   this.hasAlert = true
+    //   this.alertType = respDelete.status
 
-      this.alertMessage = respDelete.message
-      this.hasAlert = true
-      this.alertType = respDelete.status
+    //   if (respDelete.status == "success") {
+    //     this.fetchData()
+    //     setTimeout(() => {
+    //       this.dialog = false
+    //       this.dialogDelete = false
+    //       this.alertMessage = ''
+    //       this.hasAlert = false
+    //       this.alertType = ''
+    //       this.editedIndex = -1
+    //       this.editedItem = this.defaultItem
+    //       this.closeDelete()
+    //     }, 700)
+    //   }
+    // },
 
-      if (respDelete.status == "success") {
-        this.fetchData()
-        setTimeout(() => {
-          this.dialog = false
-          this.dialogDelete = false
-          this.alertMessage = ''
-          this.hasAlert = false
-          this.alertType = ''
-          this.editedIndex = -1
-          this.editedItem = this.defaultItem
-          this.closeDelete()
-        }, 700)
-      }
-    },
+    // async lockItemConfirm() {
+    //   const reportStorage = useReportStorage()
+    //   const respLock = await reportStorage.lockReport(this.editedItem)
 
-    async lockItemConfirm() {
-      const reportStorage = useReportStorage()
-      const respLock = await reportStorage.lockReport(this.editedItem)
+    //   this.alertMessage = respLock.message
+    //   this.hasAlert = true
+    //   this.alertType = respLock.status
 
-      this.alertMessage = respLock.message
-      this.hasAlert = true
-      this.alertType = respLock.status
+    //   if (respLock.status == "success") {
+    //     this.fetchData()
+    //     setTimeout(() => {
+    //       this.dialog = false
+    //       this.dialogDelete = false
+    //       this.dialogLock = false
+    //       this.alertMessage = ''
+    //       this.hasAlert = false
+    //       this.alertType = ''
+    //       this.editedIndex = -1
+    //       this.editedItem = this.defaultItem
+    //       this.closeStart()
+    //     }, 700)
+    //   }
+    // },
 
-      if (respLock.status == "success") {
-        this.fetchData()
-        setTimeout(() => {
-          this.dialog = false
-          this.dialogDelete = false
-          this.dialogLock = false
-          this.alertMessage = ''
-          this.hasAlert = false
-          this.alertType = ''
-          this.editedIndex = -1
-          this.editedItem = this.defaultItem
-          this.closeStart()
-        }, 700)
-      }
-    },
+    // async unlockItemConfirm() {
+    //   const reportStorage = useReportStorage()
+    //   const respUnlock = await reportStorage.unlockReport(this.editedItem)
 
-    async unlockItemConfirm() {
-      const reportStorage = useReportStorage()
-      const respUnlock = await reportStorage.unlockReport(this.editedItem)
+    //   this.alertMessage = respUnlock.message
+    //   this.hasAlert = true
+    //   this.alertType = respUnlock.status
 
-      this.alertMessage = respUnlock.message
-      this.hasAlert = true
-      this.alertType = respUnlock.status
+    //   if (respUnlock.status == "success") {
+    //     this.fetchData()
+    //     setTimeout(() => {
+    //       this.dialog = false
+    //       this.dialogDelete = false
+    //       this.dialogLock = false
+    //       this.dialogUnlock = false
+    //       this.alertMessage = ''
+    //       this.hasAlert = false
+    //       this.alertType = ''
+    //       this.editedIndex = -1
+    //       this.editedItem = this.defaultItem
+    //       this.closeStart()
+    //     }, 700)
+    //   }
+    // },
 
-      if (respUnlock.status == "success") {
-        this.fetchData()
-        setTimeout(() => {
-          this.dialog = false
-          this.dialogDelete = false
-          this.dialogLock = false
-          this.dialogUnlock = false
-          this.alertMessage = ''
-          this.hasAlert = false
-          this.alertType = ''
-          this.editedIndex = -1
-          this.editedItem = this.defaultItem
-          this.closeStart()
-        }, 700)
-      }
-    },
+    // close() {
+    //   this.dialog = false
+    //   this.alertMessage = ''
+    //   this.hasAlert = false
+    //   this.alertType = ''
+    //   this.editedIndex = -1
+    //   this.editedItem = this.defaultItem
+    //   this.selectedStartJuz = ''
+    //   this.selectedStartPage = ''
+    //   this.selectedEndJuz = ''
+    //   this.selectedEndPage = ''
+    // },
 
-    close() {
-      this.dialog = false
-      this.alertMessage = ''
-      this.hasAlert = false
-      this.alertType = ''
-      this.editedIndex = -1
-      this.editedItem = this.defaultItem
-      this.selectedStartJuz = ''
-      this.selectedStartPage = ''
-      this.selectedEndJuz = ''
-      this.selectedEndPage = ''
-    },
+    // closeDelete() {
+    //   this.dialog = false
+    //   this.dialogDelete = false
+    //   this.dialogStart = false
+    //   this.dialogEnd = false
+    //   this.alertMessage = ''
+    //   this.hasAlert = false
+    //   this.alertType = ''
+    //   this.editedItem = this.defaultItem
+    // },
 
-    closeDelete() {
-      this.dialog = false
-      this.dialogDelete = false
-      this.dialogStart = false
-      this.dialogEnd = false
-      this.alertMessage = ''
-      this.hasAlert = false
-      this.alertType = ''
-      this.editedItem = this.defaultItem
-    },
+    // closeLock() {
+    //   this.dialog = false
+    //   this.dialogDelete = false
+    //   this.dialogLock = false
+    //   this.alertMessage = ''
+    //   this.hasAlert = false
+    //   this.alertType = ''
+    //   this.editedItem = this.defaultItem
+    // },
 
-    closeLock() {
-      this.dialog = false
-      this.dialogDelete = false
-      this.dialogLock = false
-      this.alertMessage = ''
-      this.hasAlert = false
-      this.alertType = ''
-      this.editedItem = this.defaultItem
-    },
+    // closeUnlock() {
+    //   this.dialog = false
+    //   this.dialogDelete = false
+    //   this.dialogLock = false
+    //   this.dialogUnlock = false
+    //   this.alertMessage = ''
+    //   this.hasAlert = false
+    //   this.alertType = ''
+    //   this.editedItem = this.defaultItem
+    // },
 
-    closeUnlock() {
-      this.dialog = false
-      this.dialogDelete = false
-      this.dialogLock = false
-      this.dialogUnlock = false
-      this.alertMessage = ''
-      this.hasAlert = false
-      this.alertType = ''
-      this.editedItem = this.defaultItem
-    },
+    // async save() {
+    //   const userStorage = useUserStorage()
+    //   const { me, activeRole } = storeToRefs(userStorage)
 
-    async save() {
-      const userStorage = useUserStorage()
-      const { me, activeRole } = storeToRefs(userStorage)
+    //   if ([2, 3].includes(activeRole.value.constant_value)) {
+    //     this.editedItem.org_uuid = activeRole.value.org_uuid;
+    //   }
 
-      if ([2, 3].includes(activeRole.value.constant_value)) {
-        this.editedItem.org_uuid = activeRole.value.org_uuid;
-      }
+    //   if (this.editedIndex > -1) {
+    //     this.loading = true
+    //     const reportStorage = useReportStorage()
+    //     const respEdited = await reportStorage.editReport(this.editedItem)
 
-      if (this.editedIndex > -1) {
-        this.loading = true
-        const reportStorage = useReportStorage()
-        const respEdited = await reportStorage.editReport(this.editedItem)
+    //     this.alertMessage = respEdited.message
+    //     this.hasAlert = true
+    //     this.alertType = respEdited.status
 
-        this.alertMessage = respEdited.message
-        this.hasAlert = true
-        this.alertType = respEdited.status
+    //     if (respEdited.status == "success") {
+    //       this.fetchData()
+    //       setTimeout(() => {
+    //         this.dialog = false
+    //         this.dialogDelete = false
+    //         this.alertMessage = ''
+    //         this.hasAlert = false
+    //         this.alertType = ''
+    //         this.editedIndex = -1
+    //         this.editedItem = this.defaultItem
+    //         this.close()
+    //       }, 700)
+    //     }
+    //   } else {
 
-        if (respEdited.status == "success") {
-          this.fetchData()
-          setTimeout(() => {
-            this.dialog = false
-            this.dialogDelete = false
-            this.alertMessage = ''
-            this.hasAlert = false
-            this.alertType = ''
-            this.editedIndex = -1
-            this.editedItem = this.defaultItem
-            this.close()
-          }, 700)
-        }
-      } else {
+    //     console.log('cek activeRole: ', activeRole.value)
+    //     console.log('cek me: ', me.value)
+    //     const kelasData = me.value.kelas
 
-        console.log('cek activeRole: ', activeRole.value)
-        console.log('cek me: ', me.value)
-        const kelasData = me.value.kelas
+    //     console.log('cek activeRole.teacher_uuid: ', activeRole.value.teacher_uuid)
+    //     console.log('cek activeRole.constant_value: ', activeRole.value.constant_value)
+    //     console.log('select2 this.selectedStartJuz: ', this.selectedStartJuz)
+    //     console.log('select2 this.selectedStartPage: ', this.selectedStartPage)
+    //     console.log('select2 this.selectedEndJuz: ', this.selectedEndJuz)
+    //     console.log('select2 this.selectedEndPage: ', this.selectedEndPage)
 
-        console.log('cek activeRole.teacher_uuid: ', activeRole.value.teacher_uuid)
-        console.log('cek activeRole.constant_value: ', activeRole.value.constant_value)
-        console.log('select2 this.selectedStartJuz: ', this.selectedStartJuz)
-        console.log('select2 this.selectedStartPage: ', this.selectedStartPage)
-        console.log('select2 this.selectedEndJuz: ', this.selectedEndJuz)
-        console.log('select2 this.selectedEndPage: ', this.selectedEndPage)
+    //     this.loading = true
+    //     const reportStorage = useReportStorage()
 
-        this.loading = true
-        const reportStorage = useReportStorage()
+    //     this.editedItem.teacher_uuid = kelasData.teacher_uuid
+    //     this.editedItem.start_juz_uuid = this.selectedStartJuz
+    //     this.editedItem.start_page_uuid = this.selectedStartPage
+    //     this.editedItem.end_juz_uuid = this.selectedEndJuz
+    //     this.editedItem.end_page_uuid = this.selectedEndPage
+    //     this.editedItem.kelas_uuid = me.value.kelas.uuid
 
-        this.editedItem.teacher_uuid = kelasData.teacher_uuid
-        this.editedItem.start_juz_uuid = this.selectedStartJuz
-        this.editedItem.start_page_uuid = this.selectedStartPage
-        this.editedItem.end_juz_uuid = this.selectedEndJuz
-        this.editedItem.end_page_uuid = this.selectedEndPage
-        this.editedItem.kelas_uuid = me.value.kelas.uuid
+    //     console.log('payload: ', this.editedItem)
 
-        console.log('payload: ', this.editedItem)
+    //     const respEdited = await reportStorage.addReport(this.editedItem)
 
-        const respEdited = await reportStorage.addReport(this.editedItem)
+    //     this.alertMessage = respEdited.message
+    //     this.hasAlert = true
+    //     this.alertType = respEdited.status
 
-        this.alertMessage = respEdited.message
-        this.hasAlert = true
-        this.alertType = respEdited.status
+    //     if (respEdited.status == "success") {
+    //       this.fetchData()
+    //       setTimeout(() => {
+    //         this.dialog = false
+    //         this.dialogDelete = false
+    //         this.alertMessage = ''
+    //         this.hasAlert = false
+    //         this.alertType = ''
+    //         this.editedIndex = -1
+    //         this.editedItem = this.defaultItem
+    //         this.close()
+    //       }, 500)
+    //     }
 
-        if (respEdited.status == "success") {
-          this.fetchData()
-          setTimeout(() => {
-            this.dialog = false
-            this.dialogDelete = false
-            this.alertMessage = ''
-            this.hasAlert = false
-            this.alertType = ''
-            this.editedIndex = -1
-            this.editedItem = this.defaultItem
-            this.close()
-          }, 500)
-        }
+    //   }
 
-      }
-
-      this.loading = false
-    },
+    //   this.loading = false
+    // },
   },
   // async mounted() {
   // this.fetchData()
