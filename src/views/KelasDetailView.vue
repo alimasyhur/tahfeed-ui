@@ -600,13 +600,6 @@ export default {
     const kelasStorage = useKelasStorage()
     const data = await kelasStorage.showKelasByUUID(this.slug)
     this.kelas = data.data
-
-    // const params = {
-    //   org_uuid: this.organization.uuid
-    // }
-    // const userOrgStorage = useUserOrganizationStorage()
-    // const userOrgData = await userOrgStorage.getUserOrganizations(params)
-    // this.users = userOrgData.data
   }
 };
 </script>

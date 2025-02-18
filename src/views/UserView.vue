@@ -322,6 +322,7 @@ export default {
         params.filter = {
           org_uuid: activeRole.value.org_uuid,
           role_name: activeRole.value.role_name,
+          constant_value: activeRole.value.constant_value,
         }
       }
 
