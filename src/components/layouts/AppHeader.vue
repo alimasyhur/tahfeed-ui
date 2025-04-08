@@ -1,11 +1,13 @@
 <template>
   <v-app-bar color="white" flat>
     <v-app-bar-title :to="{ name: 'home' }">
-      <b>tah</b><b style="color: green;">feed</b>
+      <b class="text-green-darken-4">tah</b><b class="text-green-lighten-1">feed</b>
     </v-app-bar-title>
 
     <v-spacer></v-spacer>
     <v-btn :to="{ name: 'home' }" class="not-uppercase" v-if="(userStorage.currentUser == null)">Home</v-btn>
+    <v-btn :to="{ name: 'team' }" class="not-uppercase" v-if="(userStorage.currentUser == null)">Team</v-btn>
+    <v-btn :to="{ name: 'donate' }" class="not-uppercase" v-if="(userStorage.currentUser == null)">Donate</v-btn>
     <v-btn target="#" class="not-uppercase ml-2" @click="openLogin()"
       v-if="(userStorage.currentUser === null)">Login</v-btn>
     <div class="text-center mx-2" v-if="(userStorage.currentUser !== null)">

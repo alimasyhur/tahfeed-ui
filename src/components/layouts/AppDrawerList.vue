@@ -1,6 +1,6 @@
 <template>
     <v-navigation-drawer permanent v-if="(userStorage.currentUser !== null)">
-        <v-list-item prepend-avatar="https://randomuser.me/api/portraits/men/78.jpg"
+        <v-list-item prepend-avatar="/images/landing/tahfeed-semangat-hafal.png"
             :title="activeRole.user_name"></v-list-item>
         <v-divider></v-divider>
 

@@ -28,10 +28,14 @@ const icons = [
   //   "icon": "mdi-twitter",
   //   "link": "https://twitter.com/_alimasyhur",
   // },
-  // {
-  //   "icon": "mdi-linkedin",
-  //   "link": "https://www.linkedin.com/in/ali-masyhur-khoiruddin-5b393b119/",
-  // },
+  {
+    "icon": "mdi-github",
+    "link": "https://www.github.com/alimasyhur",
+  },
+  {
+    "icon": "mdi-linkedin",
+    "link": "https://www.linkedin.com/in/alimasyhur",
+  },
   {
     "icon": "mdi-instagram",
     "link": "https://www.instagram.com/_alimasyhur/",

@@ -36,6 +36,14 @@ export const useUserStorage = defineStore('user', () => {
     return [1, 2].includes(activeRole?.constant_value)
   })
 
+  const isTeacher = ref(() => {
+    const activeRole = localStorage.getItem('activeRole')
+      ? JSON.parse(localStorage.getItem('activeRole'))
+      : null
+
+    return [3].includes(activeRole?.constant_value)
+  })
+
   const dialog = ref(false)
   const dialogProfile = ref(false)
   const loading = ref(false)
@@ -472,6 +480,7 @@ export const useUserStorage = defineStore('user', () => {
     activeRole,
     isSuperAdmin,
     isSuperAdminOrAdmin,
+    isTeacher,
     getUsers,
     adminResetPassword,
     selectedRole,

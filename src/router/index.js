@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import TeamView from '../views/TeamView.vue'
+import DonateView from '../views/DonateView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import RoleView from '@/views/RoleView.vue'
 import OrganizationView from '@/views/OrganizationView.vue'
@@ -22,6 +24,22 @@ const routes = [
     component: HomeView,
     meta: {
       breadcrumb: 'Home'
+    }
+  },
+  {
+    path: '/team',
+    name: 'team',
+    component: TeamView,
+    meta: {
+      breadcrumb: 'Team'
+    }
+  },
+  {
+    path: '/donate',
+    name: 'donate',
+    component: DonateView,
+    meta: {
+      breadcrumb: 'Donate'
     }
   },
   {

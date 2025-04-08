@@ -26,7 +26,8 @@
             <v-toolbar-title>List Report</v-toolbar-title>
             <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
               <template v-slot:activator="{ props }">
-                <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="small">
+                <v-btn v-if="isTeacherRole" class="not-uppercase" color="primary" dark v-bind="props" variant="flat"
+                  size="small">
                   <v-icon>mdi-plus</v-icon> New Report
                 </v-btn>
               </template>
@@ -135,7 +136,7 @@
                         final.
                         Apakah Anda yakin akan mengunci Report <b>{{ editedItem.type_report }} - {{
                           editedItem.student_fullname
-                        }}</b> ini?</p>
+                          }}</b> ini?</p>
                       <v-row>
                         <v-col>
                           <v-btn color="success" size="large" type="submit" variant="elevated" block>
@@ -167,7 +168,7 @@
                         kembali.
                         Apakah Anda yakin akan membuka kunci Report <b>{{ editedItem.type_report }} - {{
                           editedItem.student_fullname
-                        }}</b> ini?</p>
+                          }}</b> ini?</p>
                       <v-row>
                         <v-col>
                           <v-btn color="success" size="large" type="submit" variant="elevated" block>
@@ -338,6 +339,7 @@ export default {
     },
     isSuperAdminRole: false,
     isSuperAdminOrAdminRole: false,
+    isTeacherRole: false,
     orgOptions: [],
     gradeOptions: [],
     teacherOptions: [],
@@ -418,7 +420,7 @@ export default {
       this.loading = true;
       const userStorage = useUserStorage()
       const { activeRole } = storeToRefs(userStorage)
-      const { isSuperAdmin, isSuperAdminOrAdmin } = userStorage
+      const { isSuperAdmin, isSuperAdminOrAdmin, isTeacher } = userStorage
       const { page, itemsPerPage } = this.options;
       const params = {
         page,
@@ -429,6 +431,7 @@ export default {
 
       this.isSuperAdminRole = isSuperAdmin(activeRole.value)
       this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
+      this.isTeacherRole = isTeacher(activeRole.value)
 
       if (activeRole.value.constant_value === 2) {
         const query = {
