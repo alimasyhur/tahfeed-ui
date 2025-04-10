@@ -42,7 +42,7 @@
                 <b class="text-green-darken-4">tah</b><b class="text-green-lighten-1">feed</b> donation
               </div>
 
-              <div>
+              <div class="mt-4">
                 <v-row align="left" justify="center" dense>
                   <v-col cols="12" md="12">
                     <v-card class="pa-4" outlined>
@@ -116,10 +116,10 @@
     </v-row>
 
     <v-row style="background-color: white; min-height: 500px;">
-      <v-col cols="12" class="mt-12">
+      <v-col cols="12" class="mt-6">
         <v-row>
           <v-col cols="6">
-            <v-row class="ma-12">
+            <v-row class="ma-6">
               <div class="text-h5 my-6 mx-12 fill-height text-green-darken-4">
                 Your donation will greatly help to develop this project and keep the service sustainable.
 
@@ -131,8 +131,6 @@
           </v-col>
 
           <v-col cols="6" class="fill-height">
-            <!-- <v-img :width="500" aspect-ratio="16/9" cover class="rounded-image"
-              src="/images/landing/tahfeed-target.svg"></v-img> -->
             <v-row class="ma-12">
               <div class="text-h4 fill-height text-left">Utilization of Donation Funds</div>
               <br>

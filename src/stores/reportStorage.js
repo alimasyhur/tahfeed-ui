@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { apiService } from '@/api'
 import { ref } from 'vue'
 import { useUserStorage } from '@/stores/userStorage'
+import { formatDatetime } from '@/utils/formatDate'
 
 export const useReportStorage = defineStore('report', () => {
   const reports = ref(null)
@@ -50,12 +51,17 @@ export const useReportStorage = defineStore('report', () => {
 
   const addReport = async (inputReport) => {
     try {
-      console.log('cek2: ', inputReport)
+      if (inputReport.date_input === null) {
+        return {
+          status: 'error',
+          message: 'date input is required'
+        }
+      }
 
       const { data } = await apiService.post(
         `reports`,
         {
-          date_input: inputReport.date_input,
+          date_input: formatDatetime(inputReport.date_input),
           teacher_uuid: inputReport.teacher_uuid,
           kelas_uuid: inputReport.kelas_uuid,
           start_juz_uuid: inputReport.start_juz_uuid,

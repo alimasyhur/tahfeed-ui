@@ -18,7 +18,6 @@
 
 
     <v-row>
-
       <v-data-table :headers="headers" :search="search" :items="students" :items-length="totalItems" :loading="loading"
         v-model:options="options" @update:options="fetchData" :sort-by="[{ key: 'calories', order: 'asc' }]">
         <template v-slot:top>
@@ -56,8 +55,10 @@
                             :loading="loading" clearable></v-text-field>
                         </v-col>
                         <v-col cols="12">
-                          <v-text-field v-model="editedItem.birthdate" :rules="required" label="Birthdate" type="text"
-                            :loading="loading" clearable></v-text-field>
+                          <VueDatePicker v-model="editedItem.birthdate" :rules="required" placeholder="Select Birthdate"
+                            :enable-time-picker="false" :format="formattedDate">
+                          </VueDatePicker>
+
                         </v-col>
                         <v-col cols="12">
                           <v-text-field v-model="editedItem.phone" :rules="required" label="Phone" type="text"
@@ -163,7 +164,6 @@ export default {
   data: () => ({
     dialog: false,
     dialogDelete: false,
-    headers: [],
     headers: [
       {
         title: 'NIK',
@@ -220,7 +220,7 @@ export default {
       nis: '',
       firstname: '',
       lastname: '',
-      birthdate: '',
+      birthdate: null,
       phone: '',
       bio: '',
     },
@@ -235,7 +235,7 @@ export default {
       nis: '',
       firstname: '',
       lastname: '',
-      birthdate: '',
+      birthdate: null,
       phone: '',
       bio: '',
     },
@@ -275,6 +275,16 @@ export default {
         )
       );
     },
+
+    formattedDate() {
+      const date = new Date(this.editedItem.birthdate)
+      if (!date) return ''
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+
+      return `${year}-${month}-${day}`
+    }
   },
 
   watch: {

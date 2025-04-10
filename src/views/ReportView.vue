@@ -40,8 +40,9 @@
                     <v-form v-model="form" @submit.prevent="save">
                       <v-row>
                         <v-col cols="12">
-                          <v-text-field v-model="editedItem.date_input" :rules="required" label="Date Input" type="text"
-                            :loading="loading" clearable></v-text-field>
+                          <VueDatePicker v-model="editedItem.date_input" required placeholder="Select Date Input"
+                            label="Select Date Input" :enable-time-picker="true" :format="formattedDate">
+                          </VueDatePicker>
                         </v-col>
                         <v-col cols="12">
                           <v-select v-model="editedItem.student_uuid" :items="studentOptions" item-title="displayText"
@@ -136,7 +137,7 @@
                         final.
                         Apakah Anda yakin akan mengunci Report <b>{{ editedItem.type_report }} - {{
                           editedItem.student_fullname
-                          }}</b> ini?</p>
+                        }}</b> ini?</p>
                       <v-row>
                         <v-col>
                           <v-btn color="success" size="large" type="submit" variant="elevated" block>
@@ -168,7 +169,7 @@
                         kembali.
                         Apakah Anda yakin akan membuka kunci Report <b>{{ editedItem.type_report }} - {{
                           editedItem.student_fullname
-                          }}</b> ini?</p>
+                        }}</b> ini?</p>
                       <v-row>
                         <v-col>
                           <v-btn color="success" size="large" type="submit" variant="elevated" block>
@@ -235,6 +236,7 @@ import { useQuranStorage } from '@/stores/quranStorage';
 export default {
   data: () => ({
     // coba
+    pageOptions: [],
     juzOptions: [],
     juzPageOptions: [],
     studentOptions: [],
@@ -287,7 +289,7 @@ export default {
       start_page_uuid: '',
       end_juz_uuid: '',
       end_page_uuid: '',
-      date_input: '',
+      date_input: null,
       name: '',
       description: '',
       type_report: '',
@@ -314,7 +316,7 @@ export default {
       start_page_uuid: '',
       end_juz_uuid: '',
       end_page_uuid: '',
-      date_input: '',
+      date_input: null,
       name: '',
       description: '',
       type_report: '',
@@ -368,6 +370,20 @@ export default {
         )
       );
     },
+    formattedDate() {
+      if (this.editedItem.date_input == '') return ''
+
+      const date = new Date(this.editedItem.date_input)
+      if (!date) return ''
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hh = String(date.getHours()).padStart(2, '0')
+      const mm = String(date.getMinutes()).padStart(2, '0')
+      const ss = String(date.getSeconds()).padStart(2, '0')
+
+      return `${year}-${month}-${day} ${hh}:${mm}:${ss}`
+    }
   },
 
   watch: {
@@ -636,12 +652,6 @@ export default {
       const studentStorage = useStudentStorage()
       const userStorage = useUserStorage()
       const { me, activeRole } = storeToRefs(userStorage)
-
-      console.log('wkwkwk')
-      console.log('me: ', me)
-      console.log('fetch active role teacher_uuid: ', activeRole.value.teacher_uuid)
-      console.log('fetch active role kelas_uuid: ', me.value.kelas.uuid)
-      console.log('fetch active role org_uuid: ', me.value.kelas.org_uuid)
 
       const params = {
         limit: 100000,
@@ -929,18 +939,7 @@ export default {
           }, 700)
         }
       } else {
-
-        console.log('cek activeRole: ', activeRole.value)
-        console.log('cek me: ', me.value)
         const kelasData = me.value.kelas
-
-        console.log('cek activeRole.teacher_uuid: ', activeRole.value.teacher_uuid)
-        console.log('cek activeRole.constant_value: ', activeRole.value.constant_value)
-        console.log('select2 this.selectedStartJuz: ', this.selectedStartJuz)
-        console.log('select2 this.selectedStartPage: ', this.selectedStartPage)
-        console.log('select2 this.selectedEndJuz: ', this.selectedEndJuz)
-        console.log('select2 this.selectedEndPage: ', this.selectedEndPage)
-
         this.loading = true
         const reportStorage = useReportStorage()
 
@@ -950,8 +949,6 @@ export default {
         this.editedItem.end_juz_uuid = this.selectedEndJuz
         this.editedItem.end_page_uuid = this.selectedEndPage
         this.editedItem.kelas_uuid = me.value.kelas.uuid
-
-        console.log('payload: ', this.editedItem)
 
         const respEdited = await reportStorage.addReport(this.editedItem)
 

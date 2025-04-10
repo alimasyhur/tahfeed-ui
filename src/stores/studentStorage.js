@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { apiService } from '@/api'
 import { ref } from 'vue'
 import { useUserStorage } from '@/stores/userStorage'
+import { formatDate } from '@/utils/formatDate'
 
 export const useStudentStorage = defineStore('student', () => {
   const students = ref(null)
@@ -57,7 +58,7 @@ export const useStudentStorage = defineStore('student', () => {
         nis: inputStudent.nis,
         firstname: inputStudent.firstname,
         lastname: inputStudent.lastname,
-        birthdate: inputStudent.birthdate,
+        birthdate: formatDate(inputStudent.birthdate),
         phone: inputStudent.phone,
         bio: inputStudent.bio
       }
@@ -95,7 +96,7 @@ export const useStudentStorage = defineStore('student', () => {
         nis: inputStudent.nis,
         firstname: inputStudent.firstname,
         lastname: inputStudent.lastname,
-        birthdate: inputStudent.birthdate,
+        birthdate: formatDate(inputStudent.birthdate),
         phone: inputStudent.phone,
         bio: inputStudent.bio
       }

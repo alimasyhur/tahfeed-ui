@@ -47,8 +47,13 @@
                             type="text" :loading="loading" clearable></v-text-field>
                         </v-col>
                         <v-col cols="12">
-                          <v-text-field v-model="editedItem.period" :rules="required" label="Tahun Angkatan" type="text"
-                            :loading="loading" clearable></v-text-field>
+                          <!-- <v-text-field v-model="editedItem.period" :rules="required" label="Tahun Angkatan" type="text"
+                            :loading="loading" clearable></v-text-field> -->
+
+                          <VueDatePicker v-model="editedItem.period" :rules="required" placeholder="Select Angkatan"
+                            year-picker :format="formattedYear">
+                          </VueDatePicker>
+
                         </v-col>
                         <v-col cols="12" v-if="isSuperAdminRole">
                           <v-select v-model="editedItem.org_uuid" :items="orgOptions" item-title="displayText"
@@ -194,6 +199,15 @@ export default {
         )
       );
     },
+    formattedYear() {
+      if (this.editedItem.period == '') return ''
+
+      const date = new Date(this.editedItem.period, 0, 1)
+      if (!date) return ''
+      const year = date.getFullYear()
+
+      return `${year}`
+    }
   },
 
   watch: {
