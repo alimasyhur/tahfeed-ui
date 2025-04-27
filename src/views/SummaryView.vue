@@ -475,6 +475,22 @@ export default {
             key: 'fullname',
           },
           {
+            title: `Pekan Lalu (${this.achievements[0].pekan_lalu_label})`,
+            class: 'font-weight-bold',
+            children: [
+              { title: 'Ziyadah', key: 'z_total_pekan_lalu' },
+              { title: 'Murojaah', key: 'm_total_pekan_lalu' },
+            ],
+          },
+          {
+            title: `Pekan Ini (${this.achievements[0].pekan_ini_label})`,
+            class: 'font-weight-bold',
+            children: [
+              { title: 'Ziyadah', key: 'z_total_pekan_ini' },
+              { title: 'Murojaah', key: 'm_total_pekan_ini' },
+            ],
+          },
+          {
             title: 'Total Hafalan',
             class: 'font-weight-bold',
             key: 'total',
