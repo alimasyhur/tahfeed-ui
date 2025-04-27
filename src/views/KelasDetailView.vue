@@ -113,24 +113,6 @@
                     {{ kelas.end_date }}
                   </th>
                 </tr>
-                <!-- <tr>
-                  <th class="text-left">
-                    <b>Status Verifikasi</b>
-                  </th>
-                  <th class="text-left">
-                    <v-badge :color="organization.is_verified_label_color" :content="organization.is_verified_label"
-                      inline></v-badge>
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-left">
-                    <b>Status Aktif</b>
-                  </th>
-                  <th class="text-left">
-                    <v-badge :color="organization.is_active_label_color" :content="organization.is_active_label"
-                      inline></v-badge>
-                  </th>
-                </tr> -->
               </tbody>
             </v-table>
           </v-card-subtitle>

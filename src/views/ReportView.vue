@@ -235,7 +235,6 @@ import { useQuranStorage } from '@/stores/quranStorage';
 
 export default {
   data: () => ({
-    // coba
     pageOptions: [],
     juzOptions: [],
     juzPageOptions: [],
@@ -245,9 +244,6 @@ export default {
     selectedEndJuz: null,
     selectedEndPage: null,
     typeOptions: [],
-    // coba end
-
-    // test
     selectedCategory: null,
     selectedItem: null,
     categories: [
@@ -461,6 +457,7 @@ export default {
           org_uuid: activeRole.value.org_uuid,
           teacher_uuid: activeRole.value.teacher_uuid,
         }
+
         params.filter = query
       }
 

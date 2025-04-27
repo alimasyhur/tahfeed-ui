@@ -105,9 +105,9 @@
           </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
-          <!-- <v-icon class="me-2" size="small" @click="detailReport(item.uuid)">
+          <v-icon class="me-2" size="small" @click="detailSummary(item.uuid)">
             mdi-eye
-          </v-icon> -->
+          </v-icon>
         </template>
         <template v-slot:no-data>
           no data
@@ -173,7 +173,7 @@ export default {
         href: 'summary',
       }
     ],
-    reports: [],
+    achievements: [],
     editedIndex: -1,
     editedItem: {
       uuid: '',
@@ -199,6 +199,10 @@ export default {
       start_juz_page_name: '',
       end_juz_page_name: '',
       total: '',
+      pekan_ini_label: '',
+      total_pekan_ini: '',
+      pekan_lalu_label: '',
+      total_pekan_lalu: '',
     },
     defaultItem: {
       uuid: '',
@@ -224,6 +228,10 @@ export default {
       start_juz_page_name: '',
       end_juz_page_name: '',
       total: '',
+      pekan_ini_label: '',
+      total_pekan_ini: '',
+      pekan_lalu_label: '',
+      total_pekan_lalu: '',
     },
     search: '',
     totalItems: 0,
@@ -305,7 +313,7 @@ export default {
     onCategoryChange() {
       this.selectedItem = null;
     },
-    detailReport(slug) {
+    detailSummary(slug) {
       this.$router.push({ path: `/summary/${slug}` });
     },
 
@@ -341,7 +349,6 @@ export default {
       }
 
       this.activeRole = activeRole.value
-      this.headers = this.getHeaders(activeRole.value.constant_value)
 
       if (this.search !== "") {
         params.q = this.search;
@@ -353,6 +360,8 @@ export default {
       this.achievements = data.data
       this.totalItems = data.data.total
       this.loading = false
+
+      this.headers = this.getHeaders(activeRole.value.constant_value)
     },
 
     getHeaders(activeRole) {
@@ -362,25 +371,46 @@ export default {
           {
             title: 'NIS',
             align: 'start',
+            class: 'font-weight-bold',
             key: 'nis',
           },
           {
             title: 'Name',
+            class: 'font-weight-bold',
             key: 'fullname',
           },
           {
+            title: `Pekan Lalu (${this.achievements[0].pekan_lalu_label})`,
+            class: 'font-weight-bold',
+            children: [
+              { title: 'Ziyadah', key: 'z_total_pekan_lalu' },
+              { title: 'Murojaah', key: 'm_total_pekan_lalu' },
+            ],
+          },
+          {
+            title: `Pekan Ini (${this.achievements[0].pekan_ini_label})`,
+            class: 'font-weight-bold',
+            children: [
+              { title: 'Ziyadah', key: 'z_total_pekan_ini' },
+              { title: 'Murojaah', key: 'm_total_pekan_ini' },
+            ],
+          },
+          {
             title: 'Total Hafalan',
+            class: 'font-weight-bold',
             key: 'total',
           },
           {
             title: 'Grade',
+            class: 'font-weight-bold',
             key: 'grade_name',
           },
           {
             title: 'Organization',
+            class: 'font-weight-bold',
             key: 'organization_name',
           },
-          // { title: 'Actions', key: 'actions', sortable: false },
+          { title: 'Actions', key: 'actions', sortable: false },
         ]
 
         headers = headers.concat(superAdminHeader)
@@ -391,21 +421,41 @@ export default {
           {
             title: 'NIS',
             align: 'start',
+            class: 'font-weight-bold',
             key: 'nis',
           },
           {
             title: 'Name',
+            class: 'font-weight-bold',
             key: 'fullname',
           },
           {
+            title: `Pekan Lalu (${this.achievements[0].pekan_lalu_label})`,
+            class: 'font-weight-bold',
+            children: [
+              { title: 'Ziyadah', key: 'z_total_pekan_lalu' },
+              { title: 'Murojaah', key: 'm_total_pekan_lalu' },
+            ],
+          },
+          {
+            title: `Pekan Ini (${this.achievements[0].pekan_ini_label})`,
+            class: 'font-weight-bold',
+            children: [
+              { title: 'Ziyadah', key: 'z_total_pekan_ini' },
+              { title: 'Murojaah', key: 'm_total_pekan_ini' },
+            ],
+          },
+          {
             title: 'Total Hafalan',
+            class: 'font-weight-bold',
             key: 'total',
           },
           {
             title: 'Grade',
+            class: 'font-weight-bold',
             key: 'grade_name',
           },
-          // { title: 'Actions', key: 'actions', sortable: false },
+          { title: 'Actions', key: 'actions', sortable: false },
         ]
 
         headers = headers.concat(adminHeader)
@@ -416,21 +466,25 @@ export default {
           {
             title: 'NIS',
             align: 'start',
+            class: 'font-weight-bold',
             key: 'nis',
           },
           {
             title: 'Name',
+            class: 'font-weight-bold',
             key: 'fullname',
           },
           {
             title: 'Total Hafalan',
+            class: 'font-weight-bold',
             key: 'total',
           },
           {
             title: 'Grade',
+            class: 'font-weight-bold',
             key: 'grade_name',
           },
-          // { title: 'Actions', key: 'actions', sortable: false },
+          { title: 'Actions', key: 'actions', sortable: false },
         ]
 
         headers = headers.concat(adminHeader)
