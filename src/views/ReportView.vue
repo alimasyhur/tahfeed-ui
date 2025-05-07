@@ -18,9 +18,9 @@
 
 
     <v-row>
-
-      <v-data-table :headers="headers" :search="search" :items="reports" :items-length="totalItems" :loading="loading"
-        v-model:options="options" @update:options="fetchData" :sort-by="[{ key: 'calories', order: 'asc' }]">
+      <v-data-table-server :headers="headers" :search="search" :items="reports" :items-length="totalItems"
+        :loading="loading" v-model:options="options" @update:options="fetchData" v-model:items-per-page="itemsPerPage"
+        :sort-by="[{ key: 'calories', order: 'asc' }]">
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>List Report</v-toolbar-title>
@@ -216,7 +216,7 @@
         <template v-slot:no-data>
           no data
         </template>
-      </v-data-table>
+      </v-data-table-server>
 
     </v-row>
 
@@ -472,7 +472,7 @@ export default {
       const data = await reportStorage.getReports(params)
 
       this.reports = data.data
-      this.totalItems = data.data.total
+      this.totalItems = Number(data.total)
       this.loading = false
     },
 
