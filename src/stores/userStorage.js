@@ -80,6 +80,7 @@ export const useUserStorage = defineStore('user', () => {
       }
     ]
 
+    // Super Admin
     if (actRole?.constant_value === 1) {
       const adminMenuDrawerData = [
         {
@@ -98,6 +99,7 @@ export const useUserStorage = defineStore('user', () => {
       menuDrawerData = menuDrawerData.concat(adminMenuDrawerData)
     }
 
+    // Super Admin dan Admin
     if ([1, 2].includes(actRole?.constant_value)) {
       const adminMenuDrawerData = [
         {
@@ -146,6 +148,7 @@ export const useUserStorage = defineStore('user', () => {
       menuDrawerData = menuDrawerData.concat(adminMenuDrawerData)
     }
 
+    // Teacher
     if ([3].includes(actRole?.constant_value)) {
       const teacherMenuDrawerData = [
         {

@@ -271,7 +271,7 @@ export default {
       this.isSuperAdminRole = isSuperAdmin(activeRole.value)
       this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
 
-      if (activeRole.value.constant_value === 2) {
+      if ([2, 3].includes(activeRole.value.constant_value)) {
         params.filter = {
           org_uuid: activeRole.value.org_uuid,
         }
