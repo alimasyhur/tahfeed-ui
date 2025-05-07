@@ -316,7 +316,7 @@ export default {
       const { page, itemsPerPage } = this.options;
       const params = {
         page,
-        limit: itemsPerPage,
+        limit: Number(itemsPerPage),
         q: this.search,
         sortOrder: '1',
         sortField: 'firstname',
@@ -325,7 +325,7 @@ export default {
       this.isSuperAdminRole = isSuperAdmin(activeRole.value)
       this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
 
-      if (activeRole.value.constant_value === 2) {
+      if ([2, 3].includes(activeRole.value.constant_value)) {
         const query = {
           org_uuid: activeRole.value.org_uuid
         }
@@ -343,12 +343,14 @@ export default {
       const data = await studentStorage.getStudents(params)
 
       this.students = data.data
-      this.totalItems = data.data.total
+      this.totalItems = Number(data.total)
       this.loading = false
     },
 
     getHeaders(activeRole) {
       let headers = [];
+
+      // SUPERADMIN
       if (activeRole === 1) {
         const superAdminHeader = [
           {
@@ -382,6 +384,7 @@ export default {
         headers = headers.concat(superAdminHeader)
       }
 
+      // ADMIN
       if (activeRole === 2) {
         const adminHeader = [
           {
@@ -411,6 +414,7 @@ export default {
         headers = headers.concat(adminHeader)
       }
 
+      // TEACHER
       if (activeRole === 3) {
         const adminHeader = [
           {
