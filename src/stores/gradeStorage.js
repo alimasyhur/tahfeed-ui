@@ -14,9 +14,7 @@ export const useGradeStorage = defineStore('grade', () => {
         headers: {
           Authorization: `Bearer ${userStorage.accessToken}`
         },
-        params: {
-          filter: { org_uuid: filterGrade.org_uuid }
-        }
+        params: filterGrade
       })
 
       const gradeData = data.data
