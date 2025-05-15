@@ -304,6 +304,9 @@ export default {
   },
 
   methods: {
+    detailSummary(slug) {
+      this.$router.push({ path: `/summary/${slug}` });
+    },
     onJuzChange() {
       this.selectedStartPage = null;
     },

@@ -16,6 +16,7 @@ import KelasView from '@/views/KelasView.vue'
 import KelasDetailView from '@/views/KelasDetailView.vue'
 import ReportView from '@/views/ReportView.vue'
 import SummaryView from '@/views/SummaryView.vue'
+import SummaryDetailView from '@/views/SummaryDetailView.vue'
 
 const routes = [
   {
@@ -172,6 +173,13 @@ const routes = [
       breadcrumb: 'Summary',
       requiresAuth: true,
       requireSuperAdmin: false
+    }
+  },
+  {
+    path: '/summary/:slug',
+    component: SummaryDetailView,
+    meta: {
+      breadcrumb: 'Detail'
     }
   }
 ]

@@ -161,6 +161,28 @@ export const useStudentStorage = defineStore('student', () => {
     }
   }
 
+  const showStudentByUUID = async (uuid) => {
+    try {
+      const { data } = await apiService.get(`/students/${uuid}`, {
+        headers: {
+          Authorization: `Bearer ${userStorage.accessToken}`
+        }
+      })
+
+      return data
+    } catch (error) {
+      let errMessage = error.response.data.message
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+
+      return {
+        status: error.response.data.status,
+        message: errMessage
+      }
+    }
+  }
+
   return {
     students,
     getStudents,
@@ -168,6 +190,7 @@ export const useStudentStorage = defineStore('student', () => {
     addStudent,
     editStudent,
     getStudentOptions,
-    getKelasStudentOptions
+    getKelasStudentOptions,
+    showStudentByUUID
   }
 })
