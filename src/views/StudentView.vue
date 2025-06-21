@@ -500,7 +500,10 @@ export default {
 
       const params = {}
       if (activeRole.value.role_name === 'Admin') {
-        params.org_uuid = activeRole.value.org_uuid
+        const query = {
+          org_uuid: activeRole.value.org_uuid
+        }
+        params.filter = query
       }
 
       const gradeOptionsData = await gradeStorage.getGrades(params)
