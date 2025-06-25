@@ -136,6 +136,22 @@
 
         <v-card-item>
           <!-- ini data start -->
+          <v-row>
+            <v-data-table-server :headers="headers" :search="search" :items="reports" :items-length="totalItems"
+              :loading="loading" v-model:options="options" @update:options="fetchData"
+              v-model:items-per-page="itemsPerPage" :sort-by="[{ key: 'calories', order: 'asc' }]">
+              <template v-slot:top>
+                <v-toolbar flat>
+                  <v-toolbar-title>List Report</v-toolbar-title>
+                  <v-divider class="mx-4" vertical></v-divider>
+                  <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
+                    hide-details></v-text-field>
+
+                </v-toolbar>
+              </template>
+            </v-data-table-server>
+
+          </v-row>
 
           <!-- ini data end -->
         </v-card-item>
@@ -150,9 +166,9 @@
 </template>
 
 <script>
-import { useKelasStorage } from '@/stores/kelasStorage';
 import { useStudentStorage } from '@/stores/studentStorage';
 import { useUserStorage } from '@/stores/userStorage';
+import { useReportStorage } from '@/stores/reportStorage';
 import { storeToRefs } from 'pinia';
 
 export default {
@@ -170,82 +186,15 @@ export default {
     // start
     dialog: false,
     dialogDelete: false,
-    headers: [
-      {
-        title: 'NIK',
-        align: 'start',
-        key: 'nik',
-      },
-      {
-        title: 'NIS',
-        key: 'nis',
-      },
-      {
-        title: 'First Name',
-        key: 'firstname',
-      },
-      {
-        title: 'Last Name',
-        key: 'lastname',
-      },
-      {
-        title: 'Birthdate',
-        key: 'birthdate',
-      },
-      {
-        title: 'Phone',
-        key: 'phone',
-      },
-      { title: 'Actions', key: 'actions', sortable: false },
-    ],
+    headers: [],
     students: [],
-    editedIndex: -1,
-    editedItem: {
-      uuid: '',
-      name: '',
-      description: '',
-      teacher_uuid: '',
-      org_uuid: '',
-      grade_uuid: '',
-      status: '',
-      created_at: '',
-      updated_at: '',
-      deleted_at: '',
-      student_uuid: '',
-      nik: '',
-      nis: '',
-      firstname: '',
-      lastname: '',
-      birthdate: '',
-      phone: '',
-      total_juz_target: null,
-    },
-    defaultItem: {
-      uuid: '',
-      name: '',
-      description: '',
-      teacher_uuid: '',
-      org_uuid: '',
-      grade_uuid: '',
-      status: '',
-      created_at: '',
-      updated_at: '',
-      deleted_at: '',
-      student_uuid: '',
-      nik: '',
-      nis: '',
-      firstname: '',
-      lastname: '',
-      birthdate: '',
-      phone: '',
-      total_juz_target: null,
-    },
     search: '',
     totalItems: 0,
     options: {
       page: 1,
       itemsPerPage: 10,
     },
+    reports: [],
     isSuperAdminRole: false,
     isSuperAdminOrAdminRole: false,
     orgOptions: [],
@@ -310,6 +259,96 @@ export default {
       ]
     },
 
+    getHeaders(activeRole) {
+      let headers = [];
+      if (activeRole === 1) {
+        const superAdminHeader = [
+          {
+            title: 'Date',
+            key: 'date_input',
+          },
+          {
+            title: 'Type',
+            key: 'type_report',
+          },
+          {
+            title: 'Start Page',
+            key: 'start_juz_page_name',
+          },
+          {
+            title: 'End Page',
+            key: 'end_juz_page_name',
+          },
+          {
+            title: 'Total',
+            key: 'total',
+          },
+          {
+            title: 'Organization',
+            key: 'org_uuid',
+          },
+        ]
+
+        headers = headers.concat(superAdminHeader)
+      }
+
+      if (activeRole === 2) {
+        const adminHeader = [
+          {
+            title: 'Date',
+            key: 'date_input',
+          },
+          {
+            title: 'Type',
+            key: 'type_report',
+          },
+          {
+            title: 'Start Page',
+            key: 'start_juz_page_name',
+          },
+          {
+            title: 'End Page',
+            key: 'end_juz_page_name',
+          },
+          {
+            title: 'Total',
+            key: 'total',
+          },
+        ]
+
+        headers = headers.concat(adminHeader)
+      }
+
+      if (activeRole === 3) {
+        const adminHeader = [
+          {
+            title: 'Date',
+            key: 'date_input',
+          },
+          {
+            title: 'Type',
+            key: 'type_report',
+          },
+          {
+            title: 'Start Page',
+            key: 'start_juz_page_name',
+          },
+          {
+            title: 'End Page',
+            key: 'end_juz_page_name',
+          },
+          {
+            title: 'Total',
+            key: 'total',
+          },
+        ]
+
+        headers = headers.concat(adminHeader)
+      }
+
+      return headers
+    },
+
     async fetchData() {
       this.loading = true;
       const userStorage = useUserStorage()
@@ -340,14 +379,17 @@ export default {
       }
 
       params.filter = {
-        kelas_uuid: this.$route.params.slug
+        ...params.filter,
+        student_uuid: this.$route.params.slug,
       }
 
-      const kelasStorage = useKelasStorage()
-      const data = await kelasStorage.getKelasStudents(params)
+      this.headers = this.getHeaders(activeRole.value.constant_value)
 
-      this.students = data.data
-      this.totalItems = data.data.total
+      const reportStorage = useReportStorage()
+      const data = await reportStorage.getReports(params)
+
+      this.reports = data.data
+      this.totalItems = Number(data.total)
       this.loading = false
     },
   },
