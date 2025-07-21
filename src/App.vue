@@ -1,7 +1,7 @@
 <template>
-  <v-app ref="app" class="d-flex flex-column" style="min-height: 100vh;">
+  <v-app ref="app" class="rounded rounded-md">
     <AppHeader />
-    <v-main class="bg-grey-lighten-4 flex-grow-1">
+    <v-main class="bg-grey-lighten-4">
       <Sidebar :drawer="drawer" :rail="rail" @update:drawer="drawer = $event" @update:rail="appStorage.setRail" />
       <RouterView />
     </v-main>
