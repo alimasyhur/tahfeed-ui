@@ -24,14 +24,13 @@
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>List Grades</v-toolbar-title>
-            <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
+            <v-dialog v-model="dialog" width="auto" persistent>
               <template v-slot:activator="{ props }">
                 <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="small">
                   <v-icon>mdi-plus</v-icon> New Grade
                 </v-btn>
               </template>
-              <v-card>
-                <v-card :title="formTitle"></v-card>
+              <v-card class="responsive-dialog" :title="formTitle">
                 <v-card-text>
                   <v-container>
                     <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
@@ -78,8 +77,8 @@
 
               </v-card>
             </v-dialog>
-            <v-dialog v-model="dialogDelete" max-width="500px">
-              <v-card>
+            <v-dialog v-model="dialogDelete" width="auto">
+              <v-card class="responsive-dialog">
                 <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
                 <v-card-text>
                   <v-container>
@@ -130,6 +129,14 @@
 
   </v-container>
 </template>
+
+<style scoped>
+.responsive-dialog {
+  width: 90vw;
+  max-width: 500px;
+  margin: 0 auto;
+}
+</style>
 
 <script>
 import { useGradeStorage } from '@/stores/gradeStorage';

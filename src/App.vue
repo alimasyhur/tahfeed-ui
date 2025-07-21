@@ -1,11 +1,13 @@
 <template>
-  <v-app ref="app" class="rounded rounded-md">
-    <AppHeader />
-    <v-main class="bg-grey-lighten-4">
-      <Sidebar :drawer="drawer" :rail="rail" @update:drawer="drawer = $event" @update:rail="appStorage.setRail" />
-      <RouterView />
-    </v-main>
-    <AppFooter />
+  <v-app>
+    <div class="app-wrapper">
+      <AppHeader />
+      <v-main class="bg-grey-lighten-4 main-content">
+        <Sidebar :drawer="drawer" :rail="rail" @update:drawer="drawer = $event" @update:rail="appStorage.setRail" />
+        <router-view />
+      </v-main>
+      <AppFooter />
+    </div>
   </v-app>
 </template>
 

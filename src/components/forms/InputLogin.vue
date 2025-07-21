@@ -1,26 +1,26 @@
 <template>
-  <div class="text-h4 text-center my-5">
-    Login
-  </div>
-  <v-divider></v-divider>
-  <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3" closable
-    close-label="Close Alert"></v-alert>
-  <v-form v-model="form" @submit.prevent="onSubmit">
+  <div class="text-h5 text-center my-4">Login</div>
 
+  <v-divider></v-divider>
+
+  <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3" closable
+    close-label="Close Alert" />
+
+  <v-form v-model="form" @submit.prevent="onSubmit" class="pa-2">
     <v-text-field v-model="user.email" :rules="[required]" label="Email" type="email" :loading="loading"></v-text-field>
 
     <v-text-field v-model="user.password" :rules="[required]" label="Password" type="password" :loading="loading"
       placeholder="Enter your password"></v-text-field>
 
-    <br>
-    <v-row>
-      <v-col>
+    <v-row dense class="mt-4">
+      <v-col cols="12" sm="6">
         <v-btn :disabled="!form" color="success" size="large" type="submit" variant="elevated" block>
           Sign In
         </v-btn>
       </v-col>
-      <v-col>
-        <v-btn color="warning" size="large" type="button" variant="elevated" block @click="closeDialog">Cancel
+      <v-col cols="12" sm="6">
+        <v-btn color="warning" size="large" type="button" variant="elevated" block @click="closeDialog">
+          Cancel
         </v-btn>
       </v-col>
     </v-row>

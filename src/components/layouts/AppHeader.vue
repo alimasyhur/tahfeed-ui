@@ -40,16 +40,12 @@
 
   </v-app-bar>
 
-  <v-dialog v-model="dialog" width="auto" :dialog="dialog" persistent>
-    <v-card class="mx-auto px-4 py-4" width="500" rounded="lg">
-
+  <v-dialog v-model="dialog" persistent transition="dialog-top-transition" max-width="90%">
+    <v-card class="mx-auto px-4 py-4" width="100%" rounded="lg">
       <v-card-text>
-
         <InputLogin />
-
       </v-card-text>
     </v-card>
-
   </v-dialog>
 </template>
 
@@ -58,10 +54,8 @@ import { useUserStorage } from '@/stores/userStorage';
 import { storeToRefs } from 'pinia'
 import { onBeforeMount, onMounted, onUnmounted, ref } from 'vue';
 import eventBus from "@/stores/eventBus"
-// import { useRouter } from 'vue-router';
 
 import InputLogin from '../forms/InputLogin.vue';
-// const router = useRouter()
 
 const userStorage = useUserStorage()
 

@@ -1,11 +1,5 @@
 <template>
   <v-container>
-    <!-- <v-row>
-      <v-col cols="12">
-        <h1>User</h1>
-      </v-col>
-    </v-row> -->
-
     <v-row>
       <div>
         <v-breadcrumbs :items="breadcrumbsItems">
@@ -36,7 +30,7 @@
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>List User</v-toolbar-title>
-            <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
+            <v-dialog v-model="dialog" width="auto" persistent>
               <template v-slot:activator="{ props }">
                 <v-btn class="not-uppercase mr-2" color="primary" dark v-bind="props" variant="flat" size="small">
                   <v-icon>mdi-plus</v-icon> New User
@@ -46,7 +40,7 @@
                   <v-icon>mdi-cog-outline</v-icon> Assign Role
                 </v-btn>
               </template>
-              <v-card :title="formTitle">
+              <v-card class="responsive-dialog" :title="formTitle">
                 <v-card-text>
                   <v-container>
                     <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
@@ -89,8 +83,8 @@
               </v-card>
             </v-dialog>
 
-            <v-dialog v-model="dialogResetPassword" width="auto" min-width="500" persistent>
-              <v-card title="Reset Password">
+            <v-dialog v-model="dialogResetPassword" width="auto" persistent>
+              <v-card class="responsive-dialog" title="Reset Password">
                 <v-card-text>
                   <v-container>
                     <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
@@ -123,8 +117,8 @@
               </v-card>
             </v-dialog>
 
-            <v-dialog v-model="dialogAssignRole" width="auto" min-width="500" persistent>
-              <v-card title="Assign Role">
+            <v-dialog v-model="dialogAssignRole" width="auto" persistent>
+              <v-card class="responsive-dialog" title="Assign Role">
                 <v-card-text>
                   <v-container>
                     <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
@@ -191,6 +185,15 @@
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.responsive-dialog {
+  width: 90vw;
+  max-width: 500px;
+  margin: 0 auto;
+}
+</style>
+
 
 <script>
 import { useUserStorage } from '@/stores/userStorage';

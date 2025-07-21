@@ -1,3 +1,13 @@
+.app-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex-grow: 1;
+}
+
 .not-uppercase .v-btn__content {
   text-transform: none;
 }
@@ -13,4 +23,10 @@
 
 .border-blue {
   border-color: blue;
+}
+
+.responsive-dialog {
+  width: 90vw;
+  max-width: 500px;
+  margin: 0 auto;
 }

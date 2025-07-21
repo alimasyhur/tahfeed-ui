@@ -24,15 +24,14 @@
         <template v-slot:top>
           <v-toolbar flat>
             <v-toolbar-title>List Kelas</v-toolbar-title>
-            <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
+            <v-dialog v-model="dialog" width="auto" persistent>
               <template v-slot:activator="{ props }">
                 <v-btn v-if="isSuperAdminOrAdminRole" class="not-uppercase" color="primary" dark v-bind="props"
                   variant="flat" size="small">
                   <v-icon>mdi-plus</v-icon> New Kelas
                 </v-btn>
               </template>
-              <v-card>
-                <v-card :title="formTitle"></v-card>
+              <v-card class="responsive-dialog" :title="formTitle">
                 <v-card-text>
                   <v-container>
                     <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
@@ -82,8 +81,8 @@
 
               </v-card>
             </v-dialog>
-            <v-dialog v-model="dialogDelete" max-width="500px">
-              <v-card>
+            <v-dialog v-model="dialogDelete" width="auto" persistent>
+              <v-card class="responsive-dialog">
                 <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
                 <v-card-text>
                   <v-container>
@@ -109,8 +108,8 @@
               </v-card>
             </v-dialog>
 
-            <v-dialog v-model="dialogStart" max-width="500px">
-              <v-card>
+            <v-dialog v-model="dialogStart" width="auto" persistent>
+              <v-card class="responsive-dialog">
                 <v-card-title class="text-h5">Are you sure want to start this class?</v-card-title>
                 <v-card-text>
                   <v-container>
@@ -137,8 +136,8 @@
               </v-card>
             </v-dialog>
 
-            <v-dialog v-model="dialogEnd" max-width="500px">
-              <v-card>
+            <v-dialog v-model="dialogEnd" width="auto" persistent>
+              <v-card class="responsive-dialog">
                 <v-card-title class="text-h5">Are you sure want to end this class?</v-card-title>
                 <v-card-text>
                   <v-container>
@@ -166,8 +165,8 @@
               </v-card>
             </v-dialog>
 
-            <v-dialog v-model="dialogReactivate" max-width="500px">
-              <v-card>
+            <v-dialog v-model="dialogReactivate" width="auto" persistent>
+              <v-card class="responsive-dialog">
                 <v-card-title class="text-h5">Are you sure want to reactivate this class?</v-card-title>
                 <v-card-text>
                   <v-container>
