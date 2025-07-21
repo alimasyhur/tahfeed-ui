@@ -1,221 +1,128 @@
 <template>
-  <div>
-    <v-row style="background-color: white; min-height: 500px;">
-      <v-col cols="12" class="mt-12">
-        <v-row>
-          <v-col cols="6">
-            <v-row class="ma-12">
-              <div class="text-h2 my-6 mx-12 fill-height text-green-darken-4">
-                How can <b class="text-green-darken-4">tah</b><b class="text-green-lighten-1">feed</b> grow?
-              </div>
-            </v-row>
-          </v-col>
-
-          <v-col cols="4" class="fill-height">
-            <!-- <v-img :width="500" aspect-ratio="16/9" cover class="rounded-image"
-              src="/images/landing/tahfeed-target.svg"></v-img> -->
-            <v-img :width="500" aspect-ratio="16/9" cover class="rounded-image"
-              src="/images/landing/tahfeed-donate.png"></v-img>
-          </v-col>
-
-        </v-row>
+  <v-container fluid>
+    <!-- Section 1: How can tahfeed grow -->
+    <v-row align="center" justify="center" class="py-12" style="background-color: white;">
+      <v-col cols="12" md="6">
+        <div class="text-h4 text-center text-md-left text-green-darken-4 px-4">
+          How can <b class="text-green-darken-4">tah</b><b class="text-green-lighten-1">feed</b> grow?
+        </div>
+      </v-col>
+      <v-col cols="12" md="6" class="text-center">
+        <v-img max-width="400" aspect-ratio="16/9" class="rounded-image mx-auto" cover
+          src="/images/landing/tahfeed-donate.png" />
       </v-col>
     </v-row>
 
-    <v-row>
-      <v-col cols="12">
-        <v-row class="mb-6">
-          <v-col cols="6">
-            <v-row class="ma-12">
-              <div class="text-h3 mx-12 text-green-darken-4">
-                Donations from the donors
-              </div>
-              <div class="text-h5 mx-12 text-green-darken-3">
-                <b class="text-green-darken-4">tah</b><b class="text-green-lighten-1">feed</b> is 100% funded by
-                donations from individual and corporate donors to ensure that this service remains free.
-              </div>
-            </v-row>
-          </v-col>
-          <v-col cols="6">
-            <v-row class="mt-12 mb-4">
-              <div class="text-h4">
-                <b class="text-green-darken-4">tah</b><b class="text-green-lighten-1">feed</b> donation
-              </div>
-            </v-row>
-            <v-row>
-              <div class="mt-4">
-                <v-row align="left" justify="center" dense>
-                  <v-col cols="12" md="12">
-                    <v-card class="pa-4" outlined>
-                      <v-card-subtitle class="d-flex justify-space-between align-center">
-                        <span class="text-p">No Rekening</span>
-                        <v-img src="/images/landing/bank_bsi.png" max-width="80" max-height="80" contain
-                          class="ml-4"></v-img>
-                      </v-card-subtitle>
-                      <v-card-title class="d-flex justify-space-between align-center">
-                        <span class="text-h6"><b>2854793820</b></span>
-                      </v-card-title>
+    <!-- Section 2: Donation Info -->
+    <v-row class="py-12">
+      <v-col cols="12" md="6" class="px-4">
+        <div class="text-h5 text-green-darken-4 mb-2">Donations from the donors</div>
+        <div class="text-body-1 text-green-darken-3">
+          <b class="text-green-darken-4">tah</b><b class="text-green-lighten-1">feed</b> is 100% funded by donations
+          from individual and corporate donors to ensure that this service remains free.
+        </div>
+      </v-col>
 
-                      <br>
+      <v-col cols="12" md="6">
+        <v-card class="ma-4 pa-4" outlined>
+          <v-card-subtitle class="d-flex justify-space-between align-center">
+            <span>No Rekening</span>
+            <v-img src="/images/landing/bank_bsi.png" max-width="80" contain />
+          </v-card-subtitle>
+          <v-card-title class="text-h6">
+            <b>2854793820</b>
+          </v-card-title>
 
-                      <v-row align="center" no-gutters>
-                        <v-col class="text-left" cols="3">
-                          <v-card-subtitle class="d-flex align-center">
-                            <span class="text-p">Nama Bank</span>
-                          </v-card-subtitle>
-                          <v-card-title class="d-flex align-center">
-                            <span class="text-p align-right text-right"><b>Bank BSI</b></span>
-                          </v-card-title>
-                        </v-col>
+          <v-row class="mt-4">
+            <v-col cols="12" md="4">
+              <div class="text-caption">Nama Bank</div>
+              <div><b>Bank BSI</b></div>
+            </v-col>
+            <v-col cols="12" md="5">
+              <div class="text-caption">Atas Nama</div>
+              <div><b>Muhammad Ali Masyur</b></div>
+            </v-col>
+            <v-col cols="12" md="3">
+              <div class="text-caption">Kode Bank</div>
+              <div><b>451</b></div>
+            </v-col>
+          </v-row>
 
-                        <v-col class="text-left" cols="6">
-                          <v-card-subtitle class="d-flex align-center">
-                            <span class="text-p">Atas Nama</span>
-                          </v-card-subtitle>
-                          <v-card-title class="d-flex align-center">
-                            <span class="text-p align-right text-right"><b>Muhammad Ali Masyur</b></span>
-                          </v-card-title>
-                        </v-col>
+          <v-divider class="my-4"></v-divider>
 
-                        <v-col class="text-right alight-right" cols="3">
-                          <v-card-subtitle class="d-flex align-right">
-                            <span class="text-p align-right text-right">Kode Bank</span>
-                          </v-card-subtitle>
-                          <v-card-title class="d-flex align-right">
-                            <span class="text-p align-right text-right"><b>451</b></span>
-                          </v-card-title>
-                        </v-col>
-                      </v-row>
-                      <template v-slot:actions>
-                        <v-btn class="not-uppercase" prepend-icon="mdi-whatsapp" color="green-lighten-2"
-                          variant="outlined" block target="#"
-                          href="https://api.whatsapp.com/send?phone=628156558085&text=Assalamu%27alaikum">Konfirmasi
-                          donasi via Whatsapp : wa.me/6281548004800</v-btn>
-                      </template>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </div>
-            </v-row>
-            <v-row>
-              <div>
-                <br>
-                <p><small>
-                    <i>
-                      <b>*Perhatian <br></b>
-                      <b class="text-green-darken-4">tah</b><b class="text-green-lighten-1">feed</b> hanya memiliki 1
-                      rekening
-                      sesuai info diatas. Hubungi kami jika menemukan rekening donasi
-                      yang mencurigakan.
-                    </i>
-                  </small>
-                </p>
-              </div>
-            </v-row>
-          </v-col>
-        </v-row>
+          <v-btn class="not-uppercase" prepend-icon="mdi-whatsapp" color="green-lighten-2" variant="outlined" block
+            href="https://api.whatsapp.com/send?phone=628156558085&text=Assalamu%27alaikum" target="_blank">
+            Konfirmasi donasi via Whatsapp
+          </v-btn>
+
+          <div class="mt-4">
+            <small>
+              <i>
+                <b>*Perhatian:</b> <br />
+                <b class="text-green-darken-4">tah</b><b class="text-green-lighten-1">feed</b> hanya memiliki 1 rekening
+                sesuai info di atas. Hubungi kami jika menemukan rekening donasi yang mencurigakan.
+              </i>
+            </small>
+          </div>
+        </v-card>
       </v-col>
     </v-row>
 
-    <v-row style="background-color: white; min-height: 500px;">
-      <v-col cols="12" class="mt-6">
-        <v-row>
-          <v-col cols="6">
-            <v-row class="ma-6">
-              <div class="text-h5 my-6 mx-12 fill-height text-green-darken-4">
-                Your donation will greatly help to develop this project and keep the service sustainable.
-
-                <br><br>
-
-                Jazakumullahu khairan katsiran, may Allah reward you with much goodness.
-              </div>
-            </v-row>
-          </v-col>
-
-          <v-col cols="6" class="fill-height">
-            <v-row class="mt-12 mb-4">
-              <div class="text-h4 fill-height text-left">
-                Utilization of Donation Funds
-              </div>
-              <br>
-              <br>
-            </v-row>
-            <v-row>
-              <div class="text-p fill-height text-left">
-                <ul class="check-list" v-for="(usage, i) in donationUsage" :key="i">
-                  <li>
-                    <v-icon left color="green" class="mr-2">mdi-check-circle</v-icon>
-                    {{ usage }}
-                  </li>
-                </ul>
-              </div>
-            </v-row>
-          </v-col>
-
-        </v-row>
+    <!-- Section 3: Pemanfaatan Dana -->
+    <v-row class="py-12" style="background-color: white;">
+      <v-col cols="12" md="6" class="px-4">
+        <div class="text-h6 text-green-darken-4 mb-4">
+          Your donation will greatly help to develop this project and keep the service sustainable.
+        </div>
+        <p>Jazakumullahu khairan katsiran, may Allah reward you with much goodness.</p>
+      </v-col>
+      <v-col cols="12" md="6">
+        <div class="text-h5 text-left mb-4">Utilization of Donation Funds</div>
+        <ul class="check-list">
+          <li v-for="(usage, i) in donationUsage" :key="i">
+            <v-icon left color="green" class="mr-2">mdi-check-circle</v-icon>
+            {{ usage }}
+          </li>
+        </ul>
       </v-col>
     </v-row>
-
-  </div>
+  </v-container>
 </template>
 
 <script>
 export default {
   data() {
     return {
-      slides: [
-        {
-          src: "/images/landing/img_problem_01.svg",
-          text: "Does it take a long time to prepare the students' Qur'an memorization progress report?",
-        },
-        {
-          src: "/images/landing/img_problem_02.svg",
-          text: "Is the students' Qur'an memorization progress not being monitored in a detailed and transparent manner?",
-        },
-        {
-          src: "/images/landing/img_problem_03.svg",
-          text: "Are the students' and teachers' data disorganized and lacking proper historical records?",
-        },
-      ],
-      sourceCodeLink: "https://github.com/alimasyhur/tahfeed-ui",
-      contactUsLink: "https://api.whatsapp.com/send?phone=628156558085&text=Assalamu%27alaikum%0AOrganisasi%20saya%20ingin%20bergabung%20bersama%20tahfeed.%20Bagaimana%20caranya%20ya%3F%0ATerimakasih",
       donationUsage: [
-        'Server rental and maintenance costs.',
-        'tahfeed.com domain rental cost.',
-        'Research and Development',
-      ]
-    }
+        "Server rental and maintenance costs.",
+        "tahfeed.com domain rental cost.",
+        "Research and Development",
+      ],
+    };
   },
-}
+};
 </script>
 
-<style>
+<style scoped>
 .rounded-image {
   border-radius: 16px;
-  /* Rounds the corners */
   filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.1));
-  /* Adds blur and shadow */
   overflow: hidden;
-  /* Ensures the rounded edges crop the image */
   transition: all 0.3s ease-in-out;
-  /* Smooth hover effect */
 }
 
 .rounded-image:hover {
   filter: drop-shadow(0px 6px 10px rgba(0, 0, 0, 0.15)) blur(0.5px);
-  /* Hover effect for dynamic styling */
 }
 
 .check-list {
   list-style: none;
   padding: 0;
-  margin: 0;
 }
 
 .check-list li {
   display: flex;
   align-items: center;
   margin-bottom: 8px;
-  font-size: 16px;
 }
 </style>

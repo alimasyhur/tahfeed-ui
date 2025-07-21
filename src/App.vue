@@ -1,7 +1,7 @@
 <template>
-  <v-app ref="app" class="rounded rounded-md">
+  <v-app ref="app" class="d-flex flex-column" style="min-height: 100vh;">
     <AppHeader />
-    <v-main class="bg-grey-lighten-4" style="min-height: 600px;">
+    <v-main class="bg-grey-lighten-4 flex-grow-1">
       <Sidebar :drawer="drawer" :rail="rail" @update:drawer="drawer = $event" @update:rail="appStorage.setRail" />
       <RouterView />
     </v-main>
@@ -26,17 +26,15 @@ export default {
     AppFooter,
   },
   setup() {
-
     const appStorage = useAppStorage()
     const { rail } = storeToRefs(appStorage)
-
-    const drawer = ref(true);
+    const drawer = ref(true)
 
     return {
       drawer,
       rail,
       appStorage,
-    };
+    }
   },
-};
+}
 </script>
