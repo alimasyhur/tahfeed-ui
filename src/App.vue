@@ -2,7 +2,7 @@
   <v-app ref="app" class="rounded rounded-md">
     <AppHeader />
     <v-main class="bg-grey-lighten-4" style="min-height: 600px;">
-      <Sidebar v-model="drawer" :rail="rail" />
+      <Sidebar :drawer="drawer" :rail="rail" @update:drawer="drawer = $event" @update:rail="appStorage.setRail" />
       <RouterView />
     </v-main>
     <AppFooter />
@@ -15,6 +15,8 @@ import AppHeader from "./components/layouts/AppHeader.vue"
 import Sidebar from "./components/layouts/AppDrawerList.vue"
 import AppFooter from "./components/layouts/AppFooter.vue"
 import { ref } from "vue";
+import { useAppStorage } from '@/stores/appStorage'
+import { storeToRefs } from 'pinia'
 
 export default {
   components: {
@@ -24,17 +26,16 @@ export default {
     AppFooter,
   },
   setup() {
-    const drawerKey = ref(0);
-    const newData = ref({})
 
-    const rail = ref(false)
-    const drawer = ref(true)
+    const appStorage = useAppStorage()
+    const { rail } = storeToRefs(appStorage)
+
+    const drawer = ref(true);
 
     return {
-      drawerKey,
-      rail,
       drawer,
-      newData
+      rail,
+      appStorage,
     };
   },
 };
