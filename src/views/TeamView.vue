@@ -32,20 +32,17 @@
           </v-col>
           <v-col cols="4">
             <v-row class="mx-12 my-6 justify-center align-center">
-              <div class="text-h1 text-center">
+              <v-col cols="12" class="text-h1 text-center">
                 <v-avatar image="/images/landing/owner.png" size="200"></v-avatar>
-              </div>
-              <hr><br>
-              <div class="text-h4">
+              </v-col>
+              <v-col cols="12" class="text-h4 text-center">
                 Ali Masyhur
-              </div>
-              <br>
-              <div class="text-h5 text-center">Owner / Creator</div>
-              <div class="text-p text-center">Sukoharjo, Jawa Tengah, Indonesia</div>
+              </v-col>
+              <v-col cols="12" class="text-h5 text-center">Owner / Creator</v-col>
+              <v-col cols="12" class="text-p text-center">Sukoharjo, Jawa Tengah, Indonesia</v-col>
             </v-row>
           </v-col>
           <v-col cols="4">
-
           </v-col>
         </v-row>
       </v-col>

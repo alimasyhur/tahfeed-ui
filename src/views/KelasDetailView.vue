@@ -475,8 +475,10 @@ export default {
 
     async fetchStudentOptions() {
       const studentStorage = useStudentStorage()
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
 
-      const orgUUID = this.editedItem.org_uuid;
+      const orgUUID = activeRole.value.org_uuid;
       const params = {
         filter: {
           org_uuid: orgUUID

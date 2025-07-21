@@ -24,7 +24,7 @@
 
     <v-row>
       <v-col cols="12">
-        <v-row>
+        <v-row class="mb-6">
           <v-col cols="6">
             <v-row class="ma-12">
               <div class="text-h3 mx-12 text-green-darken-4">
@@ -37,11 +37,12 @@
             </v-row>
           </v-col>
           <v-col cols="6">
-            <v-row class="ma-12">
+            <v-row class="mt-12 mb-4">
               <div class="text-h4">
                 <b class="text-green-darken-4">tah</b><b class="text-green-lighten-1">feed</b> donation
               </div>
-
+            </v-row>
+            <v-row>
               <div class="mt-4">
                 <v-row align="left" justify="center" dense>
                   <v-col cols="12" md="12">
@@ -95,7 +96,8 @@
                   </v-col>
                 </v-row>
               </div>
-
+            </v-row>
+            <v-row>
               <div>
                 <br>
                 <p><small>
@@ -131,10 +133,14 @@
           </v-col>
 
           <v-col cols="6" class="fill-height">
-            <v-row class="ma-12">
-              <div class="text-h4 fill-height text-left">Utilization of Donation Funds</div>
+            <v-row class="mt-12 mb-4">
+              <div class="text-h4 fill-height text-left">
+                Utilization of Donation Funds
+              </div>
               <br>
               <br>
+            </v-row>
+            <v-row>
               <div class="text-p fill-height text-left">
                 <ul class="check-list" v-for="(usage, i) in donationUsage" :key="i">
                   <li>
