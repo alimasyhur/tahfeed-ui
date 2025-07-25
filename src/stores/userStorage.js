@@ -199,7 +199,7 @@ export const useUserStorage = defineStore('user', () => {
 
   const loginUser = async (inputUser) => {
     hasAlert.value = false
-    loading.value = true
+    loading.value = false
     try {
       const { data } = await apiService.post('/auth/login', {
         email: inputUser.email,
@@ -273,7 +273,7 @@ export const useUserStorage = defineStore('user', () => {
 
   const registerUser = async (inputUser) => {
     hasAlert.value = false
-    loading.value = true
+    loading.value = false
     try {
       const { data } = await apiService.post('/auth/register', {
         name: inputUser.name,
