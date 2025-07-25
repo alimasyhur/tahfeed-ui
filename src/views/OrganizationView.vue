@@ -88,7 +88,6 @@
 
               </v-card>
             </v-dialog>
-            <v-divider class="mx-4" vertical></v-divider>
             <v-spacer></v-spacer>
 
             <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line

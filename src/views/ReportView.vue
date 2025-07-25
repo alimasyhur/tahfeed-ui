@@ -23,16 +23,14 @@
         :sort-by="[{ key: 'calories', order: 'asc' }]">
         <template v-slot:top>
           <v-toolbar flat>
-            <v-toolbar-title>List Report</v-toolbar-title>
-            <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
+            <v-dialog v-model="dialog" width="auto" persistent>
               <template v-slot:activator="{ props }">
                 <v-btn v-if="isTeacherRole" class="not-uppercase" color="primary" dark v-bind="props" variant="flat"
-                  size="small">
+                  size="large">
                   <v-icon>mdi-plus</v-icon> New Report
                 </v-btn>
               </template>
-              <v-card>
-                <v-card :title="formTitle"></v-card>
+              <v-card class="responsive-dialog" :title="formTitle">
                 <v-card-text>
                   <v-container>
                     <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
@@ -137,7 +135,7 @@
                         final.
                         Apakah Anda yakin akan mengunci Report <b>{{ editedItem.type_report }} - {{
                           editedItem.student_fullname
-                        }}</b> ini?</p>
+                          }}</b> ini?</p>
                       <v-row>
                         <v-col>
                           <v-btn color="success" size="large" type="submit" variant="elevated" block>
@@ -169,7 +167,7 @@
                         kembali.
                         Apakah Anda yakin akan membuka kunci Report <b>{{ editedItem.type_report }} - {{
                           editedItem.student_fullname
-                        }}</b> ini?</p>
+                          }}</b> ini?</p>
                       <v-row>
                         <v-col>
                           <v-btn color="success" size="large" type="submit" variant="elevated" block>
@@ -187,8 +185,6 @@
                 </v-card-text>
               </v-card>
             </v-dialog>
-
-            <v-divider class="mx-4" vertical></v-divider>
             <v-spacer></v-spacer>
 
             <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line

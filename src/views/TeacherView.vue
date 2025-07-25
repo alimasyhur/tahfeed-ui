@@ -22,11 +22,10 @@
         v-model:options="options" @update:options="fetchData" :sort-by="[{ key: 'calories', order: 'asc' }]">
         <template v-slot:top>
           <v-toolbar flat>
-            <v-toolbar-title>List Teachers</v-toolbar-title>
             <v-dialog v-model="dialog" width="auto" persistent>
               <template v-slot:activator="{ props }">
                 <v-btn v-if="isSuperAdminOrAdminRole" class="not-uppercase" color="primary" dark v-bind="props"
-                  variant="flat" size="small">
+                  variant="flat" size="large">
                   <v-icon>mdi-plus</v-icon> New Teacher
                 </v-btn>
               </template>
@@ -116,7 +115,6 @@
               </v-card>
             </v-dialog>
 
-            <v-divider class="mx-4" vertical></v-divider>
             <v-spacer></v-spacer>
 
             <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line

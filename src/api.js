@@ -1,8 +1,7 @@
 import axios from 'axios'
 
 const apiService = axios.create({
-  baseURL: 'https://api.tahfeed.com/api/',
-  // baseURL: 'http://localhost:8000/api/',
+  baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true
 })
 

@@ -143,7 +143,6 @@
               <template v-slot:top>
                 <v-toolbar flat>
                   <v-toolbar-title>List Report</v-toolbar-title>
-                  <v-divider class="mx-4" vertical></v-divider>
                   <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
                     hide-details></v-text-field>
 

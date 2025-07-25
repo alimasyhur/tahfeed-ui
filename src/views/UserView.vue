@@ -29,13 +29,12 @@
         </template>
         <template v-slot:top>
           <v-toolbar flat>
-            <v-toolbar-title>List User</v-toolbar-title>
             <v-dialog v-model="dialog" width="auto" persistent>
               <template v-slot:activator="{ props }">
-                <v-btn class="not-uppercase mr-2" color="primary" dark v-bind="props" variant="flat" size="small">
+                <v-btn class="not-uppercase mr-2" color="primary" dark v-bind="props" variant="flat" size="large">
                   <v-icon>mdi-plus</v-icon> New User
                 </v-btn>
-                <v-btn class="not-uppercase" color="success" dark v-bind="props" variant="flat" size="small"
+                <v-btn class="not-uppercase" color="success" dark v-bind="props" variant="flat" size="large"
                   @click="assignRole">
                   <v-icon>mdi-cog-outline</v-icon> Assign Role
                 </v-btn>
@@ -153,7 +152,6 @@
               </v-card>
             </v-dialog>
 
-            <v-divider class="mx-4" vertical></v-divider>
             <v-spacer></v-spacer>
 
             <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line

@@ -24,7 +24,6 @@
         :sort-by="[{ key: 'calories', order: 'asc' }]">
         <template v-slot:top>
           <v-toolbar flat>
-            <v-toolbar-title>List Summary</v-toolbar-title>
             <v-dialog v-model="dialog" width="auto" min-width="500" persistent>
               <template v-slot:activator="{ props }">
                 <!-- <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="small">
@@ -95,8 +94,6 @@
 
               </v-card>
             </v-dialog>
-
-            <v-divider class="mx-4" vertical></v-divider>
             <v-spacer></v-spacer>
 
             <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
