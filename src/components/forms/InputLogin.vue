@@ -7,10 +7,11 @@
     close-label="Close Alert" />
 
   <v-form v-model="form" @submit.prevent="onSubmit" class="pa-2">
-    <v-text-field v-model="user.email" :rules="[required]" label="Email" type="email" :loading="loading"></v-text-field>
+    <v-text-field autocomplete="off" v-model="email" :rules="[required]" label="Email" type="email"
+      :loading="loading"></v-text-field>
 
-    <v-text-field v-model="user.password" :rules="[required]" label="Password" type="password" :loading="loading"
-      placeholder="Enter your password"></v-text-field>
+    <v-text-field autocomplete="off" v-model="password" :rules="[required]" label="Password" type="password"
+      :loading="loading" placeholder="Enter your password"></v-text-field>
 
     <v-row dense class="mt-4">
       <v-col cols="12" sm="6">
@@ -40,31 +41,32 @@ const { loginUser, closeDialog, getMenu } = userStorage
 
 const form = ref(false)
 
-const user = reactive({
-  name: null,
-  email: null,
-  password: null,
-})
+const loading = ref(false);
+const email = ref('')
+const password = ref('')
 
-const { loading, hasAlert, alertMessage, alertType, me, activeRole, selectedRole } = storeToRefs(userStorage)
+const { hasAlert, alertMessage, alertType, me, activeRole, selectedRole } = storeToRefs(userStorage)
 
-const onSubmit = () => {
-  loginUser(user).then(() => {
-    const myRoleList = me?.value?.roles
+const onSubmit = async () => {
+  loading.value = true
+  try {
+    await loginUser({ email: email.value, password: password.value })
+
+    const myRoleList = me?.value?.roles || []
     const changedRole = myRoleList[selectedRole.value]
-
     activeRole.value = changedRole
-
     const listMenu = getMenu(changedRole)
 
-    const newData = {
+    eventBus.emit('dataUpdated', {
       activeRole: changedRole,
       listMenu,
       myRoleList
-    }
-
-    eventBus.emit('dataUpdated', newData);
-  })
+    })
+  } catch (err) {
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
 }
 
 const required = (v) => {
