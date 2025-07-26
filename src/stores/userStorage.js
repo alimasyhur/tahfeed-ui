@@ -328,7 +328,7 @@ export const useUserStorage = defineStore('user', () => {
       }, 500)
       router.push({ name: 'profile' })
     } catch (error) {
-      let errMessage = error.response.data.message
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
@@ -370,7 +370,7 @@ export const useUserStorage = defineStore('user', () => {
       }, 500)
       router.push({ name: 'profile' })
     } catch (error) {
-      let errMessage = error.response.data.message
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
@@ -450,13 +450,13 @@ export const useUserStorage = defineStore('user', () => {
 
       return data
     } catch (error) {
-      let errMessage = error.response.data.message
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
 
       return {
-        status: error.response.data.status,
+        status: error?.response?.data?.status ?? 500,
         message: errMessage
       }
     }

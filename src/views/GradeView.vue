@@ -25,7 +25,7 @@
           <v-toolbar flat>
             <v-dialog v-model="dialog" width="auto" persistent>
               <template v-slot:activator="{ props }">
-                <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="large">
+                <v-btn class="not-uppercase" color="primary" dark v-bind="props" variant="flat" size="small">
                   <v-icon>mdi-plus</v-icon> New Grade
                 </v-btn>
               </template>

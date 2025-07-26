@@ -31,10 +31,10 @@
           <v-toolbar flat>
             <v-dialog v-model="dialog" width="auto" persistent>
               <template v-slot:activator="{ props }">
-                <v-btn class="not-uppercase mr-2" color="primary" dark v-bind="props" variant="flat" size="large">
+                <v-btn class="not-uppercase mr-2" color="primary" dark v-bind="props" variant="flat" size="small">
                   <v-icon>mdi-plus</v-icon> New User
                 </v-btn>
-                <v-btn class="not-uppercase" color="success" dark v-bind="props" variant="flat" size="large"
+                <v-btn class="not-uppercase" color="success" dark v-bind="props" variant="flat" size="small"
                   @click="assignRole">
                   <v-icon>mdi-cog-outline</v-icon> Assign Role
                 </v-btn>

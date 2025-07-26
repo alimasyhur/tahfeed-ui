@@ -37,12 +37,12 @@ export const useGradeStorage = defineStore('grade', () => {
       getGrades()
       return data
     } catch (error) {
-      let errMessage = error.response.data.message
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
       return {
-        status: error.response.data.status,
+        status: error?.response?.data?.status ?? 500,
         message: errMessage
       }
     }
@@ -68,13 +68,13 @@ export const useGradeStorage = defineStore('grade', () => {
 
       return data
     } catch (error) {
-      let errMessage = error.response.data.message
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
 
       return {
-        status: error.response.data.status,
+        status: error?.response?.data?.status ?? 500,
         message: errMessage
       }
     }
@@ -99,13 +99,13 @@ export const useGradeStorage = defineStore('grade', () => {
 
       return data
     } catch (error) {
-      let errMessage = error.response.data.message
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
 
       return {
-        status: error.response.data.status,
+        status: error?.response?.data?.status ?? 500,
         message: errMessage
       }
     }

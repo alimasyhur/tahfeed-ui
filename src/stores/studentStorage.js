@@ -30,6 +30,9 @@ export const useStudentStorage = defineStore('student', () => {
   const removeStudent = async (inputRole) => {
     try {
       const { data } = await apiService.delete(`/students/${inputRole.uuid}`, {
+        data: {
+          org_uuid: inputRole.org_uuid
+        },
         headers: {
           Authorization: `Bearer ${userStorage.accessToken}`
         }
@@ -38,12 +41,12 @@ export const useStudentStorage = defineStore('student', () => {
       getStudents()
       return data
     } catch (error) {
-      let errMessage = error.response.data.message
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
       return {
-        status: error.response.data.status,
+        status: error?.response?.data?.status ?? 500,
         message: errMessage
       }
     }
@@ -75,13 +78,13 @@ export const useStudentStorage = defineStore('student', () => {
 
       return data
     } catch (error) {
-      let errMessage = error.response.data.message
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
 
       return {
-        status: error.response.data.status,
+        status: error?.response?.data?.status ?? 500,
         message: errMessage
       }
     }
@@ -113,13 +116,13 @@ export const useStudentStorage = defineStore('student', () => {
 
       return data
     } catch (error) {
-      let errMessage = error.response.data.message
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
 
       return {
-        status: error.response.data.status,
+        status: error?.response?.data?.status ?? 500,
         message: errMessage
       }
     }
@@ -171,13 +174,13 @@ export const useStudentStorage = defineStore('student', () => {
 
       return data
     } catch (error) {
-      let errMessage = error.response.data.message
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
 
       return {
-        status: error.response.data.status,
+        status: error?.response?.data?.status ?? 500,
         message: errMessage
       }
     }

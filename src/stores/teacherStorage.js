@@ -30,6 +30,9 @@ export const useTeacherStorage = defineStore('teacher', () => {
   const removeTeacher = async (inputRole) => {
     try {
       const { data } = await apiService.delete(`/teachers/${inputRole.uuid}`, {
+        data: {
+          org_uuid: inputRole.org_uuid
+        },
         headers: {
           Authorization: `Bearer ${userStorage.accessToken}`
         }
@@ -38,12 +41,13 @@ export const useTeacherStorage = defineStore('teacher', () => {
       getTeachers()
       return data
     } catch (error) {
-      let errMessage = error.response.data.message
+      console.log('error: ', error)
+      let errMessage = error?.response?.data?.message
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
       return {
-        status: error.response.data.status,
+        status: error?.response?.data?.status,
         message: errMessage
       }
     }
@@ -74,13 +78,13 @@ export const useTeacherStorage = defineStore('teacher', () => {
 
       return data
     } catch (error) {
-      let errMessage = error.response.data.message
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
 
       return {
-        status: error.response.data.status,
+        status: error?.response?.data?.status ?? 500,
         message: errMessage
       }
     }
@@ -88,6 +92,11 @@ export const useTeacherStorage = defineStore('teacher', () => {
 
   const editTeacher = async (inputTeacher) => {
     try {
+      const birthdate =
+        typeof inputTeacher.birthdate === 'string'
+          ? inputTeacher.birthdate
+          : formatDate(inputTeacher.birthdate)
+
       const { data } = await apiService.patch(
         `teachers/${inputTeacher.uuid}`,
         {
@@ -96,7 +105,7 @@ export const useTeacherStorage = defineStore('teacher', () => {
           nik: inputTeacher.nik,
           firstname: inputTeacher.firstname,
           lastname: inputTeacher.lastname,
-          birthdate: formatDate(inputTeacher.birthdate),
+          birthdate: birthdate,
           phone: inputTeacher.phone,
           bio: inputTeacher.bio
         },
@@ -109,13 +118,13 @@ export const useTeacherStorage = defineStore('teacher', () => {
 
       return data
     } catch (error) {
-      let errMessage = error.response.data.message
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name
       }
 
       return {
-        status: error.response.data.status,
+        status: error?.response?.data?.status ?? 500,
         message: errMessage
       }
     }

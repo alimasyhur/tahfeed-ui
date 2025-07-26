@@ -30,7 +30,7 @@
 
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref } from "vue";
 import { useUserStorage } from "@/stores/userStorage";
 import { storeToRefs } from "pinia";
 import eventBus from "@/stores/eventBus"
