@@ -1,223 +1,667 @@
 <template>
-  <v-container>
-    <!-- <v-row>
+  <v-container fluid class="pa-4">
+    <!-- Header Section with Gradient Background -->
+    <v-row class="mb-6">
       <v-col cols="12">
-        <h1>Report</h1>
+        <div class="header-section">
+          <v-breadcrumbs :items="breadcrumbsItems" class="pa-0 mb-4">
+            <template v-slot:divider>
+              <v-icon icon="mdi-chevron-right" size="small"></v-icon>
+            </template>
+          </v-breadcrumbs>
+
+          <div class="d-flex flex-column flex-md-row align-center justify-space-between">
+            <div class="page-title-section mb-4 mb-md-0">
+              <h1 class="page-title text-h4 font-weight-bold mb-2">
+                <v-icon icon="mdi-clipboard-text" class="mr-3" color="primary"></v-icon>
+                Report Management
+              </h1>
+              <p class="page-subtitle text-body-1 text-medium-emphasis">
+                Manage student reports, progress tracking, and assessments
+              </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons d-flex flex-column flex-sm-row ga-3">
+              <v-btn v-if="isTeacherRole" color="primary" variant="elevated" size="large" @click="dialog = true"
+                class="action-btn" prepend-icon="mdi-plus">
+                <span class="d-none d-sm-inline">New Report</span>
+                <span class="d-sm-none">New</span>
+              </v-btn>
+            </div>
+          </div>
+        </div>
       </v-col>
-    </v-row> -->
-
-    <v-row>
-      <div>
-        <v-breadcrumbs :items="breadcrumbsItems">
-          <template v-slot:divider>
-            <v-icon icon="mdi-chevron-right"></v-icon>
-          </template>
-        </v-breadcrumbs>
-      </div>
     </v-row>
 
+    <!-- Search and Statistics Section -->
+    <v-row class="mb-4">
+      <v-col cols="12" md="8" lg="6">
+        <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Search reports..." variant="outlined"
+          clearable hide-details class="search-field" density="comfortable"></v-text-field>
+      </v-col>
+      <v-col cols="12" md="4" lg="6" class="d-flex justify-end align-center">
+        <v-chip v-if="reports.length > 0" color="primary" variant="tonal" prepend-icon="mdi-clipboard-text-multiple">
+          {{ totalItems }} Total Reports
+        </v-chip>
+      </v-col>
+    </v-row>
 
+    <!-- Data Table Section -->
     <v-row>
-      <v-data-table-server :headers="headers" :search="search" :items="reports" :items-length="totalItems"
-        :loading="loading" v-model:options="options" @update:options="fetchData" v-model:items-per-page="itemsPerPage"
-        :sort-by="[{ key: 'calories', order: 'asc' }]">
-        <template v-slot:top>
-          <v-toolbar flat>
-            <v-dialog v-model="dialog" width="auto" persistent>
-              <template v-slot:activator="{ props }">
-                <v-btn v-if="isTeacherRole" class="not-uppercase" color="primary" dark v-bind="props" variant="flat"
-                  size="small">
-                  <v-icon>mdi-plus</v-icon> New Report
+      <v-col cols="12">
+        <v-card class="data-table-card" elevation="4">
+          <v-data-table-server :headers="headers" :search="search" :items="reports" :items-length="totalItems"
+            :loading="loading" v-model:options="options" @update:options="fetchData"
+            :sort-by="[{ key: 'date_input', order: 'desc' }]" class="modern-table" :mobile-breakpoint="600">
+
+            <!-- Student NIS with Icon -->
+            <template v-slot:item.student_nis="{ item }">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-card-account-details" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                <span class="font-mono">{{ item.student_nis }}</span>
+              </div>
+            </template>
+
+            <!-- Date with Icon and Formatting -->
+            <template v-slot:item.date_input="{ item }">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-calendar" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                <span>{{ formatDate(item.date_input) }}</span>
+              </div>
+            </template>
+
+            <!-- Student Name with Avatar -->
+            <template v-slot:item.student_fullname="{ item }">
+              <div class="d-flex align-center">
+                <v-avatar :color="getAvatarColor(item.student_fullname)" size="32" class="mr-3">
+                  <span class="text-white font-weight-bold">
+                    {{ getInitials(item.student_fullname) }}
+                  </span>
+                </v-avatar>
+                <div>
+                  <div class="font-weight-medium">{{ item.student_fullname }}</div>
+                  <div class="text-caption text-medium-emphasis d-md-none">
+                    NIS: {{ item.student_nis }}
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- Type Report with Chip -->
+            <template v-slot:item.type_report="{ item }">
+              <v-chip :color="item.type_report === 'ziyadah' ? 'success' : 'info'" variant="tonal" size="small"
+                class="text-capitalize">
+                {{ item.type_report }}
+              </v-chip>
+            </template>
+
+            <!-- Start Page with Icon -->
+            <template v-slot:item.start_juz_page_name="{ item }">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-book-open-page-variant" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                <span>{{ item.start_juz_page_name || 'N/A' }}</span>
+              </div>
+            </template>
+
+            <!-- End Page with Icon -->
+            <template v-slot:item.end_juz_page_name="{ item }">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-book-open-page-variant" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                <span>{{ item.end_juz_page_name || 'N/A' }}</span>
+              </div>
+            </template>
+
+            <!-- Total with Badge -->
+            <template v-slot:item.total="{ item }">
+              <v-chip color="primary" variant="outlined" size="small">
+                {{ item.total || '0' }}
+              </v-chip>
+            </template>
+
+            <!-- Organization (Super Admin only) -->
+            <template v-slot:item.org_uuid="{ item }">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-domain" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                {{ item.org_name || 'N/A' }}
+              </div>
+            </template>
+
+            <!-- Actions -->
+            <template v-slot:item.actions="{ item }">
+              <div class="action-buttons-cell">
+                <!-- Lock/Unlock Button -->
+                <v-tooltip :text="item.is_locked ? 'Unlock Report' : 'Lock Report'" location="top">
+                  <template v-slot:activator="{ props }">
+                    <v-btn :icon="item.is_locked ? 'mdi-lock-outline' : 'mdi-lock-open-variant-outline'" size="small"
+                      variant="text" :color="item.is_locked ? 'error' : 'success'"
+                      @click="item.is_locked ? unlockItem(item) : lockItem(item)" v-bind="props">
+                    </v-btn>
+                  </template>
+                </v-tooltip>
+
+                <!-- Edit Button -->
+                <v-tooltip text="Edit Report" location="top">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-if="!item.is_locked" icon="mdi-pencil" size="small" variant="text" color="primary"
+                      @click="editItem(item)" v-bind="props">
+                    </v-btn>
+                  </template>
+                </v-tooltip>
+
+                <!-- Delete Button -->
+                <v-tooltip text="Delete Report" location="top">
+                  <template v-slot:activator="{ props }">
+                    <v-btn v-if="!item.is_locked" icon="mdi-delete" size="small" variant="text" color="error"
+                      @click="deleteItem(item)" v-bind="props">
+                    </v-btn>
+                  </template>
+                </v-tooltip>
+              </div>
+            </template>
+
+            <!-- Loading State -->
+            <template v-slot:loading>
+              <v-skeleton-loader type="table-row@10"></v-skeleton-loader>
+            </template>
+
+            <!-- No Data State -->
+            <template v-slot:no-data>
+              <div class="text-center pa-8">
+                <v-icon icon="mdi-clipboard-text-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
+                <h3 class="text-h6 mb-2">No Reports Found</h3>
+                <p class="text-body-2 text-medium-emphasis mb-4">
+                  {{ search ? 'No reports match your search criteria.' : 'Get started by creating your first report.' }}
+                </p>
+                <v-btn v-if="!search && isTeacherRole" color="primary" variant="elevated" @click="dialog = true"
+                  prepend-icon="mdi-plus">
+                  Create First Report
                 </v-btn>
-              </template>
-              <v-card class="responsive-dialog" :title="formTitle">
-                <v-card-text>
-                  <v-container>
-                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
-                      closable close-label="Close Alert"></v-alert>
-                    <v-form v-model="form" @submit.prevent="save">
-                      <v-row>
-                        <v-col cols="12">
-                          <VueDatePicker v-model="editedItem.date_input" required placeholder="Select Date Input"
-                            label="Select Date Input" :enable-time-picker="true" :format="formattedDate">
-                          </VueDatePicker>
-                        </v-col>
-                        <v-col cols="12">
-                          <v-select v-model="editedItem.student_uuid" :items="studentOptions" item-title="displayText"
-                            item-value="value" label="Select Student" clearable />
-                        </v-col>
-                        <v-col cols="12">
-                          <v-select v-model="editedItem.type_report" :items="typeOptions" item-title="displayText"
-                            item-value="value" label="Select Type" clearable />
-                        </v-col>
-                        <v-col cols="12">
-                          <v-text-field v-model="editedItem.note" :rules="required" label="Note" type="text"
-                            :loading="loading" clearable></v-text-field>
-                        </v-col>
-
-                        <v-col cols="12" md="6">
-                          <v-select v-model="selectedStartJuz" :items="juzOptions" item-title="displayText"
-                            item-value="value" label="Select Juz" @change="onJuzChange" clearable />
-                        </v-col>
-
-                        <v-col cols="12" md="6">
-                          <v-select v-model="selectedStartPage" :items="pageOptions" item-title="displayText"
-                            item-value="value" label="Select Page" :disabled="!selectedStartJuz" clearable />
-                        </v-col>
-
-                        <v-col cols="12" md="6">
-                          <v-select v-model="selectedEndJuz" :items="juzOptions" item-title="displayText"
-                            item-value="value" label="Select Juz" :disabled="!selectedStartPage"
-                            @change="onJuzEndChange" clearable />
-                        </v-col>
-
-                        <v-col cols="12" md="6">
-                          <v-select v-model="selectedEndPage" :items="pageOptions" item-title="displayText"
-                            item-value="value" label="Select Page" :disabled="!selectedEndJuz" clearable />
-                        </v-col>
-                      </v-row>
-                      <v-row>
-                        <v-col>
-                          <v-btn color="success" size="large" type="submit" variant="elevated" :disabled="!form"
-                            block>Save
-                          </v-btn>
-                        </v-col>
-                        <v-col>
-                          <v-btn color="warning" size="large" type="button" variant="elevated" block
-                            @click="close">Cancel
-                          </v-btn>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-container>
-                </v-card-text>
-
-              </v-card>
-            </v-dialog>
-            <v-dialog v-model="dialogDelete" max-width="500px">
-              <v-card>
-                <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
-                <v-card-text>
-                  <v-container>
-                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
-                      closable close-label="Close Alert"></v-alert>
-                    <v-form v-model="form" @submit.prevent="deleteItemConfirm">
-                      <p class="ma-6">Apakah Anda yakin Menghapus Report <b>{{ editedItem.type_report }} - {{
-                        editedItem.student_fullname }}</b>?</p>
-                      <v-row>
-                        <v-col>
-                          <v-btn color="success" size="large" type="submit" variant="elevated" block>
-                            Ya
-                          </v-btn>
-                        </v-col>
-                        <v-col>
-                          <v-btn color="warning" size="large" type="button" variant="elevated" block
-                            @click="closeDelete">Tidak
-                          </v-btn>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-container>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
-
-            <v-dialog v-model="dialogLock" max-width="500px">
-              <v-card>
-                <v-card-title class="text-h5">Are you sure want to lock this report?</v-card-title>
-                <v-card-text>
-                  <v-container>
-                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
-                      closable close-label="Close Alert"></v-alert>
-                    <v-form v-model="form" @submit.prevent="lockItemConfirm">
-                      <p class="ma-6">Dengan mengunci report ini, Anda sudah tidak dapat membukanya kembali. Dan report
-                        menjadi
-                        final.
-                        Apakah Anda yakin akan mengunci Report <b>{{ editedItem.type_report }} - {{
-                          editedItem.student_fullname
-                        }}</b> ini?</p>
-                      <v-row>
-                        <v-col>
-                          <v-btn color="success" size="large" type="submit" variant="elevated" block>
-                            Ya
-                          </v-btn>
-                        </v-col>
-                        <v-col>
-                          <v-btn color="warning" size="large" type="button" variant="elevated" block
-                            @click="closeLock">Tidak
-                          </v-btn>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-container>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
-
-            <v-dialog v-model="dialogUnlock" max-width="500px">
-              <v-card>
-                <v-card-title class="text-h5">Are you sure want to unlock this report?</v-card-title>
-                <v-card-text>
-                  <v-container>
-                    <v-alert v-if="hasAlert" density="compact" :text="alertMessage" :type="alertType" class="my-3"
-                      closable close-label="Close Alert"></v-alert>
-                    <v-form v-model="form" @submit.prevent="unlockItemConfirm">
-                      <p class="ma-6">Dengan membuka kunci report ini, Report akan menjadi tidak final dan dapat
-                        dimodifikasi
-                        kembali.
-                        Apakah Anda yakin akan membuka kunci Report <b>{{ editedItem.type_report }} - {{
-                          editedItem.student_fullname
-                        }}</b> ini?</p>
-                      <v-row>
-                        <v-col>
-                          <v-btn color="success" size="large" type="submit" variant="elevated" block>
-                            Ya
-                          </v-btn>
-                        </v-col>
-                        <v-col>
-                          <v-btn color="warning" size="large" type="button" variant="elevated" block
-                            @click="closeUnlock">Tidak
-                          </v-btn>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-container>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
-            <v-spacer></v-spacer>
-
-            <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
-              hide-details></v-text-field>
-
-          </v-toolbar>
-        </template>
-        <template v-slot:item.actions="{ item }">
-          <v-icon v-if="!item.is_locked" class="me-2" size="small" @click="lockItem(item)">
-            mdi-lock-open-variant-outline
-          </v-icon>
-          <v-icon v-if="item.is_locked" class="me-2" size="small" @click="unlockItem(item)">
-            mdi-lock-outline
-          </v-icon>
-          <!-- <v-icon class="me-2" size="small" @click="detailReport(item.uuid)">
-            mdi-eye
-          </v-icon> -->
-          <v-icon v-if="!item.is_locked" class="me-2" size="small" @click="editItem(item)">
-            mdi-pencil
-          </v-icon>
-          <v-icon v-if="!item.is_locked" size="small" @click="deleteItem(item)">
-            mdi-delete
-          </v-icon>
-        </template>
-        <template v-slot:no-data>
-          no data
-        </template>
-      </v-data-table-server>
-
+              </div>
+            </template>
+          </v-data-table-server>
+        </v-card>
+      </v-col>
     </v-row>
 
+    <!-- Modern Report Dialog -->
+    <v-dialog v-model="dialog" max-width="900" persistent>
+      <v-card class="modern-dialog">
+        <v-card-title class="dialog-header pa-6">
+          <div class="d-flex align-center">
+            <v-icon :icon="editedIndex === -1 ? 'mdi-clipboard-text-outline' : 'mdi-pencil'" size="24" class="mr-3"
+              color="primary"></v-icon>
+            <span class="text-h5 font-weight-bold">{{ formTitle }}</span>
+            <v-btn icon="mdi-close" variant="text" size="small" @click="close" class="ml-auto"></v-btn>
+          </div>
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <v-card-text class="pa-6">
+          <v-alert v-if="hasAlert" :type="alertType" :text="alertMessage" variant="tonal" closable
+            class="mb-4"></v-alert>
+
+          <v-form v-model="form" @submit.prevent="save">
+            <v-row>
+              <!-- Report Details Section -->
+              <v-col cols="12">
+                <h3 class="text-h6 mb-4 d-flex align-center">
+                  <v-icon icon="mdi-clipboard-text" class="mr-2"></v-icon>
+                  Report Details
+                </h3>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <div class="date-picker-container">
+                  <label class="v-label">Date & Time</label>
+                  <VueDatePicker v-model="editedItem.date_input" :rules="required" placeholder="Select Date & Time"
+                    :enable-time-picker="true" :format="formattedDate" class="modern-date-picker" />
+                </div>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-select v-model="editedItem.student_uuid" :items="studentOptions" item-title="displayText"
+                  item-value="value" label="Select Student" variant="outlined" prepend-inner-icon="mdi-account-school"
+                  :rules="required" clearable></v-select>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-select v-model="editedItem.type_report" :items="typeOptions" item-title="displayText"
+                  item-value="value" label="Report Type" variant="outlined" prepend-inner-icon="mdi-clipboard-check"
+                  :rules="required" clearable></v-select>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-textarea v-model="editedItem.note" :rules="required" label="Notes" variant="outlined"
+                  prepend-inner-icon="mdi-note-text" :loading="loading" rows="2" clearable></v-textarea>
+              </v-col>
+
+              <!-- Quran Progress Section -->
+              <v-col cols="12">
+                <v-divider class="my-4"></v-divider>
+                <h3 class="text-h6 mb-4 d-flex align-center">
+                  <v-icon icon="mdi-book-open-variant" class="mr-2"></v-icon>
+                  Quran Progress
+                </h3>
+              </v-col>
+
+              <!-- Start Position -->
+              <v-col cols="12">
+                <h4 class="text-subtitle-1 mb-3 d-flex align-center">
+                  <v-icon icon="mdi-play" class="mr-2" color="success"></v-icon>
+                  Start Position
+                </h4>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-select v-model="selectedStartJuz" :items="juzOptions" item-title="displayText" item-value="value"
+                  label="Start Juz" variant="outlined" prepend-inner-icon="mdi-book-open-page-variant"
+                  @update:model-value="onJuzChange" clearable></v-select>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-select v-model="selectedStartPage" :items="pageOptions" item-title="displayText" item-value="value"
+                  label="Start Page" variant="outlined" prepend-inner-icon="mdi-bookmark" :disabled="!selectedStartJuz"
+                  clearable></v-select>
+              </v-col>
+
+              <!-- End Position -->
+              <v-col cols="12">
+                <h4 class="text-subtitle-1 mb-3 d-flex align-center">
+                  <v-icon icon="mdi-stop" class="mr-2" color="error"></v-icon>
+                  End Position
+                </h4>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-select v-model="selectedEndJuz" :items="juzOptions" item-title="displayText" item-value="value"
+                  label="End Juz" variant="outlined" prepend-inner-icon="mdi-book-open-page-variant"
+                  :disabled="!selectedStartPage" @update:model-value="onJuzEndChange" clearable></v-select>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-select v-model="selectedEndPage" :items="pageOptions" item-title="displayText" item-value="value"
+                  label="End Page" variant="outlined" prepend-inner-icon="mdi-bookmark" :disabled="!selectedEndJuz"
+                  clearable></v-select>
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions class="pa-6">
+          <v-spacer></v-spacer>
+          <v-btn color="grey" variant="text" size="large" @click="close">
+            Cancel
+          </v-btn>
+          <v-btn color="primary" variant="elevated" size="large" :disabled="!form" :loading="loading" @click="save">
+            {{ editedIndex === -1 ? 'Create Report' : 'Update Report' }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Modern Delete Confirmation Dialog -->
+    <v-dialog v-model="dialogDelete" max-width="500" persistent>
+      <v-card class="modern-dialog delete-dialog">
+        <v-card-title class="dialog-header pa-6">
+          <div class="d-flex align-center">
+            <v-icon icon="mdi-delete-alert" size="24" class="mr-3" color="error"></v-icon>
+            <span class="text-h5 font-weight-bold">Confirm Deletion</span>
+            <v-btn icon="mdi-close" variant="text" size="small" @click="closeDelete" class="ml-auto"></v-btn>
+          </div>
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <v-card-text class="pa-6">
+          <v-alert v-if="hasAlert" :type="alertType" :text="alertMessage" variant="tonal" closable
+            class="mb-4"></v-alert>
+
+          <div class="text-center">
+            <v-icon icon="mdi-alert-circle-outline" size="64" color="warning" class="mb-4"></v-icon>
+
+            <h3 class="text-h6 mb-3">Are you sure?</h3>
+
+            <p class="text-body-1 mb-4">
+              You're about to delete the report for
+              <strong class="text-error">{{ editedItem.student_fullname }}</strong>
+              ({{ editedItem.type_report }}). This action cannot be undone.
+            </p>
+
+            <v-card variant="tonal" color="warning" class="pa-4 mb-4">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-information" class="mr-2"></v-icon>
+                <span class="text-body-2">
+                  All associated data and progress will be permanently removed.
+                </span>
+              </div>
+            </v-card>
+          </div>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions class="pa-6">
+          <v-spacer></v-spacer>
+          <v-btn color="grey" variant="text" size="large" @click="closeDelete">
+            Cancel
+          </v-btn>
+          <v-btn color="error" variant="elevated" size="large" :loading="loading" @click="deleteItemConfirm">
+            Delete Report
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Modern Lock Confirmation Dialog -->
+    <v-dialog v-model="dialogLock" max-width="500" persistent>
+      <v-card class="modern-dialog lock-dialog">
+        <v-card-title class="dialog-header pa-6">
+          <div class="d-flex align-center">
+            <v-icon icon="mdi-lock-alert" size="24" class="mr-3" color="warning"></v-icon>
+            <span class="text-h5 font-weight-bold">Lock Report</span>
+            <v-btn icon="mdi-close" variant="text" size="small" @click="closeLock" class="ml-auto"></v-btn>
+          </div>
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <v-card-text class="pa-6">
+          <v-alert v-if="hasAlert" :type="alertType" :text="alertMessage" variant="tonal" closable
+            class="mb-4"></v-alert>
+
+          <div class="text-center">
+            <v-icon icon="mdi-lock-outline" size="64" color="warning" class="mb-4"></v-icon>
+
+            <h3 class="text-h6 mb-3">Lock this report?</h3>
+
+            <p class="text-body-1 mb-4">
+              You're about to lock the report for
+              <strong>{{ editedItem.student_fullname }}</strong> ({{ editedItem.type_report }}).
+            </p>
+
+            <v-card variant="tonal" color="warning" class="pa-4 mb-4">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-information" class="mr-2"></v-icon>
+                <span class="text-body-2">
+                  Once locked, this report will become final and cannot be modified.
+                </span>
+              </div>
+            </v-card>
+          </div>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions class="pa-6">
+          <v-spacer></v-spacer>
+          <v-btn color="grey" variant="text" size="large" @click="closeLock">
+            Cancel
+          </v-btn>
+          <v-btn color="warning" variant="elevated" size="large" :loading="loading" @click="lockItemConfirm">
+            Lock Report
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Modern Unlock Confirmation Dialog -->
+    <v-dialog v-model="dialogUnlock" max-width="500" persistent>
+      <v-card class="modern-dialog unlock-dialog">
+        <v-card-title class="dialog-header pa-6">
+          <div class="d-flex align-center">
+            <v-icon icon="mdi-lock-open-alert" size="24" class="mr-3" color="success"></v-icon>
+            <span class="text-h5 font-weight-bold">Unlock Report</span>
+            <v-btn icon="mdi-close" variant="text" size="small" @click="closeUnlock" class="ml-auto"></v-btn>
+          </div>
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <v-card-text class="pa-6">
+          <v-alert v-if="hasAlert" :type="alertType" :text="alertMessage" variant="tonal" closable
+            class="mb-4"></v-alert>
+
+          <div class="text-center">
+            <v-icon icon="mdi-lock-open-outline" size="64" color="success" class="mb-4"></v-icon>
+
+            <h3 class="text-h6 mb-3">Unlock this report?</h3>
+
+            <p class="text-body-1 mb-4">
+              You're about to unlock the report for
+              <strong>{{ editedItem.student_fullname }}</strong> ({{ editedItem.type_report }}).
+            </p>
+
+            <v-card variant="tonal" color="info" class="pa-4 mb-4">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-information" class="mr-2"></v-icon>
+                <span class="text-body-2">
+                  The report will no longer be final and can be modified again.
+                </span>
+              </div>
+            </v-card>
+          </div>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions class="pa-6">
+          <v-spacer></v-spacer>
+          <v-btn color="grey" variant="text" size="large" @click="closeUnlock">
+            Cancel
+          </v-btn>
+          <v-btn color="success" variant="elevated" size="large" :loading="loading" @click="unlockItemConfirm">
+            Unlock Report
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
+
+<style scoped>
+.header-section {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.1) 0%, rgba(var(--v-theme-secondary), 0.05) 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 8px;
+}
+
+.page-title {
+  color: rgb(var(--v-theme-on-surface));
+  display: flex;
+  align-items: center;
+}
+
+.page-subtitle {
+  color: rgb(var(--v-theme-on-surface-variant));
+  max-width: 600px;
+}
+
+.action-btn {
+  border-radius: 12px;
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: normal;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.search-field {
+  border-radius: 12px;
+}
+
+.search-field :deep(.v-field) {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.data-table-card {
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.modern-table :deep(.v-data-table__wrapper) {
+  border-radius: 0;
+}
+
+.modern-table :deep(.v-data-table-header) {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.05) 0%, rgba(var(--v-theme-secondary), 0.02) 100%);
+}
+
+.modern-table :deep(.v-data-table-header th) {
+  font-weight: 600;
+  color: rgb(var(--v-theme-primary));
+  border-bottom: 2px solid rgba(var(--v-theme-primary), 0.1);
+}
+
+.modern-table :deep(.v-data-table__tr:hover) {
+  background: rgba(var(--v-theme-primary), 0.02);
+}
+
+.action-buttons-cell {
+  display: flex;
+  gap: 4px;
+}
+
+.modern-dialog {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.dialog-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.05) 0%, rgba(var(--v-theme-secondary), 0.02) 100%);
+  border-bottom: 1px solid rgba(var(--v-theme-outline), 0.12);
+}
+
+.delete-dialog .dialog-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-error), 0.05) 0%, rgba(var(--v-theme-warning), 0.02) 100%);
+}
+
+.lock-dialog .dialog-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-warning), 0.05) 0%, rgba(var(--v-theme-orange), 0.02) 100%);
+}
+
+.unlock-dialog .dialog-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-success), 0.05) 0%, rgba(var(--v-theme-teal), 0.02) 100%);
+}
+
+.modern-dialog :deep(.v-field) {
+  border-radius: 12px;
+}
+
+.modern-dialog :deep(.v-btn) {
+  border-radius: 12px;
+  text-transform: none;
+  font-weight: 600;
+}
+
+.font-mono {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
+
+.date-picker-container {
+  position: relative;
+}
+
+.date-picker-container .v-label {
+  font-size: 12px;
+  color: rgb(var(--v-theme-on-surface-variant));
+  margin-bottom: 8px;
+  display: block;
+}
+
+.modern-date-picker {
+  width: 100%;
+}
+
+.modern-date-picker :deep(.dp__input) {
+  border: 1px solid rgba(var(--v-theme-outline), 0.38);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.modern-date-picker :deep(.dp__input:focus) {
+  border-color: rgb(var(--v-theme-primary));
+  box-shadow: 0 0 0 2px rgba(var(--v-theme-primary), 0.12);
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 600px) {
+  .header-section {
+    padding: 16px;
+  }
+
+  .page-title {
+    font-size: 1.5rem !important;
+  }
+
+  .action-buttons {
+    width: 100%;
+  }
+
+  .action-btn {
+    flex: 1;
+  }
+
+  .modern-dialog {
+    margin: 16px;
+    max-height: calc(100vh - 32px);
+  }
+}
+
+/* Dark mode adjustments */
+.v-theme--dark .data-table-card {
+  background: rgba(var(--v-theme-surface), 0.95);
+}
+
+.v-theme--dark .header-section {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.15) 0%, rgba(var(--v-theme-secondary), 0.08) 100%);
+}
+
+.v-theme--dark .modern-date-picker :deep(.dp__input) {
+  background: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-on-surface));
+  border-color: rgba(var(--v-theme-outline), 0.38);
+}
+
+/* Custom scrollbar */
+:deep(.v-data-table__wrapper) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--v-theme-primary), 0.3) transparent;
+}
+
+:deep(.v-data-table__wrapper)::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+:deep(.v-data-table__wrapper)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:deep(.v-data-table__wrapper)::-webkit-scrollbar-thumb {
+  background: rgba(var(--v-theme-primary), 0.3);
+  border-radius: 4px;
+}
+
+:deep(.v-data-table__wrapper)::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--v-theme-primary), 0.5);
+}
+</style>
 
 <script>
 import { useTeacherStorage } from '@/stores/teacherStorage';
@@ -240,31 +684,19 @@ export default {
     selectedEndJuz: null,
     selectedEndPage: null,
     typeOptions: [],
-    selectedCategory: null,
-    selectedItem: null,
-    categories: [
-      { id: 1, name: 'Category 1' },
-      { id: 2, name: 'Category 2' },
-      { id: 3, name: 'Category 3' },
-    ],
-    items: [
-      { id: 1, name: 'Item 1', categoryId: 1 },
-      { id: 2, name: 'Item 2', categoryId: 1 },
-      { id: 3, name: 'Item 3', categoryId: 2 },
-      { id: 4, name: 'Item 4', categoryId: 2 },
-      { id: 5, name: 'Item 5', categoryId: 3 },
-    ],
-    // test end
     dialog: false,
     dialogDelete: false,
     dialogLock: false,
     dialogUnlock: false,
-    dialogEnd: false,
-    dialogReactivate: false,
     headers: [],
     breadcrumbsItems: [
       {
-        title: 'Report',
+        title: 'Dashboard',
+        disabled: false,
+        href: '/dashboard',
+      },
+      {
+        title: 'Report Management',
         disabled: true,
         href: 'report',
       }
@@ -294,6 +726,7 @@ export default {
       student_nis: '',
       student_firstname: '',
       student_lastname: '',
+      student_fullname: '',
       start_juz_page_name: '',
       end_juz_page_name: '',
       total: '',
@@ -321,6 +754,7 @@ export default {
       student_nis: '',
       student_firstname: '',
       student_lastname: '',
+      student_fullname: '',
       start_juz_page_name: '',
       end_juz_page_name: '',
       total: '',
@@ -338,57 +772,56 @@ export default {
     gradeOptions: [],
     teacherOptions: [],
     loading: false,
-    alertMessage: 'Terjadi Kesalahan',
+    alertMessage: 'An error occurred',
     hasAlert: false,
     alertType: null,
     form: false,
     required: [
-      v => !!v || 'Field is required'
+      v => v !== null && v !== undefined && v !== '' || 'This field is required'
     ],
     activeRole: null,
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'New Report' : 'Edit Report'
+      return this.editedIndex === -1 ? 'Create New Report' : 'Edit Report'
     },
     validForm() {
-      return this.$refs.form.$valid;
+      return this.$refs.form?.$valid;
     },
     filteredItems() {
       return this.reports.filter(report =>
         Object.values(report).some(val =>
-          val.toString().toLowerCase().includes(this.search.toLowerCase())
+          val?.toString().toLowerCase().includes(this.search.toLowerCase())
         )
       );
     },
     formattedDate() {
-      if (this.editedItem.date_input == '') return ''
-
+      if (!this.editedItem.date_input) return ''
       const date = new Date(this.editedItem.date_input)
-      if (!date) return ''
       const year = date.getFullYear()
       const month = String(date.getMonth() + 1).padStart(2, '0')
       const day = String(date.getDate()).padStart(2, '0')
       const hh = String(date.getHours()).padStart(2, '0')
       const mm = String(date.getMinutes()).padStart(2, '0')
       const ss = String(date.getSeconds()).padStart(2, '0')
-
       return `${year}-${month}-${day} ${hh}:${mm}:${ss}`
     }
   },
 
   watch: {
     async dialog(val) {
-      this.orgOptions = await this.fetchOrganizationOptions()
-      this.gradeOptions = await this.fetchGradeOptions()
-      this.teacherOptions = await this.fetchTeacherOptions()
-      this.juzOptions = await this.fetchJuzOptions()
-      this.pageOptions = await this.fetchPageOptions()
-      this.studentOptions = await this.fetchKelasStudentOptions()
-      this.typeOptions = await this.fetchReportTypeOptions()
-
-      return val || this.close()
+      if (val) {
+        this.orgOptions = await this.fetchOrganizationOptions()
+        this.gradeOptions = await this.fetchGradeOptions()
+        this.teacherOptions = await this.fetchTeacherOptions()
+        this.juzOptions = await this.fetchJuzOptions()
+        this.pageOptions = await this.fetchPageOptions()
+        this.studentOptions = await this.fetchKelasStudentOptions()
+        this.typeOptions = await this.fetchReportTypeOptions()
+      } else {
+        this.close()
+      }
     },
     dialogDelete(val) {
       val || this.closeDelete()
@@ -399,11 +832,8 @@ export default {
     dialogUnlock(val) {
       val || this.closeUnlock()
     },
-    dialogReactivate(val) {
-      val || this.closeReactivate()
-    },
     options: {
-      async handler() {
+      handler() {
         // this.fetchData();
       },
       deep: true,
@@ -411,15 +841,43 @@ export default {
   },
 
   methods: {
+    // Helper methods for UI
+    getInitials(name) {
+      if (!name) return ''
+      return name
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
+    },
+
+    getAvatarColor(name) {
+      const colors = ['primary', 'secondary', 'accent', 'info', 'success', 'warning'];
+      const index = name ? name.charCodeAt(0) % colors.length : 0;
+      return colors[index];
+    },
+
+    formatDate(dateString) {
+      if (!dateString) return 'N/A'
+      const date = new Date(dateString)
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    },
+
     onJuzChange() {
       this.selectedStartPage = null;
     },
+
     onJuzEndChange() {
       this.selectedEndPage = null;
     },
-    onCategoryChange() {
-      this.selectedItem = null;
-    },
+
     detailReport(slug) {
       this.$router.push({ path: `/report/${slug}` });
     },
@@ -433,6 +891,7 @@ export default {
       const params = {
         page,
         limit: itemsPerPage,
+        q: this.search,
         sortOrder: '1',
         sortField: 'is_locked',
       };
@@ -442,19 +901,16 @@ export default {
       this.isTeacherRole = isTeacher(activeRole.value)
 
       if (activeRole.value.constant_value === 2) {
-        const query = {
+        params.filter = {
           org_uuid: activeRole.value.org_uuid
         }
-        params.filter = query
       }
 
       if (activeRole.value.constant_value === 3) {
-        const query = {
+        params.filter = {
           org_uuid: activeRole.value.org_uuid,
           teacher_uuid: activeRole.value.teacher_uuid,
         }
-
-        params.filter = query
       }
 
       this.activeRole = activeRole.value
@@ -480,38 +936,51 @@ export default {
             title: 'NIS',
             align: 'start',
             key: 'student_nis',
+            width: '120px'
           },
           {
             title: 'Date',
             key: 'date_input',
+            width: '150px'
           },
           {
-            title: 'Name',
+            title: 'Student',
             key: 'student_fullname',
+            width: '200px'
           },
           {
             title: 'Type',
             key: 'type_report',
+            width: '120px'
           },
           {
             title: 'Start Page',
             key: 'start_juz_page_name',
+            width: '120px'
           },
           {
             title: 'End Page',
             key: 'end_juz_page_name',
+            width: '120px'
           },
           {
             title: 'Total',
             key: 'total',
+            width: '80px'
           },
           {
             title: 'Organization',
             key: 'org_uuid',
+            width: '150px'
           },
-          { title: 'Actions', key: 'actions', sortable: false },
+          {
+            title: 'Actions',
+            key: 'actions',
+            sortable: false,
+            width: '120px',
+            align: 'center'
+          },
         ]
-
         headers = headers.concat(superAdminHeader)
       }
 
@@ -521,77 +990,100 @@ export default {
             title: 'NIS',
             align: 'start',
             key: 'student_nis',
+            width: '120px'
           },
           {
             title: 'Date',
             key: 'date_input',
+            width: '150px'
           },
           {
-            title: 'Name',
+            title: 'Student',
             key: 'student_fullname',
+            width: '200px'
           },
           {
             title: 'Type',
             key: 'type_report',
+            width: '120px'
           },
           {
             title: 'Start Page',
             key: 'start_juz_page_name',
+            width: '120px'
           },
           {
             title: 'End Page',
             key: 'end_juz_page_name',
+            width: '120px'
           },
           {
             title: 'Total',
             key: 'total',
+            width: '80px'
           },
-          { title: 'Actions', key: 'actions', sortable: false },
+          {
+            title: 'Actions',
+            key: 'actions',
+            sortable: false,
+            width: '120px',
+            align: 'center'
+          },
         ]
-
         headers = headers.concat(adminHeader)
       }
 
       if (activeRole === 3) {
-        const adminHeader = [
+        const teacherHeader = [
           {
             title: 'NIS',
             align: 'start',
             key: 'student_nis',
+            width: '120px'
           },
           {
             title: 'Date',
             key: 'date_input',
+            width: '150px'
           },
           {
-            title: 'Name',
+            title: 'Student',
             key: 'student_fullname',
+            width: '200px'
           },
           {
             title: 'Type',
             key: 'type_report',
+            width: '120px'
           },
           {
             title: 'Start Page',
             key: 'start_juz_page_name',
+            width: '120px'
           },
           {
             title: 'End Page',
             key: 'end_juz_page_name',
+            width: '120px'
           },
           {
             title: 'Total',
             key: 'total',
+            width: '80px'
           },
-          { title: 'Actions', key: 'actions', sortable: false },
+          {
+            title: 'Actions',
+            key: 'actions',
+            sortable: false,
+            width: '120px',
+            align: 'center'
+          },
         ]
-
-        headers = headers.concat(adminHeader)
+        headers = headers.concat(teacherHeader)
       }
 
       return headers
     },
-
 
     async fetchOrganizationOptions() {
       const orgStorage = useOrganizationStorage()
@@ -674,11 +1166,11 @@ export default {
       return [
         {
           value: 'ziyadah',
-          displayText: 'ziyadah',
+          displayText: 'Ziyadah',
         },
         {
           value: 'murojaah',
-          displayText: 'murojaah',
+          displayText: 'Murojaah',
         },
       ];
     },
@@ -712,16 +1204,6 @@ export default {
 
     async fetchJuzOptions() {
       const quranStorage = useQuranStorage()
-      const userStorage = useUserStorage()
-      const { activeRole } = storeToRefs(userStorage)
-
-      if (activeRole.value.constant_value === 2) {
-        return [{
-          value: activeRole.value.org_uuid,
-          displayText: activeRole.value.org_name,
-        }]
-      }
-
       const quranOptionsData = await quranStorage.getJuzes()
 
       const juzOptions = quranOptionsData.data.map(juz => {
@@ -737,16 +1219,6 @@ export default {
 
     async fetchPageOptions() {
       const quranStorage = useQuranStorage()
-      const userStorage = useUserStorage()
-      const { activeRole } = storeToRefs(userStorage)
-
-      if (activeRole.value.constant_value === 2) {
-        return [{
-          value: activeRole.value.org_uuid,
-          displayText: activeRole.value.org_name,
-        }]
-      }
-
       const quranOptionsData = await quranStorage.getPages()
 
       const pageOptions = quranOptionsData.data.map(page => {
@@ -785,6 +1257,7 @@ export default {
     },
 
     async deleteItemConfirm() {
+      this.loading = true
       const reportStorage = useReportStorage()
       const respDelete = await reportStorage.removeReport(this.editedItem)
 
@@ -795,19 +1268,20 @@ export default {
       if (respDelete.status == "success") {
         this.fetchData()
         setTimeout(() => {
-          this.dialog = false
           this.dialogDelete = false
           this.alertMessage = ''
           this.hasAlert = false
           this.alertType = ''
           this.editedIndex = -1
-          this.editedItem = this.defaultItem
+          this.editedItem = Object.assign({}, this.defaultItem)
           this.closeDelete()
         }, 700)
       }
+      this.loading = false
     },
 
     async lockItemConfirm() {
+      this.loading = true
       const reportStorage = useReportStorage()
       const respLock = await reportStorage.lockReport(this.editedItem)
 
@@ -818,20 +1292,20 @@ export default {
       if (respLock.status == "success") {
         this.fetchData()
         setTimeout(() => {
-          this.dialog = false
-          this.dialogDelete = false
           this.dialogLock = false
           this.alertMessage = ''
           this.hasAlert = false
           this.alertType = ''
           this.editedIndex = -1
-          this.editedItem = this.defaultItem
-          this.closeStart()
+          this.editedItem = Object.assign({}, this.defaultItem)
+          this.closeLock()
         }, 700)
       }
+      this.loading = false
     },
 
     async unlockItemConfirm() {
+      this.loading = true
       const reportStorage = useReportStorage()
       const respUnlock = await reportStorage.unlockReport(this.editedItem)
 
@@ -842,18 +1316,16 @@ export default {
       if (respUnlock.status == "success") {
         this.fetchData()
         setTimeout(() => {
-          this.dialog = false
-          this.dialogDelete = false
-          this.dialogLock = false
           this.dialogUnlock = false
           this.alertMessage = ''
           this.hasAlert = false
           this.alertType = ''
           this.editedIndex = -1
-          this.editedItem = this.defaultItem
-          this.closeStart()
+          this.editedItem = Object.assign({}, this.defaultItem)
+          this.closeUnlock()
         }, 700)
       }
+      this.loading = false
     },
 
     close() {
@@ -862,55 +1334,51 @@ export default {
       this.hasAlert = false
       this.alertType = ''
       this.editedIndex = -1
-      this.editedItem = this.defaultItem
-      this.selectedStartJuz = ''
-      this.selectedStartPage = ''
-      this.selectedEndJuz = ''
-      this.selectedEndPage = ''
+      this.editedItem = Object.assign({}, this.defaultItem)
+      this.selectedStartJuz = null
+      this.selectedStartPage = null
+      this.selectedEndJuz = null
+      this.selectedEndPage = null
     },
 
     closeDelete() {
-      this.dialog = false
       this.dialogDelete = false
-      this.dialogStart = false
-      this.dialogEnd = false
       this.alertMessage = ''
       this.hasAlert = false
       this.alertType = ''
-      this.editedItem = this.defaultItem
+      this.editedIndex = -1
+      this.editedItem = Object.assign({}, this.defaultItem)
     },
 
     closeLock() {
-      this.dialog = false
-      this.dialogDelete = false
       this.dialogLock = false
       this.alertMessage = ''
       this.hasAlert = false
       this.alertType = ''
-      this.editedItem = this.defaultItem
+      this.editedIndex = -1
+      this.editedItem = Object.assign({}, this.defaultItem)
     },
 
     closeUnlock() {
-      this.dialog = false
-      this.dialogDelete = false
-      this.dialogLock = false
       this.dialogUnlock = false
       this.alertMessage = ''
       this.hasAlert = false
       this.alertType = ''
-      this.editedItem = this.defaultItem
+      this.editedIndex = -1
+      this.editedItem = Object.assign({}, this.defaultItem)
     },
 
     async save() {
       const userStorage = useUserStorage()
       const { me, activeRole } = storeToRefs(userStorage)
 
+      this.loading = true
+
       if ([2, 3].includes(activeRole.value.constant_value)) {
         this.editedItem.org_uuid = activeRole.value.org_uuid;
       }
 
       if (this.editedIndex > -1) {
-        this.loading = true
         const reportStorage = useReportStorage()
         const respEdited = await reportStorage.editReport(this.editedItem)
 
@@ -922,18 +1390,16 @@ export default {
           this.fetchData()
           setTimeout(() => {
             this.dialog = false
-            this.dialogDelete = false
             this.alertMessage = ''
             this.hasAlert = false
             this.alertType = ''
             this.editedIndex = -1
-            this.editedItem = this.defaultItem
+            this.editedItem = Object.assign({}, this.defaultItem)
             this.close()
           }, 700)
         }
       } else {
         const kelasData = me.value.kelas
-        this.loading = true
         const reportStorage = useReportStorage()
 
         this.editedItem.teacher_uuid = kelasData.teacher_uuid
@@ -953,23 +1419,22 @@ export default {
           this.fetchData()
           setTimeout(() => {
             this.dialog = false
-            this.dialogDelete = false
             this.alertMessage = ''
             this.hasAlert = false
             this.alertType = ''
             this.editedIndex = -1
-            this.editedItem = this.defaultItem
+            this.editedItem = Object.assign({}, this.defaultItem)
             this.close()
           }, 500)
         }
-
       }
 
       this.loading = false
     },
   },
-  // async mounted() {
-  // this.fetchData()
-  // }
+
+  async mounted() {
+    // Initial data loading will be handled by fetchData method
+  }
 }
 </script>

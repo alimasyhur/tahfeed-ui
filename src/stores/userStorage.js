@@ -115,31 +115,31 @@ export const useUserStorage = defineStore('user', () => {
           toValue: 'grade'
         },
         {
-          icon: 'mdi-human',
+          icon: 'mdi-human-male-board',
           title: 'Teacher',
           toRoute: 'teacher',
           toValue: 'teacher'
         },
         {
-          icon: 'mdi-account-multiple',
+          icon: 'mdi-account-school-outline',
           title: 'Student',
           toRoute: 'student',
           toValue: 'student'
         },
         {
-          icon: 'mdi-human-male-board-poll',
+          icon: 'mdi-google-classroom',
           title: 'Class',
           toRoute: 'kelas',
           toValue: 'kelas'
         },
         {
-          icon: 'mdi-human-male-board-poll',
+          icon: 'mdi-clipboard-text',
           title: 'Report',
           toRoute: 'report',
           toValue: 'report'
         },
         {
-          icon: 'mdi-chart-bar',
+          icon: 'mdi-chart-line',
           title: 'Summary',
           toRoute: 'summary',
           toValue: 'summary'
@@ -152,31 +152,31 @@ export const useUserStorage = defineStore('user', () => {
     if ([3].includes(actRole?.constant_value)) {
       const teacherMenuDrawerData = [
         {
-          icon: 'mdi-human',
+          icon: 'mdi-human-male-board',
           title: 'Teacher',
           toRoute: 'teacher',
           toValue: 'teacher'
         },
         {
-          icon: 'mdi-account-multiple',
+          icon: 'mdi-account-school-outline',
           title: 'Student',
           toRoute: 'student',
           toValue: 'student'
         },
         {
-          icon: 'mdi-human-male-board-poll',
+          icon: 'mdi-google-classroom',
           title: 'Class',
           toRoute: 'kelas',
           toValue: 'kelas'
         },
         {
-          icon: 'mdi-chart-timeline',
+          icon: 'mdi-clipboard-text',
           title: 'Report',
           toRoute: 'report',
           toValue: 'report'
         },
         {
-          icon: 'mdi-chart-bar',
+          icon: 'mdi-chart-line',
           title: 'Summary',
           toRoute: 'summary',
           toValue: 'summary'

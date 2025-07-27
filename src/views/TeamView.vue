@@ -123,10 +123,6 @@
     <v-container fluid class="py-16 bg-grey-lighten-5">
       <v-container>
         <div class="text-center mb-12">
-          <v-chip color="blue-lighten-4" text-color="blue-darken-3" class="mb-4">
-            <v-icon start icon="mdi-github"></v-icon>
-            Open Source Community
-          </v-chip>
           <h2 class="text-h3 font-weight-bold text-grey-darken-3 mb-4">
             GitHub Contributors
           </h2>
