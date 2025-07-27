@@ -26,7 +26,7 @@
             <v-dialog v-model="dialog" width="auto" persistent>
               <template v-slot:activator="{ props }">
                 <v-btn v-if="isTeacherRole" class="not-uppercase" color="primary" dark v-bind="props" variant="flat"
-                  size="large">
+                  size="small">
                   <v-icon>mdi-plus</v-icon> New Report
                 </v-btn>
               </template>
@@ -135,7 +135,7 @@
                         final.
                         Apakah Anda yakin akan mengunci Report <b>{{ editedItem.type_report }} - {{
                           editedItem.student_fullname
-                          }}</b> ini?</p>
+                        }}</b> ini?</p>
                       <v-row>
                         <v-col>
                           <v-btn color="success" size="large" type="submit" variant="elevated" block>
@@ -167,7 +167,7 @@
                         kembali.
                         Apakah Anda yakin akan membuka kunci Report <b>{{ editedItem.type_report }} - {{
                           editedItem.student_fullname
-                          }}</b> ini?</p>
+                        }}</b> ini?</p>
                       <v-row>
                         <v-col>
                           <v-btn color="success" size="large" type="submit" variant="elevated" block>
