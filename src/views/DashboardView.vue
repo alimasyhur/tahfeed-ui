@@ -184,7 +184,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="( role, idx ) in me.roles" :key="idx">
+                <tr v-for="(role, idx) in me.roles" :key="idx">
                   <th class="text-left">{{ role.org_name }}</th>
                   <th class="text-left">{{ role.role_name }}</th>
                   <th class="text-left">
@@ -222,7 +222,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="( quran, idx ) in me.qurans" :key="idx">
+                <tr v-for="(quran, idx) in me.qurans" :key="idx">
                   <th class="text-left">{{ quran.name }}</th>
                   <th class="text-left">{{ quran.description }}</th>
                   <th class="text-left">{{ quran.organization_name }}</th>
