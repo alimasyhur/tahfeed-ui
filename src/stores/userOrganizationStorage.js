@@ -95,7 +95,7 @@ export const useUserOrganizationStorage = defineStore('users_orgs', () => {
       const { data } = await apiService.post(
         `/roles/assign`,
         {
-          user_uuid: inputUserOrg.user_uuid,
+          email: inputUserOrg.email,
           org_uuid: inputUserOrg.org_uuid,
           role_uuid: inputUserOrg.role_uuid
         },

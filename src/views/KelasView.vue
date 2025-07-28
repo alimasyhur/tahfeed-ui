@@ -103,14 +103,14 @@
             </template>
 
             <!-- Teacher Info -->
-            <template v-slot:item.teacher_name="{ item }">
-              <div class="d-flex align-center" v-if="item.teacher_name">
+            <template v-slot:item.teacher_firstname="{ item }">
+              <div class="d-flex align-center" v-if="item.teacher_firstname">
                 <v-avatar color="secondary" size="24" class="mr-2">
                   <span class="text-white text-caption font-weight-bold">
-                    {{ getInitials(item.teacher_name) }}
+                    {{ getInitials(item.teacher_firstname) }} {{ getInitials(item.teacher_lastname) }}
                   </span>
                 </v-avatar>
-                {{ item.teacher_name }}
+                {{ item.teacher_firstname }} {{ item.teacher_lastname }}
               </div>
               <span v-else class="text-medium-emphasis">Not Assigned</span>
             </template>
@@ -692,7 +692,8 @@ export default {
       period: '',
       total_juz_target: null,
       teacher_uuid: '',
-      teacher_name: '',
+      teacher_firstname: '',
+      teacher_lastname: '',
       grade_uuid: '',
       status: 'not_started',
     },
@@ -705,7 +706,8 @@ export default {
       period: '',
       total_juz_target: null,
       teacher_uuid: '',
-      teacher_name: '',
+      teacher_firstname: '',
+      teacher_lastname: '',
       grade_uuid: '',
       status: 'not_started',
     },
@@ -897,7 +899,7 @@ export default {
           },
           {
             title: 'Teacher',
-            key: 'teacher_name',
+            key: 'teacher_firstname',
             width: '160px'
           },
           {
@@ -941,7 +943,7 @@ export default {
           },
           {
             title: 'Teacher',
-            key: 'teacher_name',
+            key: 'teacher_firstname',
             width: '160px'
           },
           {

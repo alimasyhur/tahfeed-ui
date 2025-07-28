@@ -178,6 +178,10 @@
               </v-col>
 
               <v-col cols="12" md="6">
+                <v-text-field v-model="editedItem.nis" :rules="required" label="NIS (Student ID)" variant="outlined"
+                  prepend-inner-icon="mdi-card-account-details" :loading="loading" clearable></v-text-field>
+              </v-col>
+              <v-col cols="12" md="6">
                 <v-text-field v-model="editedItem.nik" :rules="required" label="NIK (National ID)" variant="outlined"
                   prepend-inner-icon="mdi-card-account-details" :loading="loading" clearable></v-text-field>
               </v-col>
@@ -198,14 +202,14 @@
               </v-col>
 
               <v-col cols="12" md="6">
+                <label class="v-label">Birthdate</label>
                 <div class="date-picker-container">
-                  <label class="v-label">Birthdate</label>
                   <VueDatePicker v-model="editedItem.birthdate" :rules="required" placeholder="Select Birthdate"
                     :enable-time-picker="false" :format="formattedDate" class="modern-date-picker" />
                 </div>
               </v-col>
 
-              <v-col cols="12" md="6">
+              <v-col cols="12">
                 <v-textarea v-model="editedItem.bio" :rules="required" label="Biography" variant="outlined"
                   prepend-inner-icon="mdi-text" :loading="loading" rows="3" clearable></v-textarea>
               </v-col>
@@ -975,6 +979,7 @@ export default {
           this.closeDelete()
         }, 700)
       }
+      this.loading = false
     },
 
     close() {

@@ -55,12 +55,10 @@ export const useTeacherStorage = defineStore('teacher', () => {
 
   const addTeacher = async (inputTeacher) => {
     try {
-      // const orgUUID = userStorage.activeRole.org_uuid
       const { data } = await apiService.post(
         `teachers`,
         {
           user_uuid: inputTeacher.user_uuid,
-          // org_uuid: orgUUID,
           org_uuid: inputTeacher.org_uuid,
           nik: inputTeacher.nik,
           firstname: inputTeacher.firstname,

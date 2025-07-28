@@ -20,15 +20,6 @@
                 Track student achievements and progress overview
               </p>
             </div>
-
-            <!-- Action Buttons -->
-            <div class="action-buttons d-flex flex-column flex-sm-row ga-3">
-              <v-btn color="primary" variant="elevated" size="large" @click="dialog = true" class="action-btn"
-                prepend-icon="mdi-plus">
-                <span class="d-none d-sm-inline">New Report</span>
-                <span class="d-sm-none">New</span>
-              </v-btn>
-            </div>
           </div>
         </div>
       </v-col>
@@ -160,120 +151,14 @@
                 <v-icon icon="mdi-chart-line-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
                 <h3 class="text-h6 mb-2">No Achievement Data Found</h3>
                 <p class="text-body-2 text-medium-emphasis mb-4">
-                  {{ search ? 'No records match your search criteria.' : 'Get started by adding your first report.' }}
+                  {{ search ? 'No records match your search criteria.' : 'Keep up.' }}
                 </p>
-                <v-btn v-if="!search" color="primary" variant="elevated" @click="dialog = true" prepend-icon="mdi-plus">
-                  Add First Report
-                </v-btn>
               </div>
             </template>
           </v-data-table>
         </v-card>
       </v-col>
     </v-row>
-
-    <!-- Modern Report Dialog -->
-    <v-dialog v-model="dialog" max-width="900" persistent>
-      <v-card class="modern-dialog">
-        <v-card-title class="dialog-header pa-6">
-          <div class="d-flex align-center">
-            <v-icon :icon="editedIndex === -1 ? 'mdi-chart-line-outline' : 'mdi-pencil'" size="24" class="mr-3"
-              color="primary"></v-icon>
-            <span class="text-h5 font-weight-bold">{{ formTitle }}</span>
-            <v-btn icon="mdi-close" variant="text" size="small" @click="close" class="ml-auto"></v-btn>
-          </div>
-        </v-card-title>
-
-        <v-divider></v-divider>
-
-        <v-card-text class="pa-6">
-          <v-alert v-if="hasAlert" :type="alertType" :text="alertMessage" variant="tonal" closable
-            class="mb-4"></v-alert>
-
-          <v-form v-model="form" @submit.prevent="save">
-            <v-row>
-              <!-- Basic Information Section -->
-              <v-col cols="12">
-                <h3 class="text-h6 mb-4 d-flex align-center">
-                  <v-icon icon="mdi-information" class="mr-2"></v-icon>
-                  Report Information
-                </h3>
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <div class="date-picker-container">
-                  <label class="v-label">Date Input</label>
-                  <VueDatePicker v-model="editedItem.date_input" :rules="required" placeholder="Select Date"
-                    :enable-time-picker="false" :format="formattedDate" class="modern-date-picker" />
-                </div>
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-select v-model="editedItem.student_uuid" :items="studentOptions" item-title="displayText"
-                  item-value="value" label="Select Student" variant="outlined" prepend-inner-icon="mdi-account-school"
-                  clearable></v-select>
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-select v-model="editedItem.type_report" :items="typeOptions" item-title="displayText"
-                  item-value="value" label="Report Type" variant="outlined" prepend-inner-icon="mdi-file-document"
-                  clearable></v-select>
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-textarea v-model="editedItem.note" :rules="required" label="Notes" variant="outlined"
-                  prepend-inner-icon="mdi-note-text" :loading="loading" rows="3" clearable></v-textarea>
-              </v-col>
-
-              <!-- Juz Selection Section -->
-              <v-col cols="12">
-                <v-divider class="my-4"></v-divider>
-                <h3 class="text-h6 mb-4 d-flex align-center">
-                  <v-icon icon="mdi-book-open" class="mr-2"></v-icon>
-                  Quran Range Selection
-                </h3>
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-select v-model="selectedStartJuz" :items="juzOptions" item-title="displayText" item-value="value"
-                  label="Start Juz" @change="onJuzChange" variant="outlined" prepend-inner-icon="mdi-book"
-                  clearable></v-select>
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-select v-model="selectedStartPage" :items="pageOptions" item-title="displayText" item-value="value"
-                  label="Start Page" :disabled="!selectedStartJuz" variant="outlined"
-                  prepend-inner-icon="mdi-book-open-page-variant" clearable></v-select>
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-select v-model="selectedEndJuz" :items="juzOptions" item-title="displayText" item-value="value"
-                  label="End Juz" :disabled="!selectedStartPage" @change="onJuzEndChange" variant="outlined"
-                  prepend-inner-icon="mdi-book" clearable></v-select>
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-select v-model="selectedEndPage" :items="pageOptions" item-title="displayText" item-value="value"
-                  label="End Page" :disabled="!selectedEndJuz" variant="outlined"
-                  prepend-inner-icon="mdi-book-open-page-variant" clearable></v-select>
-              </v-col>
-            </v-row>
-          </v-form>
-        </v-card-text>
-
-        <v-divider></v-divider>
-
-        <v-card-actions class="pa-6">
-          <v-spacer></v-spacer>
-          <v-btn color="grey" variant="text" size="large" @click="close">
-            Cancel
-          </v-btn>
-          <v-btn color="primary" variant="elevated" size="large" :disabled="!form" :loading="loading" @click="save">
-            {{ editedIndex === -1 ? 'Create Report' : 'Update Report' }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-container>
 </template>
 

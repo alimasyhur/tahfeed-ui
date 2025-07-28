@@ -278,8 +278,8 @@
           <v-form v-model="form" @submit.prevent="saveAssignRole">
             <v-row>
               <v-col cols="12">
-                <v-select v-model="editedItem.user_uuid" :items="userOptions" item-title="displayText"
-                  item-value="value" label="Select User" variant="outlined" prepend-inner-icon="mdi-account"></v-select>
+                <v-text-field v-model="editedItem.email" :rules="required" label="Email" variant="outlined"
+                  prepend-inner-icon="mdi-account" :loading="loading" clearable></v-text-field>
               </v-col>
 
               <v-col cols="12">
@@ -487,7 +487,6 @@ export default {
     ],
     rolesOptions: [],
     orgOptions: [],
-    userOptions: [],
     breadcrumbsItems: [
       {
         title: 'Dashboard',
@@ -721,28 +720,6 @@ export default {
       return headers
     },
 
-    async fetchUserOrganizationOptions() {
-      const userStorage = useUserStorage()
-      const { activeRole } = storeToRefs(userStorage)
-      const userOrgStorage = useUserOrganizationStorage()
-
-      const params = {}
-      if (activeRole.value.role_name === 'Admin') {
-        params.org_uuid = activeRole.value.org_uuid
-      }
-
-      const userOptionsData = await userOrgStorage.getUserOrganizationOptions(params)
-      const userOptions = userOptionsData.data.map(user => {
-        return {
-          ...user,
-          value: user.uuid,
-          displayText: `${user.email} (${user.name})`
-        }
-      })
-
-      return userOptions
-    },
-
     async fetchOrganizationOptions() {
       const orgStorage = useOrganizationStorage()
       const userStorage = useUserStorage()
@@ -793,13 +770,17 @@ export default {
       const roleStorage = useRoleStorage()
       const data = await roleStorage.getRoles(params)
       const rolesData = data.data
-      const rolesOptions = rolesData.map(role => {
+      let rolesOptions = rolesData.map(role => {
         return {
           ...role,
           value: role.uuid,
           displayText: role.name,
         }
       })
+
+      if (activeRole.value.role_name === 'Admin') {
+        rolesOptions = rolesOptions.filter(role => role.constant_value !== 1);
+      }
 
       return rolesOptions
     },
@@ -970,7 +951,6 @@ export default {
 
   async mounted() {
     this.rolesOptions = await this.fetchRoleOptions()
-    this.userOptions = await this.fetchUserOrganizationOptions()
     this.orgOptions = await this.fetchOrganizationOptions()
   }
 }
