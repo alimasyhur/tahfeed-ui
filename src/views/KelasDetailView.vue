@@ -139,6 +139,9 @@
             <v-chip color="secondary" variant="tonal" prepend-icon="mdi-card-account-details" class="mb-4">
               NIK: {{ kelas.teacher_nik }}
             </v-chip>
+            <v-chip color="secondary" variant="tonal" prepend-icon="mdi-email" class="mb-4">
+              Email: {{ kelas.teacher_email }}
+            </v-chip>
 
             <div class="teacher-stats">
               <v-divider class="mb-4"></v-divider>
@@ -385,7 +388,7 @@
             <h3 class="text-h6 mb-3">Are you sure?</h3>
             <p class="text-body-1 mb-4">
               You're about to remove <strong class="text-error">{{ editedItem.firstname }} {{ editedItem.lastname
-                }}</strong> from this class.
+              }}</strong> from this class.
             </p>
             <v-card variant="tonal" color="warning" class="pa-4 mb-4">
               <div class="d-flex align-center">

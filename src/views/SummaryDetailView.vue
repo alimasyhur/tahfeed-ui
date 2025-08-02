@@ -1,174 +1,461 @@
 <template>
-  <v-container>
-    <v-row>
-      <div>
-        <v-breadcrumbs :items="breadcrumbsItems">
-          <template v-slot:divider>
-            <v-icon icon="mdi-chevron-right"></v-icon>
-          </template>
-        </v-breadcrumbs>
-      </div>
-    </v-row>
-
-    <v-row v-if="(student !== undefined)">
+  <v-container fluid class="pa-4">
+    <!-- Header Section with Breadcrumbs -->
+    <v-row class="mb-6">
       <v-col cols="12">
-        <v-card-item>
-          <v-card-title>
-            <div>
-              <v-icon icon="mdi-home-account" end></v-icon>
-              {{ student.firstname }} {{ student.lastname }}
+        <div class="header-section">
+          <v-breadcrumbs :items="breadcrumbsItems" class="pa-0 mb-4">
+            <template v-slot:divider>
+              <v-icon icon="mdi-chevron-right" size="small"></v-icon>
+            </template>
+          </v-breadcrumbs>
+
+          <div class="d-flex flex-column flex-md-row align-center justify-space-between">
+            <div class="page-title-section mb-4 mb-md-0">
+              <h1 class="page-title text-h4 font-weight-bold mb-2">
+                <v-icon icon="mdi-account-school" class="mr-3" color="primary"></v-icon>
+                {{ student?.firstname || 'Student Details' }} {{ student?.lastname || '' }}
+              </h1>
+              <p class="page-subtitle text-body-1 text-medium-emphasis">
+                Student information and learning progress reports
+              </p>
             </div>
 
-          </v-card-title>
-          <v-card-subtitle>
-            <v-table density="compact">
-              <thead>
-                <tr>
-                  <th class="text-left">
-                    <b>NIK</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.nik }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th class="text-left">
-                    <b>NIS</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.nis }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-left">
-                    <b>Full Name</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.firstname }} {{ student.lastname }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-left">
-                    <b>Birthdate</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.birthdate }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-left">
-                    <b>Bio</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.bio }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-left">
-                    <b>Phone</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.phone }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-left">
-                    <b>Organization</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.organization_name }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-left">
-                    <b>Grade</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.grade_name }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-left">
-                    <b>Ziyadah Pekan Lalu ({{ student.pekan_lalu_label }})</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.z_total_pekan_lalu }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-left">
-                    <b>Murojaah Pekan Lalu ({{ student.pekan_lalu_label }})</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.m_total_pekan_lalu }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-left">
-                    <b>Ziyadah Pekan Ini ({{ student.pekan_ini_label }})</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.z_total_pekan_ini }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-left">
-                    <b>Murojaah Pekan Ini ({{ student.pekan_ini_label }})</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.m_total_pekan_ini }}
-                  </th>
-                </tr>
-                <tr>
-                  <th class="text-left">
-                    <b>Total Hafalan</b>
-                  </th>
-                  <th class="text-left">
-                    {{ student.total }}
-                  </th>
-                </tr>
-              </tbody>
-            </v-table>
-          </v-card-subtitle>
-        </v-card-item>
-
-        <v-card-item>
-          <!-- ini data start -->
-          <v-row>
-            <v-data-table-server :headers="headers" :search="search" :items="reports" :items-length="totalItems"
-              :loading="loading" v-model:options="options" @update:options="fetchData"
-              v-model:items-per-page="itemsPerPage" :sort-by="[{ key: 'calories', order: 'asc' }]">
-              <template v-slot:top>
-                <v-toolbar flat>
-                  <v-toolbar-title>List Report</v-toolbar-title>
-                  <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
-                    hide-details></v-text-field>
-
-                </v-toolbar>
-              </template>
-            </v-data-table-server>
-
-          </v-row>
-
-          <!-- ini data end -->
-        </v-card-item>
+            <!-- Status Badge -->
+            <div class="status-section" v-if="student">
+              <v-chip color="primary" variant="elevated" size="large" prepend-icon="mdi-account-check"
+                class="font-weight-medium status-chip">
+                Active Student
+              </v-chip>
+            </div>
+          </div>
+        </div>
       </v-col>
     </v-row>
+
+    <!-- Student Information Section -->
+    <v-row v-if="student && Object.keys(student).length > 0" class="mb-6">
+      <!-- Personal Information Card -->
+      <v-col cols="12" lg="8">
+        <v-card class="info-card" elevation="4">
+          <v-card-title class="card-header pa-6">
+            <div class="d-flex align-center">
+              <v-icon icon="mdi-account-details" size="24" class="mr-3" color="primary"></v-icon>
+              <span class="text-h6 font-weight-bold">Personal Information</span>
+            </div>
+          </v-card-title>
+
+          <v-divider></v-divider>
+
+          <v-card-text class="pa-6">
+            <v-row>
+              <v-col cols="12" md="6">
+                <div class="info-item mb-4">
+                  <div class="info-label d-flex align-center mb-2">
+                    <v-icon icon="mdi-card-account-details" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                    <span class="text-caption font-weight-medium text-medium-emphasis">NIK</span>
+                  </div>
+                  <div class="info-value text-h6 font-weight-medium">{{ student.nik || 'Not Set' }}</div>
+                </div>
+
+                <div class="info-item mb-4">
+                  <div class="info-label d-flex align-center mb-2">
+                    <v-icon icon="mdi-school" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                    <span class="text-caption font-weight-medium text-medium-emphasis">NIS</span>
+                  </div>
+                  <div class="info-value text-body-1">{{ student.nis || 'Not Set' }}</div>
+                </div>
+
+                <div class="info-item mb-4">
+                  <div class="info-label d-flex align-center mb-2">
+                    <v-icon icon="mdi-account" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                    <span class="text-caption font-weight-medium text-medium-emphasis">FULL NAME</span>
+                  </div>
+                  <div class="info-value text-body-1">{{ student.firstname }} {{ student.lastname }}</div>
+                </div>
+
+                <div class="info-item mb-4">
+                  <div class="info-label d-flex align-center mb-2">
+                    <v-icon icon="mdi-calendar" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                    <span class="text-caption font-weight-medium text-medium-emphasis">BIRTHDATE</span>
+                  </div>
+                  <div class="info-value text-body-1">{{ formatDate(student.birthdate) }}</div>
+                </div>
+
+                <div class="info-item mb-4">
+                  <div class="info-label d-flex align-center mb-2">
+                    <v-icon icon="mdi-phone" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                    <span class="text-caption font-weight-medium text-medium-emphasis">PHONE</span>
+                  </div>
+                  <div class="info-value text-body-1">{{ student.phone || 'Not Set' }}</div>
+                </div>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <div class="info-item mb-4">
+                  <div class="info-label d-flex align-center mb-2">
+                    <v-icon icon="mdi-domain" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                    <span class="text-caption font-weight-medium text-medium-emphasis">ORGANIZATION</span>
+                  </div>
+                  <div class="info-value text-body-1">{{ student.organization_name || 'Not Set' }}</div>
+                </div>
+
+                <div class="info-item mb-4">
+                  <div class="info-label d-flex align-center mb-2">
+                    <v-icon icon="mdi-school-outline" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                    <span class="text-caption font-weight-medium text-medium-emphasis">GRADE</span>
+                  </div>
+                  <div class="info-value text-body-1">{{ student.grade_name || 'Not Set' }}</div>
+                </div>
+
+                <div class="info-item mb-4">
+                  <div class="info-label d-flex align-center mb-2">
+                    <v-icon icon="mdi-text-account" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                    <span class="text-caption font-weight-medium text-medium-emphasis">BIO</span>
+                  </div>
+                  <div class="info-value text-body-1">{{ student.bio || 'No bio available' }}</div>
+                </div>
+
+                <div class="info-item mb-4">
+                  <div class="info-label d-flex align-center mb-2">
+                    <v-icon icon="mdi-book-open-page-variant" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                    <span class="text-caption font-weight-medium text-medium-emphasis">TOTAL HAFALAN</span>
+                  </div>
+                  <div class="info-value text-h6 font-weight-medium text-primary">{{ student.total || '0' }}</div>
+                </div>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <!-- Progress Summary Card -->
+      <v-col cols="12" lg="4">
+        <v-card class="progress-card" elevation="4">
+          <v-card-title class="card-header pa-6">
+            <div class="d-flex align-center">
+              <v-icon icon="mdi-chart-line" size="24" class="mr-3" color="secondary"></v-icon>
+              <span class="text-h6 font-weight-bold">Learning Progress</span>
+            </div>
+          </v-card-title>
+
+          <v-divider></v-divider>
+
+          <v-card-text class="pa-6">
+            <!-- Last Week Stats -->
+            <div class="progress-section mb-6">
+              <h4 class="text-subtitle-1 font-weight-bold mb-3 d-flex align-center">
+                <v-icon icon="mdi-calendar-week" class="mr-2" color="warning"></v-icon>
+                {{ student.pekan_lalu_label || 'Last Week' }}
+              </h4>
+              <div class="d-flex justify-space-between mb-2">
+                <span class="text-body-2">Ziyadah:</span>
+                <v-chip color="info" variant="tonal" size="small">
+                  <b>{{ student.z_total_pekan_lalu || '0' }}</b>
+                </v-chip>
+              </div>
+              <div class="d-flex justify-space-between">
+                <span class="text-body-2">Murojaah:</span>
+                <v-chip color="info" variant="tonal" size="small">
+                  <b>{{ student.m_total_pekan_lalu || '0' }}</b>
+                </v-chip>
+              </div>
+            </div>
+
+            <!-- This Week Stats -->
+            <div class="progress-section">
+              <h4 class="text-subtitle-1 font-weight-bold mb-3 d-flex align-center">
+                <v-icon icon="mdi-calendar-today" class="mr-2" color="success"></v-icon>
+                {{ student.pekan_ini_label || 'This Week' }}
+              </h4>
+              <div class="d-flex justify-space-between mb-2">
+                <span class="text-body-2">Ziyadah:</span>
+                <v-chip color="purple" variant="tonal" size="small">
+                  <b>{{ student.z_total_pekan_ini || '0' }}</b>
+                </v-chip>
+              </div>
+              <div class="d-flex justify-space-between">
+                <span class="text-body-2">Murojaah:</span>
+                <v-chip color="purple" variant="tonal" size="small">
+                  <b>{{ student.m_total_pekan_ini || '0' }}</b>
+                </v-chip>
+              </div>
+            </div>
+
+            <v-divider class="my-4"></v-divider>
+
+            <!-- Total Progress -->
+            <div class="text-center">
+              <div class="text-h4 font-weight-bold text-primary mb-1">{{ student.total || '0' }}</div>
+              <div class="text-caption text-medium-emphasis">Total Hafalan</div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <!-- Reports Section -->
+    <v-row v-if="student && Object.keys(student).length > 0">
+      <v-col cols="12">
+        <v-card class="reports-card" elevation="4">
+          <v-card-title class="card-header pa-6">
+            <div class="d-flex flex-column flex-md-row align-center justify-space-between w-100">
+              <div class="d-flex align-center mb-4 mb-md-0">
+                <v-icon icon="mdi-file-document-multiple" size="24" class="mr-3" color="primary"></v-icon>
+                <span class="text-h6 font-weight-bold">Learning Reports</span>
+                <v-chip v-if="reports.length > 0" color="primary" variant="tonal" class="ml-3">
+                  {{ totalItems }} Total
+                </v-chip>
+              </div>
+
+              <div class="search-section">
+                <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Search reports..."
+                  variant="outlined" clearable hide-details class="search-field" density="comfortable"
+                  style="min-width: 250px;">
+                </v-text-field>
+              </div>
+            </div>
+          </v-card-title>
+
+          <v-divider></v-divider>
+
+          <v-data-table-server :headers="headers" :search="search" :items="reports" :items-length="totalItems"
+            :loading="loading" v-model:options="options" @update:options="fetchData"
+            v-model:items-per-page="itemsPerPage" :sort-by="[{ key: 'date_input', order: 'desc' }]" class="modern-table"
+            :mobile-breakpoint="600">
+
+            <!-- Date Column -->
+            <template v-slot:item.date_input="{ item }">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-calendar" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                <span>{{ formatDate(item.date_input) }}</span>
+              </div>
+            </template>
+
+            <!-- Type Column -->
+            <template v-slot:item.type_report="{ item }">
+              <v-chip :color="getTypeColor(item.type_report)" variant="tonal" size="small"
+                :prepend-icon="getTypeIcon(item.type_report)">
+                {{ formatType(item.type_report) }}
+              </v-chip>
+            </template>
+
+            <!-- Start Page Column -->
+            <template v-slot:item.start_juz_page_name="{ item }">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-book-open" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                <span>{{ item.start_juz_page_name || 'Not Set' }}</span>
+              </div>
+            </template>
+
+            <!-- End Page Column -->
+            <template v-slot:item.end_juz_page_name="{ item }">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-book-open-variant" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                <span>{{ item.end_juz_page_name || 'Not Set' }}</span>
+              </div>
+            </template>
+
+            <!-- Total Column -->
+            <template v-slot:item.total="{ item }">
+              <v-chip color="primary" variant="tonal" size="small">
+                {{ item.total || '0' }}
+              </v-chip>
+            </template>
+
+            <!-- Organization Column (for super admin) -->
+            <template v-slot:item.org_uuid="{ item }">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-domain" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                <span>{{ item.organization_name || 'Not Set' }}</span>
+              </div>
+            </template>
+
+            <!-- Loading State -->
+            <template v-slot:loading>
+              <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
+            </template>
+
+            <!-- No Data State -->
+            <template v-slot:no-data>
+              <div class="text-center pa-8">
+                <v-icon icon="mdi-file-document-multiple" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
+                <h3 class="text-h6 mb-2">No Reports Found</h3>
+                <p class="text-body-2 text-medium-emphasis mb-4">
+                  {{ search ? 'No reports match your search criteria.' : 'This student doesn\'t have any reports yet.'
+                  }}
+                </p>
+              </div>
+            </template>
+          </v-data-table-server>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <!-- Student Not Found State -->
     <v-row v-else>
       <v-col cols="12">
-        <h1>Kelas is not found</h1>
+        <v-card class="text-center pa-8" elevation="4">
+          <v-icon icon="mdi-alert-circle" size="80" color="error" class="mb-4"></v-icon>
+          <h2 class="text-h4 mb-4">Student Not Found</h2>
+          <p class="text-body-1 text-medium-emphasis mb-6">
+            The student you're looking for doesn't exist or has been removed.
+          </p>
+          <v-btn color="primary" variant="elevated" to="/summary" prepend-icon="mdi-arrow-left">
+            Back to Summary
+          </v-btn>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.header-section {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.1) 0%, rgba(var(--v-theme-secondary), 0.05) 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 8px;
+}
+
+.page-title {
+  color: rgb(var(--v-theme-on-surface));
+  display: flex;
+  align-items: center;
+}
+
+.page-subtitle {
+  color: rgb(var(--v-theme-on-surface-variant));
+  max-width: 600px;
+}
+
+.status-chip {
+  border-radius: 12px;
+  font-size: 0.875rem;
+  height: 40px;
+}
+
+.info-card,
+.progress-card,
+.reports-card {
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.card-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.05) 0%, rgba(var(--v-theme-secondary), 0.02) 100%);
+  border-bottom: 1px solid rgba(var(--v-theme-outline), 0.12);
+}
+
+.info-item {
+  padding: 8px 0;
+}
+
+.info-label {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  color: rgb(var(--v-theme-on-surface));
+}
+
+.progress-card {
+  background: linear-gradient(135deg, rgba(var(--v-theme-secondary), 0.05) 0%, rgba(var(--v-theme-primary), 0.02) 100%);
+}
+
+.progress-section {
+  background: rgba(var(--v-theme-surface-variant), 0.05);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.search-field {
+  border-radius: 12px;
+}
+
+.search-field :deep(.v-field) {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.modern-table :deep(.v-data-table__wrapper) {
+  border-radius: 0;
+}
+
+.modern-table :deep(.v-data-table-header) {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.05) 0%, rgba(var(--v-theme-secondary), 0.02) 100%);
+}
+
+.modern-table :deep(.v-data-table-header th) {
+  font-weight: 600;
+  color: rgb(var(--v-theme-primary));
+  border-bottom: 2px solid rgba(var(--v-theme-primary), 0.1);
+}
+
+.modern-table :deep(.v-data-table__tr:hover) {
+  background: rgba(var(--v-theme-primary), 0.02);
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 600px) {
+  .header-section {
+    padding: 16px;
+  }
+
+  .page-title {
+    font-size: 1.5rem !important;
+  }
+
+  .info-card .pa-6 {
+    padding: 16px !important;
+  }
+}
+
+/* Dark mode adjustments */
+.v-theme--dark .info-card,
+.v-theme--dark .progress-card,
+.v-theme--dark .reports-card {
+  background: rgba(var(--v-theme-surface), 0.95);
+}
+
+.v-theme--dark .header-section {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.15) 0%, rgba(var(--v-theme-secondary), 0.08) 100%);
+}
+
+/* Custom scrollbar */
+:deep(.v-data-table__wrapper) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--v-theme-primary), 0.3) transparent;
+}
+
+:deep(.v-data-table__wrapper)::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+:deep(.v-data-table__wrapper)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:deep(.v-data-table__wrapper)::-webkit-scrollbar-thumb {
+  background: rgba(var(--v-theme-primary), 0.3);
+  border-radius: 4px;
+}
+
+:deep(.v-data-table__wrapper)::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--v-theme-primary), 0.5);
+}
+</style>
 
 <script>
 import { useStudentStorage } from '@/stores/studentStorage';
 import { useUserStorage } from '@/stores/userStorage';
 import { useReportStorage } from '@/stores/reportStorage';
 import { storeToRefs } from 'pinia';
+import moment from 'moment';
 
 export default {
   data: () => ({
@@ -182,7 +469,6 @@ export default {
     ],
     student: {},
     users: [],
-    // start
     dialog: false,
     dialogDelete: false,
     headers: [],
@@ -208,7 +494,6 @@ export default {
       v => !!v || 'Field is required'
     ],
     activeRole: null,
-    // end
   }),
 
   computed: {
@@ -243,6 +528,39 @@ export default {
   },
 
   methods: {
+    // Helper methods for UI
+    formatDate(date) {
+      if (!date) return 'Not Set';
+      return moment(date).format('DD MMM YYYY');
+    },
+
+    getTypeColor(type) {
+      const colors = {
+        'ziyadah': 'success',
+        'murojaah': 'warning',
+        'review': 'info'
+      };
+      return colors[type] || 'grey';
+    },
+
+    getTypeIcon(type) {
+      const icons = {
+        'ziyadah': 'mdi-plus-circle',
+        'murojaah': 'mdi-refresh',
+        'review': 'mdi-eye'
+      };
+      return icons[type] || 'mdi-help';
+    },
+
+    formatType(type) {
+      const typeMap = {
+        'ziyadah': 'Ziyadah',
+        'murojaah': 'Murojaah',
+        'review': 'Review'
+      };
+      return typeMap[type] || type;
+    },
+
     getBreadcrumbs() {
       this.breadcrumbsItems = [
         {
@@ -251,7 +569,7 @@ export default {
           to: { name: 'summary' }
         },
         {
-          title: this.$route.params.slug,
+          title: `${this.student?.firstname || ''} ${this.student?.lastname || ''}`.trim() || this.$route.params.slug,
           disabled: true,
           href: `summary/${this.$route.params.slug}`,
         }
@@ -260,92 +578,45 @@ export default {
 
     getHeaders(activeRole) {
       let headers = [];
+      const baseHeaders = [
+        {
+          title: 'Date',
+          key: 'date_input',
+          width: '130px'
+        },
+        {
+          title: 'Type',
+          key: 'type_report',
+          width: '120px'
+        },
+        {
+          title: 'Start Page',
+          key: 'start_juz_page_name',
+          width: '150px'
+        },
+        {
+          title: 'End Page',
+          key: 'end_juz_page_name',
+          width: '150px'
+        },
+        {
+          title: 'Total',
+          key: 'total',
+          width: '100px'
+        },
+      ];
+
+      headers = [...baseHeaders];
+
       if (activeRole === 1) {
-        const superAdminHeader = [
-          {
-            title: 'Date',
-            key: 'date_input',
-          },
-          {
-            title: 'Type',
-            key: 'type_report',
-          },
-          {
-            title: 'Start Page',
-            key: 'start_juz_page_name',
-          },
-          {
-            title: 'End Page',
-            key: 'end_juz_page_name',
-          },
-          {
-            title: 'Total',
-            key: 'total',
-          },
-          {
-            title: 'Organization',
-            key: 'org_uuid',
-          },
-        ]
-
-        headers = headers.concat(superAdminHeader)
+        headers.push({
+          title: 'Organization',
+          key: 'org_uuid',
+          width: '200px'
+        });
       }
 
-      if (activeRole === 2) {
-        const adminHeader = [
-          {
-            title: 'Date',
-            key: 'date_input',
-          },
-          {
-            title: 'Type',
-            key: 'type_report',
-          },
-          {
-            title: 'Start Page',
-            key: 'start_juz_page_name',
-          },
-          {
-            title: 'End Page',
-            key: 'end_juz_page_name',
-          },
-          {
-            title: 'Total',
-            key: 'total',
-          },
-        ]
-
-        headers = headers.concat(adminHeader)
-      }
-
-      if (activeRole === 3) {
-        const adminHeader = [
-          {
-            title: 'Date',
-            key: 'date_input',
-          },
-          {
-            title: 'Type',
-            key: 'type_report',
-          },
-          {
-            title: 'Start Page',
-            key: 'start_juz_page_name',
-          },
-          {
-            title: 'End Page',
-            key: 'end_juz_page_name',
-          },
-          {
-            title: 'Total',
-            key: 'total',
-          },
-        ]
-
-        headers = headers.concat(adminHeader)
-      }
-
-      return headers
+      return headers;
     },
 
     async fetchData() {
@@ -358,8 +629,8 @@ export default {
         page,
         limit: itemsPerPage,
         q: this.search,
-        sortOrder: '1',
-        sortField: 'firstname',
+        sortOrder: '-1',
+        sortField: 'date_input',
       };
 
       this.isSuperAdminRole = isSuperAdmin(activeRole.value)
@@ -391,14 +662,30 @@ export default {
       this.totalItems = Number(data.total)
       this.loading = false
     },
+
+    close() {
+      this.dialog = false
+    },
+
+    closeDelete() {
+      this.dialogDelete = false
+    },
   },
+
   async mounted() {
     this.slug = this.$route.params.slug;
-    this.getBreadcrumbs()
 
     const studentStorage = useStudentStorage()
-    const data = await studentStorage.showStudentByUUID(this.slug)
-    this.student = data.data.student;
+    try {
+      const data = await studentStorage.showStudentByUUID(this.slug)
+      this.student = data.data.student;
+      this.getBreadcrumbs()
+      // Fetch reports after student data is loaded
+      this.fetchData()
+    } catch (error) {
+      console.error('Failed to load student:', error)
+      this.student = {}
+    }
   }
 };
 </script>

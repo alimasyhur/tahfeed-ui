@@ -694,6 +694,7 @@ export default {
       teacher_uuid: '',
       teacher_firstname: '',
       teacher_lastname: '',
+      teacher_email: '',
       grade_uuid: '',
       status: 'not_started',
     },
@@ -708,6 +709,7 @@ export default {
       teacher_uuid: '',
       teacher_firstname: '',
       teacher_lastname: '',
+      teacher_email: '',
       grade_uuid: '',
       status: 'not_started',
     },
@@ -903,6 +905,11 @@ export default {
             width: '160px'
           },
           {
+            title: 'Email',
+            key: 'teacher_email',
+            width: '160px'
+          },
+          {
             title: 'Organization',
             key: 'org_name',
             width: '160px'
@@ -944,6 +951,11 @@ export default {
           {
             title: 'Teacher',
             key: 'teacher_firstname',
+            width: '160px'
+          },
+          {
+            title: 'Email',
+            key: 'teacher_email',
             width: '160px'
           },
           {
