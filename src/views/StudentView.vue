@@ -822,11 +822,6 @@ export default {
             width: '150px'
           },
           {
-            title: 'Organization',
-            key: 'org_name',
-            width: '160px'
-          },
-          {
             title: 'Actions',
             key: 'actions',
             sortable: false,

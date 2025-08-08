@@ -871,11 +871,11 @@ export default {
     },
 
     onJuzChange() {
-      this.selectedStartPage = null;
+      this.selectedStartPage = this.editedItem.start_page_uuid;
     },
 
     onJuzEndChange() {
-      this.selectedEndPage = null;
+      this.selectedEndPage = this.editedIndex.end_page_uuid;
     },
 
     detailReport(slug) {
@@ -1378,9 +1378,21 @@ export default {
         this.editedItem.org_uuid = activeRole.value.org_uuid;
       }
 
+      const kelasData = me.value.kelas
+      const reportStorage = useReportStorage()
+      this.editedItem.teacher_uuid = kelasData.teacher_uuid
+      this.editedItem.start_juz_uuid = this.selectedStartJuz
+      this.editedItem.start_page_uuid = this.selectedStartPage
+      this.editedItem.end_juz_uuid = this.selectedEndJuz
+      this.editedItem.end_page_uuid = this.selectedEndPage
+      this.editedItem.kelas_uuid = me.value.kelas.uuid
+
       if (this.editedIndex > -1) {
-        const reportStorage = useReportStorage()
+        console.log('EDIT ITEM: ', this.editedItem);
+
         const respEdited = await reportStorage.editReport(this.editedItem)
+
+        console.log('EDIT ITEM respEdited: ', respEdited);
 
         this.alertMessage = respEdited.message
         this.hasAlert = true
@@ -1399,16 +1411,6 @@ export default {
           }, 700)
         }
       } else {
-        const kelasData = me.value.kelas
-        const reportStorage = useReportStorage()
-
-        this.editedItem.teacher_uuid = kelasData.teacher_uuid
-        this.editedItem.start_juz_uuid = this.selectedStartJuz
-        this.editedItem.start_page_uuid = this.selectedStartPage
-        this.editedItem.end_juz_uuid = this.selectedEndJuz
-        this.editedItem.end_page_uuid = this.selectedEndPage
-        this.editedItem.kelas_uuid = me.value.kelas.uuid
-
         const respEdited = await reportStorage.addReport(this.editedItem)
 
         this.alertMessage = respEdited.message

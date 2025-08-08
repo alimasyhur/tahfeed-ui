@@ -92,6 +92,11 @@ export const useStudentStorage = defineStore('student', () => {
 
   const editStudent = async (inputStudent) => {
     try {
+      const birthdate =
+        typeof inputStudent.birthdate === 'string'
+          ? inputStudent.birthdate
+          : formatDate(inputStudent.birthdate)
+
       const payload = {
         org_uuid: inputStudent.org_uuid,
         grade_uuid: inputStudent.grade_uuid,
@@ -99,7 +104,7 @@ export const useStudentStorage = defineStore('student', () => {
         nis: inputStudent.nis,
         firstname: inputStudent.firstname,
         lastname: inputStudent.lastname,
-        birthdate: formatDate(inputStudent.birthdate),
+        birthdate: birthdate,
         phone: inputStudent.phone,
         bio: inputStudent.bio
       }
