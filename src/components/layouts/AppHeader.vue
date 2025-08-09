@@ -49,8 +49,11 @@
             <v-btn v-bind="props" variant="outlined" color="green-darken-2" class="user-menu-btn text-none" rounded="lg"
               size="large">
               <div class="d-flex align-center">
-                <v-avatar size="32" color="green-lighten-4" class="me-3">
-                  <v-icon icon="mdi-account" color="green-darken-3"></v-icon>
+                <v-avatar size="40" class="org-icon-avatar mr-2">
+                  <v-img v-if="userStorage?.me?.organization?.logo_image_url"
+                    :src="userStorage?.me?.organization?.logo_image_url"
+                    :alt="userStorage?.me?.organization?.logo_image_url || 'Organization'" cover></v-img>
+                  <v-icon v-else icon="mdi-domain" color="green-darken-3" size="24"></v-icon>
                 </v-avatar>
                 <div class="text-left">
                   <div class="text-body-2 font-weight-bold text-green-darken-3">
@@ -79,8 +82,11 @@
               <v-list-item v-for="(role, idx) in myRoleList" :key="idx" @click="handleSwitchRole(idx)"
                 class="rounded-lg mx-2 mb-1" :class="{ 'bg-green-lighten-5': idx === selectedRole }">
                 <template v-slot:prepend>
-                  <v-avatar size="36" color="green-lighten-4">
-                    <v-icon icon="mdi-domain" color="green-darken-2" size="20"></v-icon>
+                  <v-avatar size="40" class="org-icon-avatar mr-2">
+                    <v-img v-if="userStorage?.me?.organization?.logo_image_url"
+                      :src="userStorage?.me?.organization?.logo_image_url"
+                      :alt="userStorage?.me?.organization?.logo_image_url || 'Organization'" cover></v-img>
+                    <v-icon v-else icon="mdi-domain" color="green-darken-3" size="24"></v-icon>
                   </v-avatar>
                 </template>
 
@@ -168,8 +174,11 @@
             <v-card class="rounded-xl bg-green-lighten-5" elevation="0">
               <v-card-text class="pa-4">
                 <div class="d-flex align-center">
-                  <v-avatar size="48" color="green-lighten-4">
-                    <v-icon icon="mdi-account" color="green-darken-3" size="24"></v-icon>
+                  <v-avatar size="40" class="org-icon-avatar">
+                    <v-img v-if="userStorage?.me?.organization?.logo_image_url"
+                      :src="userStorage?.me?.organization?.logo_image_url"
+                      :alt="userStorage?.me?.organization?.logo_image_url || 'Organization'" cover></v-img>
+                    <v-icon v-else icon="mdi-domain" color="green-darken-3" size="24"></v-icon>
                   </v-avatar>
                   <div class="ml-3">
                     <div class="text-body-1 font-weight-bold text-green-darken-3">

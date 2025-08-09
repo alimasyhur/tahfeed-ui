@@ -5,7 +5,7 @@
             :temporary="$vuetify.display.smAndDown" @update:model-value="emit('update:drawer', $event)"
             class="d-none d-md-flex modern-drawer" :width="rail ? 72 : 280">
             <!-- User Profile Header -->
-            <v-list-item prepend-avatar="/images/landing/tahfeed-semangat-hafal.png" :title="activeRole.user_name"
+            <v-list-item :prepend-avatar="profile?.profile_image_url" :title="activeRole.user_name"
                 :subtitle="activeRole.role_name" @click="emit('update:rail', !props.rail)" class="user-profile-item">
                 <template v-slot:append>
                     <v-btn :icon="rail ? 'mdi-chevron-right' : 'mdi-chevron-left'" variant="text" size="small"
@@ -53,7 +53,7 @@
                 <v-card-title class="d-flex align-center justify-space-between pa-4">
                     <div class="d-flex align-center">
                         <v-avatar size="32" class="me-3">
-                            <v-img src="/images/landing/tahfeed-semangat-hafal.png" />
+                            <v-img :src="profile?.profile_image_url || '/images/landing/tahfeed-semangat-hafal.png'" />
                         </v-avatar>
                         <div>
                             <div class="font-weight-bold text-body-2">{{ activeRole.user_name }}</div>
@@ -84,7 +84,7 @@
 
 <script setup>
 import { useUserStorage } from '@/stores/userStorage'
-import { onBeforeMount, onMounted, onUnmounted, ref, computed } from 'vue'
+import { onBeforeMount, onMounted, onUnmounted, ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter, useRoute } from 'vue-router'
 import eventBus from '@/stores/eventBus'
@@ -101,11 +101,60 @@ const router = useRouter()
 const route = useRoute()
 
 const { logoutUser, getMenu } = userStorage
-const { activeRole } = storeToRefs(userStorage)
+const { activeRole, me } = storeToRefs(userStorage)
 
-const listMenu = ref(getMenu(activeRole.value))
+const listMenu = ref([])
 const showMoreMenu = ref(false)
 const activeTab = ref(null)
+const profile = ref(null)
+
+// Update active tab based on current route - PINDAH KE ATAS
+const updateActiveTab = () => {
+    const currentMenu = listMenu.value.find(menu => menu.toRoute === route.name)
+    if (currentMenu) {
+        activeTab.value = currentMenu.toValue
+    }
+}
+
+// WATCH untuk memantau perubahan data user
+watch(
+    () => me.value,
+    (newUserData) => {
+        if (newUserData) {
+            profile.value = newUserData.profile
+            // Update menu ketika user data berubah
+            if (activeRole.value) {
+                listMenu.value = getMenu(activeRole.value)
+            }
+            updateActiveTab()
+        }
+    },
+    { deep: true, immediate: true }
+)
+
+// Watch activeRole changes
+watch(
+    () => activeRole.value,
+    (newRole) => {
+        console.log('Active role changed:', newRole)
+        if (newRole) {
+            listMenu.value = getMenu(newRole)
+            updateActiveTab()
+        }
+    },
+    { deep: true, immediate: true }
+)
+
+// Initialize data on component mount
+onMounted(() => {
+    if (activeRole.value) {
+        listMenu.value = getMenu(activeRole.value)
+    }
+    if (me.value?.profile) {
+        profile.value = me.value.profile
+    }
+    updateActiveTab()
+})
 
 // For bottom navigation: limit to 4 main items + more button
 const limitedMenu = computed(() => {
@@ -124,13 +173,6 @@ router.afterEach(() => {
     showMoreMenu.value = false
 });
 
-// Update active tab based on current route
-const updateActiveTab = () => {
-    const currentMenu = listMenu.value.find(menu => menu.toRoute === route.name)
-    if (currentMenu) {
-        activeTab.value = currentMenu.toValue
-    }
-}
 
 const updateDrawerItems = (userData) => {
     listMenu.value = userData.listMenu

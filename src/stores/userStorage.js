@@ -462,6 +462,28 @@ export const useUserStorage = defineStore('user', () => {
     }
   }
 
+  const uploadProfileImage = async (formData) => {
+    try {
+      const { data } = await apiService.post('/images/profiles/upload', formData, {
+        headers: {
+          Authorization: `Bearer ${accessToken.value}`
+        }
+      })
+
+      return data
+    } catch (error) {
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+
+      return {
+        status: error?.response?.data?.status ?? 500,
+        message: errMessage
+      }
+    }
+  }
+
   return {
     loginUser,
     accessToken,
@@ -488,6 +510,7 @@ export const useUserStorage = defineStore('user', () => {
     adminResetPassword,
     selectedRole,
     getMenu,
-    setSelectedRole
+    setSelectedRole,
+    uploadProfileImage
   }
 })

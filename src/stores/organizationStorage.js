@@ -219,6 +219,29 @@ export const useOrganizationStorage = defineStore('organization', () => {
     }
   }
 
+  // UPLOAD IMAGE START
+  const uploadOrganizationImage = async (formData) => {
+    try {
+      const { data } = await apiService.post('/images/organizations/upload', formData, {
+        headers: {
+          Authorization: `Bearer ${userStorage.accessToken}`
+        }
+      })
+
+      return data
+    } catch (error) {
+      let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
+      if (Array.isArray(errMessage)) {
+        errMessage = error.response.data.message[0].name
+      }
+
+      return {
+        status: error?.response?.data?.status ?? 500,
+        message: errMessage
+      }
+    }
+  }
+
   return {
     loading,
     alertMessage,
@@ -231,6 +254,7 @@ export const useOrganizationStorage = defineStore('organization', () => {
     closeDialogOrganization,
     addAdminOrganization,
     editAdminOrganization,
-    showOrganizationByDomain
+    showOrganizationByDomain,
+    uploadOrganizationImage
   }
 })
