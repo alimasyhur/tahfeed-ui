@@ -1145,8 +1145,8 @@ export default {
       };
 
       params.filter = {
-        org_uuid: activeRole.value.org_uuid,
-        kelas_uuid: me.value.kelas.uuid,
+        org_uuid: activeRole.value?.org_uuid,
+        kelas_uuid: me.value?.kelas?.uuid,
       }
 
       const studentOptionsData = await studentStorage.getKelasStudentOptions(params)

@@ -1,300 +1,316 @@
 <template>
   <v-container fluid class="pa-4">
-    <!-- Header Section with Breadcrumbs -->
-    <v-row class="mb-6">
-      <v-col cols="12">
-        <div class="header-section">
-          <v-breadcrumbs :items="breadcrumbsItems" class="pa-0 mb-4">
-            <template v-slot:divider>
-              <v-icon icon="mdi-chevron-right" size="small"></v-icon>
-            </template>
-          </v-breadcrumbs>
+    <!-- Main Loading State -->
+    <div v-if="mainLoading" class="main-loader">
+      <v-row class="justify-center align-center" style="min-height: 60vh;">
+        <v-col cols="12" class="text-center">
+          <v-progress-circular :size="80" :width="6" color="primary" indeterminate class="mb-4"></v-progress-circular>
+          <h3 class="text-h5 mb-2">Loading Class Details</h3>
+          <p class="text-body-2 text-medium-emphasis">Please wait while we fetch the class information...</p>
+        </v-col>
+      </v-row>
+    </div>
 
-          <div class="d-flex flex-column flex-md-row align-center justify-space-between">
-            <div class="page-title-section mb-4 mb-md-0">
-              <h1 class="page-title text-h4 font-weight-bold mb-2">
-                <v-icon icon="mdi-google-classroom" class="mr-3" color="primary"></v-icon>
-                {{ kelas?.name || 'Class Details' }}
-              </h1>
-              <p class="page-subtitle text-body-1 text-medium-emphasis">
-                {{ kelas?.description || 'Class information and student management' }}
-              </p>
-            </div>
+    <!-- Main Content - Only show when not loading -->
+    <div v-else>
+      <!-- Header Section with Breadcrumbs -->
+      <v-row class="mb-6">
+        <v-col cols="12">
+          <div class="header-section">
+            <v-breadcrumbs :items="breadcrumbsItems" class="pa-0 mb-4">
+              <template v-slot:divider>
+                <v-icon icon="mdi-chevron-right" size="small"></v-icon>
+              </template>
+            </v-breadcrumbs>
 
-            <!-- Status Badge -->
-            <div class="status-section" v-if="kelas">
-              <v-chip :color="getStatusColor(kelas.status)" :variant="kelas.status === 'active' ? 'elevated' : 'tonal'"
-                size="large" :prepend-icon="getStatusIcon(kelas.status)" class="font-weight-medium status-chip">
-                {{ formatStatus(kelas.status) }}
-              </v-chip>
-            </div>
-          </div>
-        </div>
-      </v-col>
-    </v-row>
-
-    <!-- Class Information Cards -->
-    <v-row v-if="kelas" class="mb-6">
-      <!-- Basic Information Card -->
-      <v-col cols="12" lg="8">
-        <v-card class="info-card" elevation="4">
-          <v-card-title class="card-header pa-6">
-            <div class="d-flex align-center">
-              <v-icon icon="mdi-information" size="24" class="mr-3" color="primary"></v-icon>
-              <span class="text-h6 font-weight-bold">Class Information</span>
-            </div>
-          </v-card-title>
-
-          <v-divider></v-divider>
-
-          <v-card-text class="pa-6">
-            <v-row>
-              <v-col cols="12" md="6">
-                <div class="info-item mb-4">
-                  <div class="info-label d-flex align-center mb-2">
-                    <v-icon icon="mdi-google-classroom" size="18" class="mr-2 text-medium-emphasis"></v-icon>
-                    <span class="text-caption font-weight-medium text-medium-emphasis">CLASS NAME</span>
-                  </div>
-                  <div class="info-value text-h6 font-weight-medium">{{ kelas.name }}</div>
-                </div>
-
-                <div class="info-item mb-4">
-                  <div class="info-label d-flex align-center mb-2">
-                    <v-icon icon="mdi-domain" size="18" class="mr-2 text-medium-emphasis"></v-icon>
-                    <span class="text-caption font-weight-medium text-medium-emphasis">ORGANIZATION</span>
-                  </div>
-                  <div class="info-value text-body-1">{{ kelas.org_name }}</div>
-                </div>
-
-                <div class="info-item mb-4">
-                  <div class="info-label d-flex align-center mb-2">
-                    <v-icon icon="mdi-school" size="18" class="mr-2 text-medium-emphasis"></v-icon>
-                    <span class="text-caption font-weight-medium text-medium-emphasis">GRADE</span>
-                  </div>
-                  <div class="info-value text-body-1">{{ kelas.grade_name }}</div>
-                </div>
-
-                <div class="info-item mb-4">
-                  <div class="info-label d-flex align-center mb-2">
-                    <v-icon icon="mdi-target" size="18" class="mr-2 text-medium-emphasis"></v-icon>
-                    <span class="text-caption font-weight-medium text-medium-emphasis">JUZ TARGET</span>
-                  </div>
-                  <div class="info-value text-body-1">{{ kelas.total_juz_target }} Juz</div>
-                </div>
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <div class="info-item mb-4">
-                  <div class="info-label d-flex align-center mb-2">
-                    <v-icon icon="mdi-calendar-range" size="18" class="mr-2 text-medium-emphasis"></v-icon>
-                    <span class="text-caption font-weight-medium text-medium-emphasis">GRADE PERIOD</span>
-                  </div>
-                  <div class="info-value text-body-1">{{ kelas.grade_period }}</div>
-                </div>
-
-                <div class="info-item mb-4">
-                  <div class="info-label d-flex align-center mb-2">
-                    <v-icon icon="mdi-play" size="18" class="mr-2 text-medium-emphasis"></v-icon>
-                    <span class="text-caption font-weight-medium text-medium-emphasis">START DATE</span>
-                  </div>
-                  <div class="info-value text-body-1">{{ formatDate(kelas.start_date) }}</div>
-                </div>
-
-                <div class="info-item mb-4">
-                  <div class="info-label d-flex align-center mb-2">
-                    <v-icon icon="mdi-stop" size="18" class="mr-2 text-medium-emphasis"></v-icon>
-                    <span class="text-caption font-weight-medium text-medium-emphasis">END DATE</span>
-                  </div>
-                  <div class="info-value text-body-1">{{ formatDate(kelas.end_date) }}</div>
-                </div>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <!-- Teacher Information Card -->
-      <v-col cols="12" lg="4">
-        <v-card class="teacher-card" elevation="4">
-          <v-card-title class="card-header pa-6">
-            <div class="d-flex align-center">
-              <v-icon icon="mdi-account-tie" size="24" class="mr-3" color="secondary"></v-icon>
-              <span class="text-h6 font-weight-bold">Teacher Information</span>
-            </div>
-          </v-card-title>
-
-          <v-divider></v-divider>
-
-          <v-card-text class="pa-6 text-center">
-            <v-avatar color="secondary" size="80" class="mb-4">
-              <span class="text-white text-h5 font-weight-bold">
-                {{ getTeacherInitials() }}
-              </span>
-            </v-avatar>
-
-            <div class="teacher-name text-h6 font-weight-bold mb-2">
-              {{ kelas.teacher_firstname }} {{ kelas.teacher_lastname }}
-            </div>
-
-            <v-chip color="secondary" variant="tonal" prepend-icon="mdi-card-account-details" class="mb-4">
-              NIK: {{ kelas.teacher_nik }}
-            </v-chip>
-            <v-chip color="secondary" variant="tonal" prepend-icon="mdi-email" class="mb-4">
-              Email: {{ kelas.teacher_email }}
-            </v-chip>
-
-            <div class="teacher-stats">
-              <v-divider class="mb-4"></v-divider>
-              <div class="d-flex justify-center">
-                <div class="text-center">
-                  <div class="text-h6 font-weight-bold text-primary">{{ students.length }}</div>
-                  <div class="text-caption text-medium-emphasis">Students</div>
-                </div>
+            <div class="d-flex flex-column flex-md-row align-center justify-space-between">
+              <div class="page-title-section mb-4 mb-md-0">
+                <h1 class="page-title text-h4 font-weight-bold mb-2">
+                  <v-icon icon="mdi-google-classroom" class="mr-3" color="primary"></v-icon>
+                  {{ kelas?.name || 'Class Details' }}
+                </h1>
+                <p class="page-subtitle text-body-1 text-medium-emphasis">
+                  {{ kelas?.description || 'Class information and student management' }}
+                </p>
               </div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
 
-    <!-- Students Section -->
-    <v-row v-if="kelas">
-      <v-col cols="12">
-        <v-card class="students-card" elevation="4">
-          <v-card-title class="card-header pa-6">
-            <div class="d-flex flex-column flex-md-row align-center justify-space-between w-100">
-              <div class="d-flex align-center mb-4 mb-md-0">
-                <v-icon icon="mdi-account-group" size="24" class="mr-3" color="primary"></v-icon>
-                <span class="text-h6 font-weight-bold">Class Students</span>
-                <v-chip v-if="students.length > 0" color="primary" variant="tonal" class="ml-3">
-                  {{ totalItems }} Total
+              <!-- Status Badge -->
+              <div class="status-section" v-if="kelas">
+                <v-chip :color="getStatusColor(kelas.status)"
+                  :variant="kelas.status === 'active' ? 'elevated' : 'tonal'" size="large"
+                  :prepend-icon="getStatusIcon(kelas.status)" class="font-weight-medium status-chip">
+                  {{ formatStatus(kelas.status) }}
                 </v-chip>
               </div>
-
-              <div class="d-flex flex-column flex-sm-row ga-3 align-center">
-                <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Search students..."
-                  variant="outlined" clearable hide-details class="search-field" density="comfortable"
-                  style="min-width: 250px;">
-                </v-text-field>
-
-                <v-btn v-if="kelas.status !== 'finished' && isSuperAdminOrAdminRole" color="primary" variant="elevated"
-                  size="large" @click="dialog = true" class="add-student-btn" prepend-icon="mdi-account-plus">
-                  <span class="d-none d-sm-inline">Add Student</span>
-                  <span class="d-sm-none">Add</span>
-                </v-btn>
-              </div>
             </div>
-          </v-card-title>
+          </div>
+        </v-col>
+      </v-row>
 
-          <v-divider></v-divider>
-
-          <v-data-table :headers="headers" :search="search" :items="students" :items-length="totalItems"
-            :loading="loading" v-model:options="options" @update:options="fetchData"
-            :sort-by="[{ key: 'firstname', order: 'asc' }]" class="modern-table" :mobile-breakpoint="600">
-
-            <!-- Student Name with Avatar -->
-            <template v-slot:item.firstname="{ item }">
+      <!-- Class Information Cards -->
+      <v-row v-if="kelas" class="mb-6">
+        <!-- Basic Information Card -->
+        <v-col cols="12" lg="8">
+          <v-card class="info-card" elevation="4">
+            <v-card-title class="card-header pa-6">
               <div class="d-flex align-center">
-                <v-avatar color="primary" size="32" class="mr-3">
-                  <span class="text-white text-caption font-weight-bold">
-                    {{ getStudentInitials(item.firstname, item.lastname) }}
-                  </span>
-                </v-avatar>
-                <div>
-                  <div class="font-weight-medium">{{ item.firstname }} {{ item.lastname }}</div>
-                  <div class="text-caption text-medium-emphasis d-md-none">
-                    NIK: {{ item.nik }}
+                <v-icon icon="mdi-information" size="24" class="mr-3" color="primary"></v-icon>
+                <span class="text-h6 font-weight-bold">Class Information</span>
+              </div>
+            </v-card-title>
+
+            <v-divider></v-divider>
+
+            <v-card-text class="pa-6">
+              <v-row>
+                <v-col cols="12" md="6">
+                  <div class="info-item mb-4">
+                    <div class="info-label d-flex align-center mb-2">
+                      <v-icon icon="mdi-google-classroom" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                      <span class="text-caption font-weight-medium text-medium-emphasis">CLASS NAME</span>
+                    </div>
+                    <div class="info-value text-h6 font-weight-medium">{{ kelas.name }}</div>
+                  </div>
+
+                  <div class="info-item mb-4">
+                    <div class="info-label d-flex align-center mb-2">
+                      <v-icon icon="mdi-domain" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                      <span class="text-caption font-weight-medium text-medium-emphasis">ORGANIZATION</span>
+                    </div>
+                    <div class="info-value text-body-1">{{ kelas.org_name }}</div>
+                  </div>
+
+                  <div class="info-item mb-4">
+                    <div class="info-label d-flex align-center mb-2">
+                      <v-icon icon="mdi-school" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                      <span class="text-caption font-weight-medium text-medium-emphasis">GRADE</span>
+                    </div>
+                    <div class="info-value text-body-1">{{ kelas.grade_name }}</div>
+                  </div>
+
+                  <div class="info-item mb-4">
+                    <div class="info-label d-flex align-center mb-2">
+                      <v-icon icon="mdi-target" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                      <span class="text-caption font-weight-medium text-medium-emphasis">JUZ TARGET</span>
+                    </div>
+                    <div class="info-value text-body-1">{{ kelas.total_juz_target }} Juz</div>
+                  </div>
+                </v-col>
+
+                <v-col cols="12" md="6">
+                  <div class="info-item mb-4">
+                    <div class="info-label d-flex align-center mb-2">
+                      <v-icon icon="mdi-calendar-range" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                      <span class="text-caption font-weight-medium text-medium-emphasis">GRADE PERIOD</span>
+                    </div>
+                    <div class="info-value text-body-1">{{ kelas.grade_period }}</div>
+                  </div>
+
+                  <div class="info-item mb-4">
+                    <div class="info-label d-flex align-center mb-2">
+                      <v-icon icon="mdi-play" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                      <span class="text-caption font-weight-medium text-medium-emphasis">START DATE</span>
+                    </div>
+                    <div class="info-value text-body-1">{{ formatDate(kelas.start_date) }}</div>
+                  </div>
+
+                  <div class="info-item mb-4">
+                    <div class="info-label d-flex align-center mb-2">
+                      <v-icon icon="mdi-stop" size="18" class="mr-2 text-medium-emphasis"></v-icon>
+                      <span class="text-caption font-weight-medium text-medium-emphasis">END DATE</span>
+                    </div>
+                    <div class="info-value text-body-1">{{ formatDate(kelas.end_date) }}</div>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <!-- Teacher Information Card -->
+        <v-col cols="12" lg="4">
+          <v-card class="teacher-card" elevation="4">
+            <v-card-title class="card-header pa-6">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-account-tie" size="24" class="mr-3" color="secondary"></v-icon>
+                <span class="text-h6 font-weight-bold">Teacher Information</span>
+              </div>
+            </v-card-title>
+
+            <v-divider></v-divider>
+
+            <v-card-text class="pa-6 text-center">
+              <v-avatar color="secondary" size="80" class="mb-4">
+                <span class="text-white text-h5 font-weight-bold">
+                  {{ getTeacherInitials() }}
+                </span>
+              </v-avatar>
+
+              <div class="teacher-name text-h6 font-weight-bold mb-2">
+                {{ kelas.teacher_firstname }} {{ kelas.teacher_lastname }}
+              </div>
+
+              <v-chip color="secondary" variant="tonal" prepend-icon="mdi-card-account-details" class="mb-4">
+                NIK: {{ kelas.teacher_nik }}
+              </v-chip>
+              <v-chip color="secondary" variant="tonal" prepend-icon="mdi-email" class="mb-4">
+                Email: {{ kelas.teacher_email }}
+              </v-chip>
+
+              <div class="teacher-stats">
+                <v-divider class="mb-4"></v-divider>
+                <div class="d-flex justify-center">
+                  <div class="text-center">
+                    <div class="text-h6 font-weight-bold text-primary">{{ students.length }}</div>
+                    <div class="text-caption text-medium-emphasis">Students</div>
                   </div>
                 </div>
               </div>
-            </template>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
 
-            <!-- NIK with Icon -->
-            <template v-slot:item.nik="{ item }">
-              <div class="d-flex align-center">
-                <v-icon icon="mdi-card-account-details" size="small" class="mr-2 text-medium-emphasis"></v-icon>
-                <span>{{ item.nik }}</span>
+      <!-- Students Section -->
+      <v-row v-if="kelas">
+        <v-col cols="12">
+          <v-card class="students-card" elevation="4">
+            <v-card-title class="card-header pa-6">
+              <div class="d-flex flex-column flex-md-row align-center justify-space-between w-100">
+                <div class="d-flex align-center mb-4 mb-md-0">
+                  <v-icon icon="mdi-account-group" size="24" class="mr-3" color="primary"></v-icon>
+                  <span class="text-h6 font-weight-bold">Class Students</span>
+                  <v-chip v-if="students.length > 0" color="primary" variant="tonal" class="ml-3">
+                    {{ totalItems }} Total
+                  </v-chip>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row ga-3 align-center">
+                  <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Search students..."
+                    variant="outlined" clearable hide-details class="search-field" density="comfortable"
+                    style="min-width: 250px;">
+                  </v-text-field>
+
+                  <v-btn v-if="kelas.status !== 'finished' && isSuperAdminOrAdminRole" color="primary"
+                    variant="elevated" size="large" @click="dialog = true" class="add-student-btn"
+                    prepend-icon="mdi-account-plus">
+                    <span class="d-none d-sm-inline">Add Student</span>
+                    <span class="d-sm-none">Add</span>
+                  </v-btn>
+                </div>
               </div>
-            </template>
+            </v-card-title>
 
-            <!-- NIS with Icon -->
-            <template v-slot:item.nis="{ item }">
-              <div class="d-flex align-center">
-                <v-icon icon="mdi-school" size="small" class="mr-2 text-medium-emphasis"></v-icon>
-                <span>{{ item.nis || 'Not Set' }}</span>
-              </div>
-            </template>
+            <v-divider></v-divider>
 
-            <!-- Birthdate with Icon -->
-            <template v-slot:item.birthdate="{ item }">
-              <div class="d-flex align-center">
-                <v-icon icon="mdi-calendar" size="small" class="mr-2 text-medium-emphasis"></v-icon>
-                <span>{{ formatDate(item.birthdate) }}</span>
-              </div>
-            </template>
+            <v-data-table :headers="headers" :search="search" :items="students" :items-length="totalItems"
+              :loading="studentsLoading" v-model:options="options" @update:options="fetchData"
+              :sort-by="[{ key: 'firstname', order: 'asc' }]" class="modern-table" :mobile-breakpoint="600">
 
-            <!-- Phone with Icon -->
-            <template v-slot:item.phone="{ item }">
-              <div class="d-flex align-center">
-                <v-icon icon="mdi-phone" size="small" class="mr-2 text-medium-emphasis"></v-icon>
-                <span>{{ item.phone || 'Not Set' }}</span>
-              </div>
-            </template>
+              <!-- Student Name with Avatar -->
+              <template v-slot:item.firstname="{ item }">
+                <div class="d-flex align-center">
+                  <v-avatar color="primary" size="32" class="mr-3">
+                    <span class="text-white text-caption font-weight-bold">
+                      {{ getStudentInitials(item.firstname, item.lastname) }}
+                    </span>
+                  </v-avatar>
+                  <div>
+                    <div class="font-weight-medium">{{ item.firstname }} {{ item.lastname }}</div>
+                    <div class="text-caption text-medium-emphasis d-md-none">
+                      NIK: {{ item.nik }}
+                    </div>
+                  </div>
+                </div>
+              </template>
 
-            <!-- Actions -->
-            <template v-slot:item.actions="{ item }">
-              <div class="action-buttons-cell">
-                <v-tooltip text="Remove Student" location="top"
-                  v-if="kelas.status !== 'finished' && isSuperAdminOrAdminRole">
-                  <template v-slot:activator="{ props }">
-                    <v-btn icon="mdi-account-remove" size="small" variant="text" color="error" @click="deleteItem(item)"
-                      v-bind="props">
-                    </v-btn>
-                  </template>
-                </v-tooltip>
-              </div>
-            </template>
+              <!-- NIK with Icon -->
+              <template v-slot:item.nik="{ item }">
+                <div class="d-flex align-center">
+                  <v-icon icon="mdi-card-account-details" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                  <span>{{ item.nik }}</span>
+                </div>
+              </template>
 
-            <!-- Loading State -->
-            <template v-slot:loading>
-              <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
-            </template>
+              <!-- NIS with Icon -->
+              <template v-slot:item.nis="{ item }">
+                <div class="d-flex align-center">
+                  <v-icon icon="mdi-school" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                  <span>{{ item.nis || 'Not Set' }}</span>
+                </div>
+              </template>
 
-            <!-- No Data State -->
-            <template v-slot:no-data>
-              <div class="text-center pa-8">
-                <v-icon icon="mdi-account-group" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
-                <h3 class="text-h6 mb-2">No Students Found</h3>
-                <p class="text-body-2 text-medium-emphasis mb-4">
-                  {{ search ? 'No students match your search criteria.' : 'This class doesn\'t have any students yet.'
-                  }}
-                </p>
-                <v-btn v-if="!search && kelas.status !== 'finished' && isSuperAdminOrAdminRole" color="primary"
-                  variant="elevated" @click="dialog = true" prepend-icon="mdi-account-plus">
-                  Add First Student
-                </v-btn>
-              </div>
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-col>
-    </v-row>
+              <!-- Birthdate with Icon -->
+              <template v-slot:item.birthdate="{ item }">
+                <div class="d-flex align-center">
+                  <v-icon icon="mdi-calendar" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                  <span>{{ formatDate(item.birthdate) }}</span>
+                </div>
+              </template>
 
-    <!-- Class Not Found State -->
-    <v-row v-else>
-      <v-col cols="12">
-        <v-card class="text-center pa-8" elevation="4">
-          <v-icon icon="mdi-alert-circle" size="80" color="error" class="mb-4"></v-icon>
-          <h2 class="text-h4 mb-4">Class Not Found</h2>
-          <p class="text-body-1 text-medium-emphasis mb-6">
-            The class you're looking for doesn't exist or has been removed.
-          </p>
-          <v-btn color="primary" variant="elevated" to="/kelas" prepend-icon="mdi-arrow-left">
-            Back to Classes
-          </v-btn>
-        </v-card>
-      </v-col>
-    </v-row>
+              <!-- Phone with Icon -->
+              <template v-slot:item.phone="{ item }">
+                <div class="d-flex align-center">
+                  <v-icon icon="mdi-phone" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                  <span>{{ item.phone || 'Not Set' }}</span>
+                </div>
+              </template>
+
+              <!-- Actions -->
+              <template v-slot:item.actions="{ item }">
+                <div class="action-buttons-cell">
+                  <v-tooltip text="Remove Student" location="top"
+                    v-if="kelas.status !== 'finished' && isSuperAdminOrAdminRole">
+                    <template v-slot:activator="{ props }">
+                      <v-btn icon="mdi-account-remove" size="small" variant="text" color="error"
+                        @click="deleteItem(item)" v-bind="props">
+                      </v-btn>
+                    </template>
+                  </v-tooltip>
+                </div>
+              </template>
+
+              <!-- Loading State -->
+              <template v-slot:loading>
+                <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
+              </template>
+
+              <!-- No Data State -->
+              <template v-slot:no-data>
+                <div class="text-center pa-8">
+                  <v-icon icon="mdi-account-group" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
+                  <h3 class="text-h6 mb-2">No Students Found</h3>
+                  <p class="text-body-2 text-medium-emphasis mb-4">
+                    {{ search ? 'No students match your search criteria.' : 'This class doesn\'t have any students yet.'
+                    }}
+                  </p>
+                  <v-btn v-if="!search && kelas.status !== 'finished' && isSuperAdminOrAdminRole" color="primary"
+                    variant="elevated" @click="dialog = true" prepend-icon="mdi-account-plus">
+                    Add First Student
+                  </v-btn>
+                </div>
+              </template>
+            </v-data-table>
+          </v-card>
+        </v-col>
+      </v-row>
+
+      <!-- Class Not Found State -->
+      <v-row v-if="!kelas && !mainLoading">
+        <v-col cols="12">
+          <v-card class="text-center pa-8" elevation="4">
+            <v-icon icon="mdi-alert-circle" size="80" color="error" class="mb-4"></v-icon>
+            <h2 class="text-h4 mb-4">Class Not Found</h2>
+            <p class="text-body-1 text-medium-emphasis mb-6">
+              The class you're looking for doesn't exist or has been removed.
+            </p>
+            <v-btn color="primary" variant="elevated" to="/kelas" prepend-icon="mdi-arrow-left">
+              Back to Classes
+            </v-btn>
+          </v-card>
+        </v-col>
+      </v-row>
+    </div>
 
     <!-- Add Student Dialog -->
     <v-dialog v-model="dialog" max-width="600" persistent>
@@ -313,7 +329,13 @@
           <v-alert v-if="hasAlert" :type="alertType" :text="alertMessage" variant="tonal" closable
             class="mb-4"></v-alert>
 
-          <v-form v-model="form" @submit.prevent="save">
+          <!-- Dialog Loading State -->
+          <div v-if="dialogLoading" class="text-center py-8">
+            <v-progress-circular :size="50" :width="4" color="primary" indeterminate class="mb-4"></v-progress-circular>
+            <p class="text-body-2 text-medium-emphasis">Loading student options...</p>
+          </div>
+
+          <v-form v-else v-model="form" @submit.prevent="save">
             <div class="mb-4">
               <h3 class="text-h6 mb-3 d-flex align-center">
                 <v-icon icon="mdi-account-search" class="mr-2"></v-icon>
@@ -359,7 +381,8 @@
           <v-btn color="grey" variant="text" size="large" @click="close">
             Cancel
           </v-btn>
-          <v-btn color="primary" variant="elevated" size="large" :disabled="!form" :loading="loading" @click="save">
+          <v-btn color="primary" variant="elevated" size="large" :disabled="!form || dialogLoading"
+            :loading="actionLoading" @click="save">
             Add Student
           </v-btn>
         </v-card-actions>
@@ -388,7 +411,7 @@
             <h3 class="text-h6 mb-3">Are you sure?</h3>
             <p class="text-body-1 mb-4">
               You're about to remove <strong class="text-error">{{ editedItem.firstname }} {{ editedItem.lastname
-              }}</strong> from this class.
+                }}</strong> from this class.
             </p>
             <v-card variant="tonal" color="warning" class="pa-4 mb-4">
               <div class="d-flex align-center">
@@ -404,7 +427,7 @@
         <v-card-actions class="pa-6">
           <v-spacer></v-spacer>
           <v-btn color="grey" variant="text" size="large" @click="closeDelete">Cancel</v-btn>
-          <v-btn color="error" variant="elevated" size="large" :loading="loading" @click="deleteItemConfirm">
+          <v-btn color="error" variant="elevated" size="large" :loading="actionLoading" @click="deleteItemConfirm">
             Remove Student
           </v-btn>
         </v-card-actions>
@@ -414,6 +437,21 @@
 </template>
 
 <style scoped>
+.main-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.v-theme--dark .main-loader {
+  background: rgba(var(--v-theme-surface), 0.95);
+}
+
 .header-section {
   background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.1) 0%, rgba(var(--v-theme-secondary), 0.05) 100%);
   border-radius: 16px;
@@ -711,7 +749,11 @@ export default {
     orgOptions: [],
     userOptions: [],
     studentOptions: [],
-    loading: false,
+    // Loading states
+    mainLoading: true,      // For initial page load
+    studentsLoading: false, // For students table
+    dialogLoading: false,   // For dialog content loading
+    actionLoading: false,   // For save/delete actions
     alertMessage: 'An error occurred',
     hasAlert: false,
     alertType: null,
@@ -741,9 +783,16 @@ export default {
   watch: {
     async dialog(val) {
       if (val) {
-        this.orgOptions = await this.fetchOrganizationOptions()
-        this.userOptions = await this.fetchUserOrganizationOptions()
-        this.studentOptions = await this.fetchStudentOptions()
+        this.dialogLoading = true;
+        try {
+          this.orgOptions = await this.fetchOrganizationOptions()
+          this.userOptions = await this.fetchUserOrganizationOptions()
+          this.studentOptions = await this.fetchStudentOptions()
+        } catch (error) {
+          console.error('Error loading dialog data:', error);
+        } finally {
+          this.dialogLoading = false;
+        }
       } else {
         this.close()
       }
@@ -840,44 +889,51 @@ export default {
     },
 
     async fetchData() {
-      this.loading = true;
-      const userStorage = useUserStorage()
-      const { activeRole } = storeToRefs(userStorage)
-      const { isSuperAdmin, isSuperAdminOrAdmin } = userStorage
-      const { page, itemsPerPage } = this.options;
-      const params = {
-        page,
-        limit: itemsPerPage,
-        q: this.search,
-        sortOrder: '1',
-        sortField: 'firstname',
-      };
+      this.studentsLoading = true;
+      try {
+        const userStorage = useUserStorage()
+        const { activeRole } = storeToRefs(userStorage)
+        const { isSuperAdmin, isSuperAdminOrAdmin } = userStorage
+        const { page, itemsPerPage } = this.options;
+        const params = {
+          page,
+          limit: itemsPerPage,
+          q: this.search,
+          sortOrder: '1',
+          sortField: 'firstname',
+        };
 
-      this.isSuperAdminRole = isSuperAdmin(activeRole.value)
-      this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
+        this.isSuperAdminRole = isSuperAdmin(activeRole.value)
+        this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
 
-      if (activeRole.value.constant_value === 2) {
-        params.filter = {
-          org_uuid: activeRole.value.org_uuid,
+        if (activeRole.value.constant_value === 2) {
+          params.filter = {
+            org_uuid: activeRole.value.org_uuid,
+          }
         }
+
+        this.activeRole = activeRole.value
+
+        if (this.search !== "") {
+          params.q = this.search;
+        }
+
+        params.filter = {
+          kelas_uuid: this.$route.params.slug
+        }
+
+        const kelasStorage = useKelasStorage()
+        const data = await kelasStorage.getKelasStudents(params)
+
+        this.students = data.data
+        this.totalItems = data.total || data.data.length
+      } catch (error) {
+        console.error('Error fetching students:', error);
+        this.students = [];
+        this.totalItems = 0;
+      } finally {
+        this.studentsLoading = false;
       }
-
-      this.activeRole = activeRole.value
-
-      if (this.search !== "") {
-        params.q = this.search;
-      }
-
-      params.filter = {
-        kelas_uuid: this.$route.params.slug
-      }
-
-      const kelasStorage = useKelasStorage()
-      const data = await kelasStorage.getKelasStudents(params)
-
-      this.students = data.data
-      this.totalItems = data.total || data.data.length
-      this.loading = false
     },
 
     async fetchOrganizationOptions() {
@@ -957,27 +1013,35 @@ export default {
     },
 
     async deleteItemConfirm() {
-      this.loading = true
-      const kelasStorage = useKelasStorage()
-      const respDelete = await kelasStorage.removeKelasStudent(this.editedItem)
+      this.actionLoading = true
+      try {
+        const kelasStorage = useKelasStorage()
+        const respDelete = await kelasStorage.removeKelasStudent(this.editedItem)
 
-      this.alertMessage = respDelete.message
-      this.hasAlert = true
-      this.alertType = respDelete.status
+        this.alertMessage = respDelete.message
+        this.hasAlert = true
+        this.alertType = respDelete.status
 
-      if (respDelete.status == "success") {
-        this.fetchData()
-        setTimeout(() => {
-          this.dialogDelete = false
-          this.alertMessage = ''
-          this.hasAlert = false
-          this.alertType = ''
-          this.editedIndex = -1
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.closeDelete()
-        }, 700)
+        if (respDelete.status == "success") {
+          this.fetchData()
+          setTimeout(() => {
+            this.dialogDelete = false
+            this.alertMessage = ''
+            this.hasAlert = false
+            this.alertType = ''
+            this.editedIndex = -1
+            this.editedItem = Object.assign({}, this.defaultItem)
+            this.closeDelete()
+          }, 700)
+        }
+      } catch (error) {
+        console.error('Error deleting student:', error);
+        this.alertMessage = 'Failed to remove student. Please try again.'
+        this.hasAlert = true
+        this.alertType = 'error'
+      } finally {
+        this.actionLoading = false
       }
-      this.loading = false
     },
 
     close() {
@@ -1007,44 +1071,54 @@ export default {
       this.editedItem.kelas_uuid = kelasUUID;
       this.editedItem.org_uuid = orgUUID;
 
-      this.loading = true
-      const kelasStorage = useKelasStorage()
-      const respEdited = await kelasStorage.assignStudent(this.editedItem)
+      this.actionLoading = true
+      try {
+        const kelasStorage = useKelasStorage()
+        const respEdited = await kelasStorage.assignStudent(this.editedItem)
 
-      this.alertMessage = respEdited.message
-      this.hasAlert = true
-      this.alertType = respEdited.status
+        this.alertMessage = respEdited.message
+        this.hasAlert = true
+        this.alertType = respEdited.status
 
-      if (respEdited.status == "success") {
-        this.fetchData()
-        setTimeout(() => {
-          this.dialog = false
-          this.alertMessage = ''
-          this.hasAlert = false
-          this.alertType = ''
-          this.editedIndex = -1
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.close()
-        }, 500)
+        if (respEdited.status == "success") {
+          this.fetchData()
+          setTimeout(() => {
+            this.dialog = false
+            this.alertMessage = ''
+            this.hasAlert = false
+            this.alertType = ''
+            this.editedIndex = -1
+            this.editedItem = Object.assign({}, this.defaultItem)
+            this.close()
+          }, 500)
+        }
+      } catch (error) {
+        console.error('Error adding student:', error);
+        this.alertMessage = 'Failed to add student. Please try again.'
+        this.hasAlert = true
+        this.alertType = 'error'
+      } finally {
+        this.actionLoading = false
       }
-
-      this.loading = false
     },
   },
 
   async mounted() {
+    this.mainLoading = true;
     this.slug = this.$route.params.slug;
 
-    const kelasStorage = useKelasStorage()
     try {
+      const kelasStorage = useKelasStorage()
       const data = await kelasStorage.showKelasByUUID(this.slug)
       this.kelas = data.data
       this.getBreadcrumbs()
       // Fetch initial data after kelas is loaded
-      this.fetchData()
+      await this.fetchData()
     } catch (error) {
       console.error('Failed to load class:', error)
       this.kelas = null
+    } finally {
+      this.mainLoading = false;
     }
   }
 }
