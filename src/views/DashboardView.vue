@@ -30,6 +30,42 @@
     <!-- Statistics Cards -->
     <v-row class="mb-6">
 
+      <v-col cols="12" sm="6" lg="3" v-if="isSuperAdmin">
+        <v-card class="stats-card stats-card-success" elevation="4">
+          <v-card-text class="pa-6">
+            <div class="d-flex justify-space-between align-center">
+              <div>
+                <div class="text-h4 font-weight-bold text-success mb-1">
+                  {{ dashboardData.totalOrgs || 0 }}
+                </div>
+                <div class="text-body-2 text-medium-emphasis">Total Organizations</div>
+              </div>
+              <v-avatar size="64" color="success" variant="tonal">
+                <v-icon icon="mdi-home-group" size="32"></v-icon>
+              </v-avatar>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <v-col cols="12" sm="6" lg="3" v-if="isSuperAdmin">
+        <v-card class="stats-card stats-card-primary" elevation="4">
+          <v-card-text class="pa-6">
+            <div class="d-flex justify-space-between align-center">
+              <div>
+                <div class="text-h4 font-weight-bold text-primary mb-1">
+                  {{ dashboardData.totalUsers || 0 }}
+                </div>
+                <div class="text-body-2 text-medium-emphasis">Total Users</div>
+              </div>
+              <v-avatar size="64" color="primary" variant="tonal">
+                <v-icon icon="mdi-account-group-outline" size="32"></v-icon>
+              </v-avatar>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
       <v-col cols="12" sm="6" lg="3">
         <v-card class="stats-card stats-card-secondary" elevation="4">
           <v-card-text class="pa-6">
@@ -353,8 +389,6 @@ GRAFIK START
 import { useDashboardStorage } from '@/stores/dashboardStorage';
 
 import { useUserStorage } from '@/stores/userStorage';
-import { useStudentStorage } from '@/stores/studentStorage';
-import { useReportStorage } from '@/stores/reportStorage';
 import { storeToRefs } from 'pinia';
 import moment from 'moment';
 import {
@@ -395,6 +429,7 @@ ChartJS.register(
 
 export default {
   data: () => ({
+    isSuperAdmin: false,
     loading: false,
     selectedPeriod: 'month',
     periodOptions: [
@@ -408,6 +443,8 @@ export default {
       totalTeachers: 0,
       totalReports: 0,
       totalKelases: 0,
+      totalUsers: 0,
+      totalOrgs: 0,
     },
     recentActivities: [],
     charts: {
@@ -441,12 +478,29 @@ export default {
           period: this.selectedPeriod,
         };
 
-        // Add organization filter for non-super super admin roles
-        if (activeRole.value.constant_value !== 1) {
+        if (Number(activeRole.value.constant_value) === Number(1)) {
+          this.isSuperAdmin = true;
           params.filter = {
-            org_uuid: activeRole.value.org_uuid,
+            ...params.filter,
+            is_superadmin: 1,
           };
         }
+
+        // Add organization filter for non-super super admin roles
+        if (activeRole.value.constant_value !== 1) {
+          // let is_admin = 0;
+          // if (activeRole.value.constant_value === 1) { // ADMIN Role
+          //   is_admin = 1;
+          // }
+
+          params.filter = {
+            ...params.filter,
+            org_uuid: activeRole.value.org_uuid,
+            // is_admin: is_admin,
+          };
+        }
+
+        console.log('PARAMS: ', params);
 
         // Fetch dashboard statistics (you'll need to create these API endpoints)
         // For now, using mock data based on your database structure
@@ -463,6 +517,7 @@ export default {
     async fetchStatistics(params) {
       const dashboardStorage = useDashboardStorage()
       const data = await dashboardStorage.getDashboard(params)
+      console.log('DATA: ', data);
       const dashboardData = data.data
 
       // Mock data - replace with actual API calls
@@ -471,6 +526,8 @@ export default {
         totalTeachers: dashboardData.totalTeachers,
         totalReports: dashboardData.totalReports,
         totalKelases: dashboardData.totalKelases,
+        totalUsers: dashboardData.totalUsers,
+        totalOrgs: dashboardData.totalOrgs,
       };
     },
 

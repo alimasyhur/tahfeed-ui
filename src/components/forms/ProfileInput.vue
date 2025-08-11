@@ -38,7 +38,7 @@
 
           <v-row>
             <!-- First Name -->
-            <v-col cols="12" md="6">
+            <v-col cols="12">
               <div class="field-group">
                 <label class="field-label text-caption font-weight-medium text-medium-emphasis mb-2 d-block">
                   FIRST NAME *
@@ -51,7 +51,7 @@
             </v-col>
 
             <!-- Last Name -->
-            <v-col cols="12" md="6">
+            <v-col cols="12">
               <div class="field-group">
                 <label class="field-label text-caption font-weight-medium text-medium-emphasis mb-2 d-block">
                   LAST NAME *
@@ -66,7 +66,7 @@
 
           <v-row>
             <!-- Birthdate -->
-            <v-col cols="12" md="6">
+            <v-col cols="12">
               <div class="field-group">
                 <label class="field-label text-caption font-weight-medium text-medium-emphasis mb-2 d-block">
                   DATE OF BIRTH *
@@ -78,7 +78,7 @@
             </v-col>
 
             <!-- Phone -->
-            <v-col cols="12" md="6">
+            <v-col cols="12">
               <div class="field-group">
                 <label class="field-label text-caption font-weight-medium text-medium-emphasis mb-2 d-block">
                   PHONE NUMBER *

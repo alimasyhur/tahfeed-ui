@@ -21,7 +21,7 @@ export const useDashboardStorage = defineStore('dashboard', () => {
 
       dashboards.value = dashboardData
       return data
-    } catch {
+    } catch (error) {
       dashboards.value = null
     }
   }
