@@ -109,12 +109,6 @@ export const useUserStorage = defineStore('user', () => {
           toValue: 'user'
         },
         {
-          icon: 'mdi-star',
-          title: 'Grade',
-          toRoute: 'grade',
-          toValue: 'grade'
-        },
-        {
           icon: 'mdi-human-male-board',
           title: 'Teacher',
           toRoute: 'teacher',
@@ -131,6 +125,12 @@ export const useUserStorage = defineStore('user', () => {
           title: 'Class',
           toRoute: 'kelas',
           toValue: 'kelas'
+        },
+        {
+          icon: 'mdi-star',
+          title: 'Grade',
+          toRoute: 'grade',
+          toValue: 'grade'
         },
         {
           icon: 'mdi-clipboard-text',
@@ -152,22 +152,10 @@ export const useUserStorage = defineStore('user', () => {
     if ([3].includes(actRole?.constant_value)) {
       const teacherMenuDrawerData = [
         {
-          icon: 'mdi-human-male-board',
-          title: 'Teacher',
-          toRoute: 'teacher',
-          toValue: 'teacher'
-        },
-        {
           icon: 'mdi-account-school-outline',
           title: 'Student',
           toRoute: 'student',
           toValue: 'student'
-        },
-        {
-          icon: 'mdi-google-classroom',
-          title: 'Class',
-          toRoute: 'kelas',
-          toValue: 'kelas'
         },
         {
           icon: 'mdi-clipboard-text',
@@ -180,6 +168,18 @@ export const useUserStorage = defineStore('user', () => {
           title: 'Summary',
           toRoute: 'summary',
           toValue: 'summary'
+        },
+        {
+          icon: 'mdi-human-male-board',
+          title: 'Teacher',
+          toRoute: 'teacher',
+          toValue: 'teacher'
+        },
+        {
+          icon: 'mdi-google-classroom',
+          title: 'Class',
+          toRoute: 'kelas',
+          toValue: 'kelas'
         }
       ]
       menuDrawerData = menuDrawerData.concat(teacherMenuDrawerData)
