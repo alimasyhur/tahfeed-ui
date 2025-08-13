@@ -53,7 +53,7 @@
           <v-data-table :headers="headers" :search="search" :items="students" :items-length="totalItems"
             :loading="loading" v-model:options="options" @update:options="fetchData"
             :sort-by="[{ key: 'firstname', order: 'asc' }]" class="modern-table" :mobile-breakpoint="600">
-            <!-- Teacher Name with Avatar -->
+            <!-- Student Name with Avatar -->
             <template v-slot:item.firstname="{ item }">
               <div class="d-flex align-center">
                 <v-avatar :color="getAvatarColor(item.firstname + ' ' + item.lastname)" size="32" class="mr-3">
@@ -75,6 +75,14 @@
               <div class="d-flex align-center">
                 <v-icon icon="mdi-card-account-details" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span class="font-mono">{{ item.nik }}</span>
+              </div>
+            </template>
+
+            <!-- NIS with Icon -->
+            <template v-slot:item.nis="{ item }">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-card-account-details" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                <span class="font-mono font-weight-bold">{{ item.nis }}</span>
               </div>
             </template>
 
@@ -107,9 +115,24 @@
               </div>
             </template>
 
+            <!-- Grade Period -->
+            <template v-slot:item.grade_period="{ item }">
+              <div class="d-flex align-center">
+                <v-icon icon="mdi-star" size="small" class="mr-2 text-medium-emphasis"></v-icon>
+                {{ item.grade_period }}
+              </div>
+            </template>
+
             <!-- Actions -->
             <template v-slot:item.actions="{ item }">
               <div class="action-buttons-cell">
+                <v-tooltip text="View Details" location="top">
+                  <template v-slot:activator="{ props }">
+                    <v-btn icon="mdi-eye" size="small" variant="text" color="info" @click="viewItem(item)"
+                      v-bind="props"></v-btn>
+                  </template>
+                </v-tooltip>
+
                 <v-tooltip text="Edit Student" location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn v-if="isSuperAdminOrAdminRole" icon="mdi-pencil" size="small" variant="text" color="primary"
@@ -137,7 +160,7 @@
                 <v-icon icon="mdi-school-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
                 <h3 class="text-h6 mb-2">No Students Found</h3>
                 <p class="text-body-2 text-medium-emphasis mb-4">
-                  {{ search ? 'No students match your search criteria.' : 'Get started by adding your first teacher.' }}
+                  {{ search ? 'No students match your search criteria.' : 'Get started by adding your first student.' }}
                 </p>
                 <v-btn v-if="!search && isSuperAdminOrAdminRole" color="primary" variant="elevated"
                   @click="dialog = true" prepend-icon="mdi-plus">
@@ -150,6 +173,179 @@
       </v-col>
     </v-row>
 
+    <!-- Student Detail Dialog -->
+    <v-dialog v-model="dialogDetail" max-width="900" persistent>
+      <v-card class="modern-dialog detail-dialog">
+        <v-card-title class="dialog-header pa-6">
+          <div class="d-flex align-center">
+            <v-icon icon="mdi-account-details" size="24" class="mr-3" color="info"></v-icon>
+            <span class="text-h5 font-weight-bold">Student Details</span>
+            <v-btn icon="mdi-close" variant="text" size="small" @click="closeDetail" class="ml-auto"></v-btn>
+          </div>
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <v-card-text class="pa-6">
+          <v-row v-if="selectedItem">
+            <!-- Profile Section -->
+            <v-col cols="12">
+              <div class="profile-header mb-6">
+                <div class="d-flex align-center mb-4">
+                  <v-avatar :color="getAvatarColor(selectedItem.firstname + ' ' + selectedItem.lastname)" size="80"
+                    class="mr-4">
+                    <span class="text-white font-weight-bold text-h4">
+                      {{ getInitials(selectedItem.firstname + ' ' + selectedItem.lastname) }}
+                    </span>
+                  </v-avatar>
+                  <div>
+                    <h2 class="text-h4 font-weight-bold mb-1">
+                      {{ selectedItem.firstname }} {{ selectedItem.lastname }}
+                    </h2>
+                    <div class="d-flex align-center text-body-1 text-medium-emphasis mb-1">
+                      <v-icon icon="mdi-card-account-details" size="small" class="mr-2"></v-icon>
+                      NIK: {{ selectedItem.nik }}
+                    </div>
+                    <div class="d-flex align-center text-body-1 text-medium-emphasis">
+                      <v-icon icon="mdi-school" size="small" class="mr-2"></v-icon>
+                      NIS: {{ selectedItem.nis }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </v-col>
+
+            <!-- Personal Information Section -->
+            <v-col cols="12" md="6">
+              <v-card variant="tonal" color="primary" class="h-100">
+                <v-card-title class="pb-2">
+                  <v-icon icon="mdi-account" class="mr-2"></v-icon>
+                  Personal Information
+                </v-card-title>
+                <v-card-text>
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Full Name</div>
+                    <div class="detail-value">{{ selectedItem.firstname }} {{ selectedItem.lastname }}</div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">NIK (National ID)</div>
+                    <div class="detail-value font-mono font-weight-bold">{{ selectedItem.nik }}</div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">NIS (Student ID)</div>
+                    <div class="detail-value font-mono font-weight-bold">{{ selectedItem.nis }}</div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Birthdate</div>
+                    <div class="detail-value d-flex align-center">
+                      <span>{{ formatDate(selectedItem.birthdate) }}</span>
+                      <v-chip v-if="getAge(selectedItem.birthdate)" color="info" variant="tonal" size="small"
+                        class="ml-2">
+                        {{ getAge(selectedItem.birthdate) }} years old
+                      </v-chip>
+                    </div>
+                  </div>
+
+                  <div class="detail-item">
+                    <div class="detail-label">Phone Number</div>
+                    <div class="detail-value">
+                      <a :href="`tel:${selectedItem.phone}`" class="text-decoration-none d-flex align-center">
+                        <v-icon icon="mdi-phone" size="small" class="mr-2"></v-icon>
+                        {{ selectedItem.phone }}
+                      </a>
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+
+            <!-- Academic & Organization Section -->
+            <v-col cols="12" md="6">
+              <v-card variant="tonal" color="secondary" class="h-100">
+                <v-card-title class="pb-2">
+                  <v-icon icon="mdi-school" class="mr-2"></v-icon>
+                  Academic & Organization
+                </v-card-title>
+                <v-card-text>
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Organization</div>
+                    <div class="detail-value d-flex align-center">
+                      <v-icon icon="mdi-domain" size="small" class="mr-2"></v-icon>
+                      {{ selectedItem.org_name || 'Not assigned' }}
+                    </div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Grade/Class</div>
+                    <div class="detail-value d-flex align-center">
+                      <v-icon icon="mdi-star" size="small" class="mr-2"></v-icon>
+                      {{ selectedItem.grade_period || 'Not assigned' }}
+                    </div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">User Account Status</div>
+                    <div class="detail-value">
+                      <v-chip :color="selectedItem.user_uuid ? 'success' : 'warning'" variant="tonal" size="small">
+                        <v-icon :icon="selectedItem.user_uuid ? 'mdi-check-circle' : 'mdi-alert-circle'" size="small"
+                          class="mr-1"></v-icon>
+                        {{ selectedItem.user_uuid ? 'Linked' : 'Not linked' }}
+                      </v-chip>
+                    </div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Profile Created</div>
+                    <div class="detail-value">
+                      <v-icon icon="mdi-calendar-plus" size="small" class="mr-2"></v-icon>
+                      {{ selectedItem.created_at ? formatDate(selectedItem.created_at) : 'N/A' }}
+                    </div>
+                  </div>
+
+                  <div class="detail-item">
+                    <div class="detail-label">Last Updated</div>
+                    <div class="detail-value">
+                      <v-icon icon="mdi-calendar-edit" size="small" class="mr-2"></v-icon>
+                      {{ selectedItem.updated_at ? formatDate(selectedItem.updated_at) : 'N/A' }}
+                    </div>
+                  </div>
+
+                </v-card-text>
+              </v-card>
+            </v-col>
+
+            <!-- Biography Section -->
+            <v-col cols="12" v-if="selectedItem.bio">
+              <v-card variant="tonal" color="info">
+                <v-card-title class="pb-2">
+                  <v-icon icon="mdi-text-account" class="mr-2"></v-icon>
+                  Biography
+                </v-card-title>
+                <v-card-text>
+                  <div class="detail-value">
+                    {{ selectedItem.bio }}
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions class="pa-6">
+          <v-spacer></v-spacer>
+          <v-btn color="grey" variant="text" size="large" @click="closeDetail">
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Create/Edit Student Dialog -->
     <v-dialog v-model="dialog" max-width="800" persistent>
       <v-card class="modern-dialog">
         <v-card-title class="dialog-header pa-6">
@@ -187,11 +383,6 @@
               </v-col>
 
               <v-col cols="12" md="6">
-                <v-text-field v-model="editedItem.phone" :rules="required" label="Phone Number" variant="outlined"
-                  prepend-inner-icon="mdi-phone" :loading="loading" clearable></v-text-field>
-              </v-col>
-
-              <v-col cols="12" md="6">
                 <v-text-field v-model="editedItem.firstname" :rules="required" label="First Name" variant="outlined"
                   prepend-inner-icon="mdi-account" :loading="loading" clearable></v-text-field>
               </v-col>
@@ -199,6 +390,11 @@
               <v-col cols="12" md="6">
                 <v-text-field v-model="editedItem.lastname" :rules="required" label="Last Name" variant="outlined"
                   prepend-inner-icon="mdi-account" :loading="loading" clearable></v-text-field>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-text-field v-model="editedItem.phone" :rules="required" label="Phone Number" variant="outlined"
+                  prepend-inner-icon="mdi-phone" :loading="loading" clearable></v-text-field>
               </v-col>
 
               <v-col cols="12" md="6">
@@ -251,12 +447,13 @@
             Cancel
           </v-btn>
           <v-btn color="primary" variant="elevated" size="large" :disabled="!form" :loading="loading" @click="save">
-            {{ editedIndex === -1 ? 'Create New Student' : 'Update Student' }}
+            {{ editedIndex === -1 ? 'Create Student' : 'Update Student' }}
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
+    <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="dialogDelete" max-width="500" persistent>
       <v-card class="modern-dialog delete-dialog">
         <v-card-title class="dialog-header pa-6">
@@ -398,6 +595,10 @@
   background: linear-gradient(135deg, rgba(var(--v-theme-error), 0.05) 0%, rgba(var(--v-theme-warning), 0.02) 100%);
 }
 
+.detail-dialog .dialog-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-info), 0.05) 0%, rgba(var(--v-theme-primary), 0.02) 100%);
+}
+
 .modern-dialog :deep(.v-field) {
   border-radius: 12px;
 }
@@ -441,6 +642,39 @@
   box-shadow: 0 0 0 2px rgba(var(--v-theme-primary), 0.12);
 }
 
+/* Detail Dialog Specific Styles */
+.profile-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.03) 0%, rgba(var(--v-theme-info), 0.02) 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin: -8px -8px 16px -8px;
+}
+
+.detail-item {
+  margin-bottom: 16px;
+}
+
+.detail-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: black;
+  margin-bottom: 4px;
+}
+
+.detail-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(var(--v-theme-on-surface));
+  line-height: 1.4;
+}
+
+.detail-dialog .v-card-text {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
 /* Mobile Responsive Adjustments */
 @media (max-width: 600px) {
   .header-section {
@@ -463,6 +697,14 @@
     margin: 16px;
     max-height: calc(100vh - 32px);
   }
+
+  .profile-header {
+    padding: 16px;
+  }
+
+  .detail-dialog .v-card-text {
+    max-height: calc(100vh - 200px);
+  }
 }
 
 /* Dark mode adjustments */
@@ -472,6 +714,10 @@
 
 .v-theme--dark .header-section {
   background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.15) 0%, rgba(var(--v-theme-secondary), 0.08) 100%);
+}
+
+.v-theme--dark .profile-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.08) 0%, rgba(var(--v-theme-info), 0.05) 100%);
 }
 
 .v-theme--dark .modern-date-picker :deep(.dp__input) {
@@ -503,6 +749,25 @@
 :deep(.v-data-table__wrapper)::-webkit-scrollbar-thumb:hover {
   background: rgba(var(--v-theme-primary), 0.5);
 }
+
+/* Detail dialog scrollbar */
+.detail-dialog .v-card-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.detail-dialog .v-card-text::-webkit-scrollbar-track {
+  background: rgba(var(--v-theme-outline), 0.1);
+  border-radius: 3px;
+}
+
+.detail-dialog .v-card-text::-webkit-scrollbar-thumb {
+  background: rgba(var(--v-theme-primary), 0.3);
+  border-radius: 3px;
+}
+
+.detail-dialog .v-card-text::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--v-theme-primary), 0.5);
+}
 </style>
 
 <script>
@@ -517,6 +782,7 @@ export default {
   data: () => ({
     dialog: false,
     dialogDelete: false,
+    dialogDetail: false,
     headers: [
       {
         title: 'NIK',
@@ -597,6 +863,7 @@ export default {
       phone: '',
       bio: '',
     },
+    selectedItem: null,
     search: '',
     totalItems: 0,
     options: {
@@ -621,7 +888,7 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'New New Student' : 'Edit Student'
+      return this.editedIndex === -1 ? 'Create New Student' : 'Edit Student'
     },
     validForm() {
       return this.$refs.form.$valid;
@@ -645,14 +912,19 @@ export default {
 
   watch: {
     async dialog(val) {
-      this.orgOptions = await this.fetchOrganizationOptions()
-      this.userOptions = await this.fetchUserOrganizationOptions()
-      this.gradeOptions = await this.fetchGradeOptions()
-
-      return val || this.close()
+      if (val) {
+        this.orgOptions = await this.fetchOrganizationOptions()
+        this.userOptions = await this.fetchUserOrganizationOptions()
+        this.gradeOptions = await this.fetchGradeOptions()
+      } else {
+        this.close()
+      }
     },
     dialogDelete(val) {
       val || this.closeDelete()
+    },
+    dialogDetail(val) {
+      val || this.closeDetail()
     },
     options: {
       handler() {
@@ -766,6 +1038,11 @@ export default {
             width: '150px'
           },
           {
+            title: 'NIS',
+            key: 'nis',
+            width: '150px'
+          },
+          {
             title: 'Birthdate',
             key: 'birthdate',
             width: '150px'
@@ -781,10 +1058,15 @@ export default {
             width: '160px'
           },
           {
+            title: 'Grade',
+            key: 'grade_period',
+            width: '120px'
+          },
+          {
             title: 'Actions',
             key: 'actions',
             sortable: false,
-            width: '100px',
+            width: '140px',
             align: 'center'
           },
         ]
@@ -812,6 +1094,11 @@ export default {
             width: '150px'
           },
           {
+            title: 'NIS',
+            key: 'nis',
+            width: '150px'
+          },
+          {
             title: 'Birthdate',
             key: 'birthdate',
             width: '150px'
@@ -822,10 +1109,15 @@ export default {
             width: '150px'
           },
           {
+            title: 'Grade',
+            key: 'grade_period',
+            width: '120px'
+          },
+          {
             title: 'Actions',
             key: 'actions',
             sortable: false,
-            width: '100px',
+            width: '140px',
             align: 'center'
           },
         ]
@@ -835,7 +1127,7 @@ export default {
 
       // TEACHER
       if (activeRole === 3) {
-        const adminHeader = [
+        const teacherHeader = [
           {
             title: 'First Name',
             key: 'firstname',
@@ -853,6 +1145,11 @@ export default {
             width: '150px'
           },
           {
+            title: 'NIS',
+            key: 'nis',
+            width: '150px'
+          },
+          {
             title: 'Birthdate',
             key: 'birthdate',
             width: '150px'
@@ -862,9 +1159,21 @@ export default {
             key: 'phone',
             width: '150px'
           },
+          {
+            title: 'Grade',
+            key: 'grade_period',
+            width: '120px'
+          },
+          {
+            title: 'Actions',
+            key: 'actions',
+            sortable: false,
+            width: '50px',
+            align: 'center'
+          },
         ]
 
-        headers = headers.concat(adminHeader)
+        headers = headers.concat(teacherHeader)
       }
 
       return headers
@@ -941,6 +1250,12 @@ export default {
       return gradeOptions
     },
 
+    // New method for viewing student details
+    viewItem(item) {
+      this.selectedItem = Object.assign({}, item)
+      this.dialogDetail = true
+    },
+
     editItem(item) {
       this.editedIndex = this.students.indexOf(item)
       this.editedItem = Object.assign({}, item)
@@ -993,6 +1308,12 @@ export default {
       this.hasAlert = false
       this.alertType = ''
       this.editedItem = Object.assign({}, this.defaultItem)
+    },
+
+    // New method for closing detail dialog
+    closeDetail() {
+      this.dialogDetail = false
+      this.selectedItem = null
     },
 
     async save() {
@@ -1051,6 +1372,7 @@ export default {
     },
   },
   async mounted() {
+    // Initial data loading will be handled by fetchData method
   }
 }
 </script>

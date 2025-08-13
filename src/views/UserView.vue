@@ -108,6 +108,13 @@
             <!-- Actions -->
             <template v-slot:item.actions="{ item }">
               <div class="action-buttons-cell">
+                <v-tooltip text="View Details" location="top">
+                  <template v-slot:activator="{ props }">
+                    <v-btn icon="mdi-eye" size="small" variant="text" color="info" @click="viewItem(item)"
+                      v-bind="props"></v-btn>
+                  </template>
+                </v-tooltip>
+
                 <v-tooltip text="Edit User" location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn icon="mdi-pencil" size="small" variant="text" color="primary" @click="editItem(item)"
@@ -146,6 +153,179 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- User Detail Dialog -->
+    <v-dialog v-model="dialogDetail" max-width="900" persistent>
+      <v-card class="modern-dialog detail-dialog">
+        <v-card-title class="dialog-header pa-6">
+          <div class="d-flex align-center">
+            <v-icon icon="mdi-account-details" size="24" class="mr-3" color="info"></v-icon>
+            <span class="text-h5 font-weight-bold">User Details</span>
+            <v-btn icon="mdi-close" variant="text" size="small" @click="closeDetail" class="ml-auto"></v-btn>
+          </div>
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <v-card-text class="pa-6">
+          <v-row v-if="selectedItem">
+            <!-- Profile Section -->
+            <v-col cols="12">
+              <div class="profile-header mb-6">
+                <div class="d-flex align-center mb-4">
+                  <v-avatar :color="getAvatarColor(selectedItem.user_name)" size="80" class="mr-4">
+                    <span class="text-white font-weight-bold text-h4">
+                      {{ getInitials(selectedItem.user_name) }}
+                    </span>
+                  </v-avatar>
+                  <div>
+                    <h2 class="text-h4 font-weight-bold mb-1">
+                      {{ selectedItem.user_name }}
+                    </h2>
+                    <div class="d-flex align-center text-body-1 text-medium-emphasis">
+                      <v-icon icon="mdi-email" size="small" class="mr-2"></v-icon>
+                      {{ selectedItem.email }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </v-col>
+
+            <!-- Personal Information Section -->
+            <v-col cols="12" md="6">
+              <v-card variant="tonal" color="primary" class="h-100">
+                <v-card-title class="pb-2">
+                  <v-icon icon="mdi-account" class="mr-2"></v-icon>
+                  User Information
+                </v-card-title>
+                <v-card-text>
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Full Name</div>
+                    <div class="detail-value">{{ selectedItem.user_name }}</div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Email Address</div>
+                    <div class="detail-value d-flex align-center">
+                      <a :href="`mailto:${selectedItem.email}`" class="text-decoration-none d-flex align-center">
+                        <v-icon icon="mdi-email" size="small" class="mr-2"></v-icon>
+                        {{ selectedItem.email }}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">User Role</div>
+                    <div class="detail-value">
+                      <v-chip color="secondary" variant="tonal" size="small" prepend-icon="mdi-shield-account">
+                        {{ selectedItem.role_name }}
+                      </v-chip>
+                    </div>
+                  </div>
+
+                  <div class="detail-item">
+                    <div class="detail-label">User ID</div>
+                    <div class="detail-value font-mono font-weight-bold">{{ selectedItem.user_uuid }}</div>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+
+            <!-- Status & Organization Section -->
+            <v-col cols="12" md="6">
+              <v-card variant="tonal" color="secondary" class="h-100">
+                <v-card-title class="pb-2">
+                  <v-icon icon="mdi-cog" class="mr-2"></v-icon>
+                  Status & Organization
+                </v-card-title>
+                <v-card-text>
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Organization</div>
+                    <div class="detail-value d-flex align-center">
+                      <v-icon icon="mdi-domain" size="small" class="mr-2"></v-icon>
+                      {{ selectedItem.org_name || 'Not assigned' }}
+                    </div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Account Status</div>
+                    <div class="detail-value">
+                      <v-chip :color="selectedItem.is_active_label_color" variant="flat" size="small"
+                        class="font-weight-medium">
+                        <v-icon :icon="selectedItem.is_active ? 'mdi-check-circle' : 'mdi-cancel'" size="small"
+                          class="mr-1"></v-icon>
+                        {{ selectedItem.is_active_label }}
+                      </v-chip>
+                    </div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Confirmation Status</div>
+                    <div class="detail-value">
+                      <v-chip :color="selectedItem.is_confirmed_label_color" variant="flat" size="small"
+                        class="font-weight-medium">
+                        <v-icon :icon="getConfirmationIcon(selectedItem.is_confirmed)" size="small"
+                          class="mr-1"></v-icon>
+                        {{ selectedItem.is_confirmed_label }}
+                      </v-chip>
+                    </div>
+                  </div>
+
+                  <div class="detail-item">
+                    <div class="detail-label">Account Created</div>
+                    <div class="detail-value">
+                      <v-icon icon="mdi-calendar-plus" size="small" class="mr-2"></v-icon>
+                      {{ selectedItem.created_at ? formatDate(selectedItem.created_at) : 'N/A' }}
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+
+            <!-- Additional Information Section -->
+            <v-col cols="12">
+              <v-card variant="tonal" color="info">
+                <v-card-title class="pb-2">
+                  <v-icon icon="mdi-information" class="mr-2"></v-icon>
+                  Additional Information
+                </v-card-title>
+                <v-card-text>
+                  <v-row>
+                    <v-col cols="12" md="6">
+                      <div class="detail-item mb-3">
+                        <div class="detail-label">Last Login</div>
+                        <div class="detail-value">
+                          <v-icon icon="mdi-login" size="small" class="mr-2"></v-icon>
+                          {{ selectedItem.last_login ? formatDate(selectedItem.last_login) : 'Never logged in' }}
+                        </div>
+                      </div>
+                    </v-col>
+                    <v-col cols="12" md="6">
+                      <div class="detail-item mb-3">
+                        <div class="detail-label">Last Updated</div>
+                        <div class="detail-value">
+                          <v-icon icon="mdi-calendar-edit" size="small" class="mr-2"></v-icon>
+                          {{ selectedItem.updated_at ? formatDate(selectedItem.updated_at) : 'N/A' }}
+                        </div>
+                      </div>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions class="pa-6">
+          <v-spacer></v-spacer>
+          <v-btn color="grey" variant="text" size="large" @click="closeDetail">
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- Modern User Dialog -->
     <v-dialog v-model="dialog" max-width="600" persistent>
@@ -395,6 +575,10 @@
   border-bottom: 1px solid rgba(var(--v-theme-outline), 0.12);
 }
 
+.detail-dialog .dialog-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-info), 0.05) 0%, rgba(var(--v-theme-primary), 0.02) 100%);
+}
+
 .modern-dialog :deep(.v-field) {
   border-radius: 12px;
 }
@@ -403,6 +587,44 @@
   border-radius: 12px;
   text-transform: none;
   font-weight: 600;
+}
+
+.font-mono {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
+
+/* Detail Dialog Specific Styles */
+.profile-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.03) 0%, rgba(var(--v-theme-info), 0.02) 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin: -8px -8px 16px -8px;
+}
+
+.detail-item {
+  margin-bottom: 16px;
+}
+
+.detail-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: black;
+  margin-bottom: 4px;
+}
+
+.detail-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(var(--v-theme-on-surface));
+  line-height: 1.4;
+}
+
+.detail-dialog .v-card-text {
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
 /* Mobile Responsive Adjustments */
@@ -427,6 +649,14 @@
     margin: 16px;
     max-height: calc(100vh - 32px);
   }
+
+  .profile-header {
+    padding: 16px;
+  }
+
+  .detail-dialog .v-card-text {
+    max-height: calc(100vh - 200px);
+  }
 }
 
 /* Dark mode adjustments */
@@ -436,6 +666,10 @@
 
 .v-theme--dark .header-section {
   background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.15) 0%, rgba(var(--v-theme-secondary), 0.08) 100%);
+}
+
+.v-theme--dark .profile-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.08) 0%, rgba(var(--v-theme-info), 0.05) 100%);
 }
 
 /* Custom scrollbar */
@@ -461,6 +695,25 @@
 :deep(.v-data-table__wrapper)::-webkit-scrollbar-thumb:hover {
   background: rgba(var(--v-theme-primary), 0.5);
 }
+
+/* Detail dialog scrollbar */
+.detail-dialog .v-card-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.detail-dialog .v-card-text::-webkit-scrollbar-track {
+  background: rgba(var(--v-theme-outline), 0.1);
+  border-radius: 3px;
+}
+
+.detail-dialog .v-card-text::-webkit-scrollbar-thumb {
+  background: rgba(var(--v-theme-primary), 0.3);
+  border-radius: 3px;
+}
+
+.detail-dialog .v-card-text::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--v-theme-primary), 0.5);
+}
 </style>
 
 <script>
@@ -475,6 +728,7 @@ export default {
     dialog: false,
     dialogResetPassword: false,
     dialogAssignRole: false,
+    dialogDetail: false,
     headers: [],
     statusConfirmationOptions: [
       { value: 0, displayText: 'Not Confirmed' },
@@ -525,6 +779,7 @@ export default {
       is_active: '',
       is_confirmed: '',
     },
+    selectedItem: null,
     search: '',
     totalItems: 0,
     options: {
@@ -570,11 +825,15 @@ export default {
     dialogAssignRole(val) {
       val || this.close()
     },
+    dialogDetail(val) {
+      val || this.closeDetail()
+    },
   },
 
   methods: {
     // Helper methods for UI
     getInitials(name) {
+      if (!name) return ''
       return name
         .split(' ')
         .map(n => n[0])
@@ -585,8 +844,27 @@ export default {
 
     getAvatarColor(name) {
       const colors = ['primary', 'secondary', 'accent', 'info', 'success', 'warning'];
-      const index = name.charCodeAt(0) % colors.length;
+      const index = name ? name.charCodeAt(0) % colors.length : 0;
       return colors[index];
+    },
+
+    formatDate(dateString) {
+      if (!dateString) return 'N/A'
+      const date = new Date(dateString)
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      })
+    },
+
+    getConfirmationIcon(status) {
+      switch (status) {
+        case 0: return 'mdi-clock-outline'
+        case 1: return 'mdi-check-circle'
+        case 2: return 'mdi-close-circle'
+        default: return 'mdi-help-circle'
+      }
     },
 
     async fetchData() {
@@ -669,7 +947,7 @@ export default {
             title: 'Actions',
             key: 'actions',
             sortable: false,
-            width: '100px',
+            width: '140px',
             align: 'center'
           },
         ]
@@ -709,7 +987,7 @@ export default {
             title: 'Actions',
             key: 'actions',
             sortable: false,
-            width: '100px',
+            width: '140px',
             align: 'center'
           },
         ]
@@ -785,15 +1063,23 @@ export default {
       return rolesOptions
     },
 
+    // New method for viewing user details
+    viewItem(item) {
+      this.selectedItem = Object.assign({}, item)
+      this.dialogDetail = true
+    },
+
     editItem(item) {
       this.editedIndex = this.users.indexOf(item)
       this.editedItem = Object.assign({}, item)
+      this.dialogDetail = false
       this.dialog = true
     },
 
     resetPassword(item) {
       this.editedIndex = this.users.indexOf(item)
       this.editedItem = Object.assign({}, item)
+      this.dialogDetail = false
       this.dialogResetPassword = true
     },
 
@@ -828,6 +1114,12 @@ export default {
       this.alertType = ''
       this.editedIndex = -1
       this.editedItem = Object.assign({}, this.defaultItem)
+    },
+
+    // New method for closing detail dialog
+    closeDetail() {
+      this.dialogDetail = false
+      this.selectedItem = null
     },
 
     async save() {

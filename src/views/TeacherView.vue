@@ -75,7 +75,7 @@
             <template v-slot:item.nik="{ item }">
               <div class="d-flex align-center">
                 <v-icon icon="mdi-card-account-details" size="small" class="mr-2 text-medium-emphasis"></v-icon>
-                <span class="font-mono">{{ item.nik }}</span>
+                <span class="font-mono font-bold">{{ item.nik }}</span>
               </div>
             </template>
 
@@ -84,7 +84,8 @@
               <div class="d-flex align-center">
                 <v-icon icon="mdi-calendar" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span>{{ formatDate(item.birthdate) }}</span>
-                <v-chip v-if="getAge(item.birthdate)" color="info" variant="tonal" size="x-small" class="ml-2">
+                <v-chip v-if="getAge(item.birthdate)" color="info" variant="tonal" size="x-small font-bold"
+                  class="ml-2">
                   {{ getAge(item.birthdate) }} yrs
                 </v-chip>
               </div>
@@ -111,6 +112,13 @@
             <!-- Actions -->
             <template v-slot:item.actions="{ item }">
               <div class="action-buttons-cell">
+                <v-tooltip text="View Details" location="top">
+                  <template v-slot:activator="{ props }">
+                    <v-btn icon="mdi-eye" size="small" variant="text" color="info" @click="viewItem(item)"
+                      v-bind="props"></v-btn>
+                  </template>
+                </v-tooltip>
+
                 <v-tooltip text="Edit Teacher" location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn v-if="isSuperAdminOrAdminRole" icon="mdi-pencil" size="small" variant="text" color="primary"
@@ -150,6 +158,161 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Teacher Detail Dialog -->
+    <v-dialog v-model="dialogDetail" max-width="900" persistent>
+      <v-card class="modern-dialog detail-dialog">
+        <v-card-title class="dialog-header pa-6">
+          <div class="d-flex align-center">
+            <v-icon icon="mdi-account-details" size="24" class="mr-3" color="info"></v-icon>
+            <span class="text-h5 font-weight-bold">Teacher Details</span>
+            <v-btn icon="mdi-close" variant="text" size="small" @click="closeDetail" class="ml-auto"></v-btn>
+          </div>
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <v-card-text class="pa-6">
+          <v-row v-if="selectedItem">
+            <!-- Profile Section -->
+            <v-col cols="12">
+              <div class="profile-header mb-6">
+                <div class="d-flex align-center mb-4">
+                  <v-avatar :color="getAvatarColor(selectedItem.firstname + ' ' + selectedItem.lastname)" size="80"
+                    class="mr-4">
+                    <span class="text-white font-weight-bold text-h4">
+                      {{ getInitials(selectedItem.firstname + ' ' + selectedItem.lastname) }}
+                    </span>
+                  </v-avatar>
+                  <div>
+                    <h2 class="text-h4 font-weight-bold mb-1">
+                      {{ selectedItem.firstname }} {{ selectedItem.lastname }}
+                    </h2>
+                    <div class="d-flex align-center text-body-1 text-medium-emphasis">
+                      <v-icon icon="mdi-card-account-details" size="small" class="mr-2"></v-icon>
+                      NIK: {{ selectedItem.nik }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </v-col>
+
+            <!-- Personal Information Section -->
+            <v-col cols="12" md="6">
+              <v-card variant="tonal" color="primary" class="h-100">
+                <v-card-title class="pb-2">
+                  <v-icon icon="mdi-account" class="mr-2"></v-icon>
+                  Personal Information
+                </v-card-title>
+                <v-card-text>
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Full Name</div>
+                    <div class="detail-value">{{ selectedItem.firstname }} {{ selectedItem.lastname }}</div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">NIK (National ID)</div>
+                    <div class="detail-value font-mono font-weight-bold">{{ selectedItem.nik }}</div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Birthdate</div>
+                    <div class="detail-value d-flex align-center">
+                      <span>{{ formatDate(selectedItem.birthdate) }}</span>
+                      <v-chip v-if="getAge(selectedItem.birthdate)" color="info" variant="tonal" size="small"
+                        class="ml-2">
+                        {{ getAge(selectedItem.birthdate) }} years old
+                      </v-chip>
+                    </div>
+                  </div>
+
+                  <div class="detail-item">
+                    <div class="detail-label">Phone Number</div>
+                    <div class="detail-value">
+                      <a :href="`tel:${selectedItem.phone}`" class="text-decoration-none d-flex align-center">
+                        <v-icon icon="mdi-phone" size="small" class="mr-2"></v-icon>
+                        {{ selectedItem.phone }}
+                      </a>
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+
+            <!-- Organization & Account Section -->
+            <v-col cols="12" md="6">
+              <v-card variant="tonal" color="secondary" class="h-100">
+                <v-card-title class="pb-2">
+                  <v-icon icon="mdi-domain" class="mr-2"></v-icon>
+                  Organization & Account
+                </v-card-title>
+                <v-card-text>
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Organization</div>
+                    <div class="detail-value d-flex align-center">
+                      <v-icon icon="mdi-domain" size="small" class="mr-2"></v-icon>
+                      {{ selectedItem.org_name || 'Not assigned' }}
+                    </div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">User Account Status</div>
+                    <div class="detail-value">
+                      <v-chip :color="selectedItem.user_uuid ? 'success' : 'warning'" variant="tonal" size="small">
+                        <v-icon :icon="selectedItem.user_uuid ? 'mdi-check-circle' : 'mdi-alert-circle'" size="small"
+                          class="mr-1"></v-icon>
+                        {{ selectedItem.user_uuid ? 'Linked' : 'Not linked' }}
+                      </v-chip>
+                    </div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Profile Created</div>
+                    <div class="detail-value">
+                      <v-icon icon="mdi-calendar-plus" size="small" class="mr-2"></v-icon>
+                      {{ selectedItem.created_at ? formatDate(selectedItem.created_at) : 'N/A' }}
+                    </div>
+                  </div>
+
+                  <div class="detail-item mb-3">
+                    <div class="detail-label">Last Updated</div>
+                    <div class="detail-value">
+                      <v-icon icon="mdi-calendar-edit" size="small" class="mr-2"></v-icon>
+                      {{ selectedItem.updated_at ? formatDate(selectedItem.updated_at) : 'N/A' }}
+                    </div>
+                  </div>
+
+                </v-card-text>
+              </v-card>
+            </v-col>
+
+            <!-- Biography Section -->
+            <v-col cols="12" v-if="selectedItem.bio">
+              <v-card variant="tonal" color="info">
+                <v-card-title class="pb-2">
+                  <v-icon icon="mdi-text-account" class="mr-2"></v-icon>
+                  Biography
+                </v-card-title>
+                <v-card-text>
+                  <div class="detail-value">
+                    {{ selectedItem.bio }}
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions class="pa-6">
+          <v-spacer></v-spacer>
+          <v-btn color="grey" variant="text" size="large" @click="closeDetail">
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- Modern Teacher Dialog -->
     <v-dialog v-model="dialog" max-width="800" persistent>
@@ -221,7 +384,7 @@
                 </h3>
               </v-col>
 
-              <v-col cols="12" md="6">
+              <v-col cols="12">
                 <v-select v-model="editedItem.user_uuid" :items="userOptions" item-title="displayText"
                   item-value="value" label="Link to User Account" variant="outlined"
                   prepend-inner-icon="mdi-account-circle" clearable></v-select>
@@ -390,6 +553,10 @@
   background: linear-gradient(135deg, rgba(var(--v-theme-error), 0.05) 0%, rgba(var(--v-theme-warning), 0.02) 100%);
 }
 
+.detail-dialog .dialog-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-info), 0.05) 0%, rgba(var(--v-theme-primary), 0.02) 100%);
+}
+
 .modern-dialog :deep(.v-field) {
   border-radius: 12px;
 }
@@ -433,6 +600,39 @@
   box-shadow: 0 0 0 2px rgba(var(--v-theme-primary), 0.12);
 }
 
+/* Detail Dialog Specific Styles */
+.profile-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.03) 0%, rgba(var(--v-theme-info), 0.02) 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin: -8px -8px 16px -8px;
+}
+
+.detail-item {
+  margin-bottom: 16px;
+}
+
+.detail-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: black;
+  margin-bottom: 4px;
+}
+
+.detail-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(var(--v-theme-on-surface));
+  line-height: 1.4;
+}
+
+.detail-dialog .v-card-text {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
 /* Mobile Responsive Adjustments */
 @media (max-width: 600px) {
   .header-section {
@@ -455,6 +655,14 @@
     margin: 16px;
     max-height: calc(100vh - 32px);
   }
+
+  .profile-header {
+    padding: 16px;
+  }
+
+  .detail-dialog .v-card-text {
+    max-height: calc(100vh - 200px);
+  }
 }
 
 /* Dark mode adjustments */
@@ -464,6 +672,10 @@
 
 .v-theme--dark .header-section {
   background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.15) 0%, rgba(var(--v-theme-secondary), 0.08) 100%);
+}
+
+.v-theme--dark .profile-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.08) 0%, rgba(var(--v-theme-info), 0.05) 100%);
 }
 
 .v-theme--dark .modern-date-picker :deep(.dp__input) {
@@ -495,6 +707,25 @@
 :deep(.v-data-table__wrapper)::-webkit-scrollbar-thumb:hover {
   background: rgba(var(--v-theme-primary), 0.5);
 }
+
+/* Detail dialog scrollbar */
+.detail-dialog .v-card-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.detail-dialog .v-card-text::-webkit-scrollbar-track {
+  background: rgba(var(--v-theme-outline), 0.1);
+  border-radius: 3px;
+}
+
+.detail-dialog .v-card-text::-webkit-scrollbar-thumb {
+  background: rgba(var(--v-theme-primary), 0.3);
+  border-radius: 3px;
+}
+
+.detail-dialog .v-card-text::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--v-theme-primary), 0.5);
+}
 </style>
 
 <script>
@@ -508,6 +739,7 @@ export default {
   data: () => ({
     dialog: false,
     dialogDelete: false,
+    dialogDetail: false,
     headers: [],
     breadcrumbsItems: [
       {
@@ -547,6 +779,7 @@ export default {
       phone: '',
       bio: '',
     },
+    selectedItem: null,
     search: '',
     totalItems: 0,
     options: {
@@ -603,6 +836,9 @@ export default {
     },
     dialogDelete(val) {
       val || this.closeDelete()
+    },
+    dialogDetail(val) {
+      val || this.closeDetail()
     },
     options: {
       handler() {
@@ -699,15 +935,15 @@ export default {
       if (activeRole === 1) {
         const superAdminHeader = [
           {
+            title: 'NIK',
+            key: 'nik',
+            width: '150px'
+          },
+          {
             title: 'Teacher',
             align: 'start',
             key: 'firstname',
             width: '200px'
-          },
-          {
-            title: 'NIK',
-            key: 'nik',
-            width: '150px'
           },
           {
             title: 'Birthdate',
@@ -728,7 +964,7 @@ export default {
             title: 'Actions',
             key: 'actions',
             sortable: false,
-            width: '100px',
+            width: '140px',
             align: 'center'
           },
         ]
@@ -738,15 +974,15 @@ export default {
       if (activeRole === 2) {
         const adminHeader = [
           {
+            title: 'NIK',
+            key: 'nik',
+            width: '150px'
+          },
+          {
             title: 'Teacher',
             align: 'start',
             key: 'firstname',
             width: '200px'
-          },
-          {
-            title: 'NIK',
-            key: 'nik',
-            width: '150px'
           },
           {
             title: 'Birthdate',
@@ -762,7 +998,7 @@ export default {
             title: 'Actions',
             key: 'actions',
             sortable: false,
-            width: '100px',
+            width: '140px',
             align: 'center'
           },
         ]
@@ -772,15 +1008,15 @@ export default {
       if (activeRole === 3) {
         const teacherHeader = [
           {
+            title: 'NIK',
+            key: 'nik',
+            width: '150px'
+          },
+          {
             title: 'Teacher',
             align: 'start',
             key: 'firstname',
             width: '200px'
-          },
-          {
-            title: 'NIK',
-            key: 'nik',
-            width: '150px'
           },
           {
             title: 'Birthdate',
@@ -791,6 +1027,13 @@ export default {
             title: 'Phone',
             key: 'phone',
             width: '150px'
+          },
+          {
+            title: 'Actions',
+            key: 'actions',
+            sortable: false,
+            width: '50px',
+            align: 'center'
           },
         ]
         headers = headers.concat(teacherHeader)
@@ -845,6 +1088,12 @@ export default {
       return userOptions
     },
 
+    // New method for viewing teacher details
+    viewItem(item) {
+      this.selectedItem = Object.assign({}, item)
+      this.dialogDetail = true
+    },
+
     editItem(item) {
       this.editedIndex = this.teachers.indexOf(item)
       this.editedItem = Object.assign({}, item)
@@ -897,6 +1146,12 @@ export default {
       this.alertType = ''
       this.editedIndex = -1
       this.editedItem = Object.assign({}, this.defaultItem)
+    },
+
+    // New method for closing detail dialog
+    closeDetail() {
+      this.dialogDetail = false
+      this.selectedItem = null
     },
 
     async save() {
