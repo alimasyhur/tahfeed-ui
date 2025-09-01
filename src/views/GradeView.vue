@@ -104,7 +104,7 @@
 
             <!-- Organization -->
             <template v-slot:item.org_name="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-domain" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 {{ item.org_name }}
               </div>
@@ -112,7 +112,7 @@
 
             <!-- Actions -->
             <template v-slot:item.actions="{ item }">
-              <div class="action-buttons-cell">
+              <div class="action-buttons-cell justify-center">
                 <v-tooltip text="Edit Grade" location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn v-if="isSuperAdminOrAdminRole" icon="mdi-pencil" size="small" variant="text" color="primary"

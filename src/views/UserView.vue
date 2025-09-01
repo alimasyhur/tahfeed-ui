@@ -107,7 +107,7 @@
 
             <!-- Actions -->
             <template v-slot:item.actions="{ item }">
-              <div class="action-buttons-cell">
+              <div class="action-buttons-cell justify-center">
                 <v-tooltip text="View Details" location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn icon="mdi-eye" size="small" variant="text" color="info" @click="viewItem(item)"

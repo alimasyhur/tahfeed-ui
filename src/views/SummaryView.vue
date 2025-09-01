@@ -48,24 +48,14 @@
 
             <!-- Student Name with Avatar -->
             <template v-slot:item.fullname="{ item }">
-              <div class="d-flex align-center">
-                <v-avatar :color="getAvatarColor(item.fullname)" size="32" class="mr-3">
-                  <span class="text-white font-weight-bold">
-                    {{ getInitials(item.fullname) }}
-                  </span>
-                </v-avatar>
-                <div>
-                  <div class="font-weight-medium">{{ item.fullname }}</div>
-                  <div class="text-caption text-medium-emphasis d-md-none">
-                    NIS: {{ item.nis }}
-                  </div>
-                </div>
+              <div>
+                <div class="font-weight-medium">{{ item.fullname }}</div>
               </div>
             </template>
 
             <!-- NIS with Icon -->
             <template v-slot:item.nis="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-card-account-details" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span class="font-mono">{{ item.nis }}</span>
               </div>
@@ -73,46 +63,38 @@
 
             <!-- Progress Chips for Week Data -->
             <template v-slot:item.z_total_pekan_lalu="{ item }">
-              <v-chip color="info" variant="tonal" size="small" prepend-icon="mdi-book-open">
-                {{ item.z_total_pekan_lalu || 0 }}
-              </v-chip>
+              <b>{{ item.z_total_pekan_lalu || 0 }}</b>
             </template>
 
             <template v-slot:item.m_total_pekan_lalu="{ item }">
-              <v-chip color="warning" variant="tonal" size="small" prepend-icon="mdi-repeat">
-                {{ item.m_total_pekan_lalu || 0 }}
-              </v-chip>
+              <b>{{ item.m_total_pekan_lalu || 0 }}</b>
             </template>
 
             <template v-slot:item.z_total_pekan_ini="{ item }">
-              <v-chip color="success" variant="tonal" size="small" prepend-icon="mdi-book-open">
-                {{ item.z_total_pekan_ini || 0 }}
-              </v-chip>
+              <b>{{ item.z_total_pekan_ini || 0 }}</b>
             </template>
 
             <template v-slot:item.m_total_pekan_ini="{ item }">
-              <v-chip color="orange" variant="tonal" size="small" prepend-icon="mdi-repeat">
-                {{ item.m_total_pekan_ini || 0 }}
-              </v-chip>
+              <b>{{ item.m_total_pekan_ini || 0 }}</b>
             </template>
 
             <!-- Total Hafalan with Progress -->
             <template v-slot:item.total="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <!-- <v-progress-circular :model-value="getTotalProgress(item.total)" :size="30" :width="3" color="primary"
                   class="mr-2">
                   <span class="text-caption">{{ item.total }}</span>
                 </v-progress-circular> -->
                 <!-- <span class="font-weight-medium">{{ item.total }}</span> -->
-                <v-chip color="black" variant="tonal" size="small" prepend-icon="mdi-book">
-                  {{ item.total }}
+                <v-chip color="black" variant="tonal" size="large" prepend-icon="mdi-book">
+                  <b>{{ item.total }}</b>
                 </v-chip>
               </div>
             </template>
 
             <!-- Grade with Icon -->
             <template v-slot:item.grade_name="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-chip color="primary" variant="tonal" size="small">
                   <v-icon icon="mdi-school" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                   {{ item.grade_name }}
@@ -122,7 +104,7 @@
 
             <!-- Organization -->
             <template v-slot:item.organization_name="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-domain" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 {{ item.organization_name }}
               </div>
@@ -130,7 +112,7 @@
 
             <!-- Actions -->
             <template v-slot:item.actions="{ item }">
-              <div class="action-buttons-cell">
+              <div class="action-buttons-cell justify-center">
                 <v-tooltip text="View Details" location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn icon="mdi-eye" size="small" variant="text" color="primary" @click="detailSummary(item.uuid)"

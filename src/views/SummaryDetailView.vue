@@ -150,13 +150,13 @@
               </h4>
               <div class="d-flex justify-space-between mb-2">
                 <span class="text-body-2">Ziyadah:</span>
-                <v-chip color="info" variant="tonal" size="small">
+                <v-chip color="info" variant="tonal" size="large">
                   <b>{{ student.z_total_pekan_lalu || '0' }}</b>
                 </v-chip>
               </div>
               <div class="d-flex justify-space-between">
                 <span class="text-body-2">Murojaah:</span>
-                <v-chip color="info" variant="tonal" size="small">
+                <v-chip color="info" variant="tonal" size="large">
                   <b>{{ student.m_total_pekan_lalu || '0' }}</b>
                 </v-chip>
               </div>
@@ -170,13 +170,13 @@
               </h4>
               <div class="d-flex justify-space-between mb-2">
                 <span class="text-body-2">Ziyadah:</span>
-                <v-chip color="purple" variant="tonal" size="small">
+                <v-chip color="purple" variant="tonal" size="large">
                   <b>{{ student.z_total_pekan_ini || '0' }}</b>
                 </v-chip>
               </div>
               <div class="d-flex justify-space-between">
                 <span class="text-body-2">Murojaah:</span>
-                <v-chip color="purple" variant="tonal" size="small">
+                <v-chip color="purple" variant="tonal" size="large">
                   <b>{{ student.m_total_pekan_ini || '0' }}</b>
                 </v-chip>
               </div>
@@ -186,8 +186,8 @@
 
             <!-- Total Progress -->
             <div class="text-center">
-              <div class="text-h4 font-weight-bold text-primary mb-1">{{ student.total || '0' }}</div>
-              <div class="text-caption text-medium-emphasis">Total Hafalan</div>
+              <div class="text-h4 font-weight-bold text-primary mb-1"><b>{{ student.total || '0' }}</b></div>
+              <div class="text-caption text-large-emphasis"><b>Total Hafalan</b></div>
             </div>
           </v-card-text>
         </v-card>
@@ -226,7 +226,7 @@
 
             <!-- Date Column -->
             <template v-slot:item.date_input="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-calendar" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span>{{ formatDate(item.date_input) }}</span>
               </div>
@@ -242,7 +242,7 @@
 
             <!-- Start Page Column -->
             <template v-slot:item.start_juz_page_name="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-book-open" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span>{{ item.start_juz_page_name || 'Not Set' }}</span>
               </div>
@@ -250,7 +250,7 @@
 
             <!-- End Page Column -->
             <template v-slot:item.end_juz_page_name="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-book-open-variant" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span>{{ item.end_juz_page_name || 'Not Set' }}</span>
               </div>
@@ -258,14 +258,14 @@
 
             <!-- Total Column -->
             <template v-slot:item.total="{ item }">
-              <v-chip color="primary" variant="tonal" size="small">
-                {{ item.total || '0' }}
+              <v-chip color="primary" variant="tonal" size="large">
+                <b>{{ item.total || '0' }}</b>
               </v-chip>
             </template>
 
             <!-- Organization Column (for super admin) -->
             <template v-slot:item.org_uuid="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-domain" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span>{{ item.organization_name || 'Not Set' }}</span>
               </div>

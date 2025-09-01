@@ -73,7 +73,7 @@
 
             <!-- NIK with Icon -->
             <template v-slot:item.nik="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-card-account-details" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span class="font-mono font-bold">{{ item.nik }}</span>
               </div>
@@ -81,7 +81,7 @@
 
             <!-- Birthdate with Icon -->
             <template v-slot:item.birthdate="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-calendar" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span>{{ formatDate(item.birthdate) }}</span>
                 <v-chip v-if="getAge(item.birthdate)" color="info" variant="tonal" size="x-small font-bold"
@@ -93,7 +93,7 @@
 
             <!-- Phone with Icon -->
             <template v-slot:item.phone="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-phone" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <a :href="`tel:${item.phone}`" class="text-decoration-none">
                   {{ item.phone }}
@@ -103,7 +103,7 @@
 
             <!-- Organization -->
             <template v-slot:item.org_name="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-domain" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 {{ item.org_name }}
               </div>
@@ -111,7 +111,7 @@
 
             <!-- Actions -->
             <template v-slot:item.actions="{ item }">
-              <div class="action-buttons-cell">
+              <div class="action-buttons-cell justify-center">
                 <v-tooltip text="View Details" location="top">
                   <template v-slot:activator="{ props }">
                     <v-btn icon="mdi-eye" size="small" variant="text" color="info" @click="viewItem(item)"

@@ -57,7 +57,7 @@
 
             <!-- Student NIS with Icon -->
             <template v-slot:item.student_nis="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-card-account-details" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span class="font-mono">{{ item.student_nis }}</span>
               </div>
@@ -65,7 +65,7 @@
 
             <!-- Date with Icon and Formatting -->
             <template v-slot:item.date_input="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-calendar" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span>{{ formatDate(item.date_input) }}</span>
               </div>
@@ -73,17 +73,10 @@
 
             <!-- Student Name with Avatar -->
             <template v-slot:item.student_fullname="{ item }">
-              <div class="d-flex align-center">
-                <v-avatar :color="getAvatarColor(item.student_fullname)" size="32" class="mr-3">
-                  <span class="text-white font-weight-bold">
-                    {{ getInitials(item.student_fullname) }}
-                  </span>
-                </v-avatar>
-                <div>
-                  <div class="font-weight-medium">{{ item.student_fullname }}</div>
-                  <div class="text-caption text-medium-emphasis d-md-none">
-                    NIS: {{ item.student_nis }}
-                  </div>
+              <div>
+                <div class="font-weight-medium">{{ item.student_fullname }}</div>
+                <div class="text-caption text-medium-emphasis d-md-none">
+                  NIS: {{ item.student_nis }}
                 </div>
               </div>
             </template>
@@ -92,36 +85,34 @@
             <template v-slot:item.type_report="{ item }">
               <v-chip :color="item.type_report === 'ziyadah' ? 'success' : 'info'" variant="tonal" size="small"
                 class="text-capitalize">
-                {{ item.type_report }}
+                <b>{{ item.type_report }}</b>
               </v-chip>
             </template>
 
             <!-- Start Page with Icon -->
             <template v-slot:item.start_juz_page_name="{ item }">
-              <div class="d-flex align-center">
-                <v-icon icon="mdi-book-open-page-variant" size="small" class="mr-2 text-medium-emphasis"></v-icon>
-                <span>{{ item.start_juz_page_name || 'N/A' }}</span>
+              <div>
+                <span><b>{{ item.start_juz_page_name || 'N/A' }}</b></span>
               </div>
             </template>
 
             <!-- End Page with Icon -->
             <template v-slot:item.end_juz_page_name="{ item }">
-              <div class="d-flex align-center">
-                <v-icon icon="mdi-book-open-page-variant" size="small" class="mr-2 text-medium-emphasis"></v-icon>
-                <span>{{ item.end_juz_page_name || 'N/A' }}</span>
+              <div>
+                <span><b>{{ item.end_juz_page_name || 'N/A' }}</b></span>
               </div>
             </template>
 
             <!-- Total with Badge -->
             <template v-slot:item.total="{ item }">
-              <v-chip color="primary" variant="outlined" size="small">
-                {{ item.total || '0' }}
+              <v-chip color="black" variant="tonal" size="large" prepend-icon="mdi-book">
+                <b>{{ item.total || '0' }}</b>
               </v-chip>
             </template>
 
             <!-- Organization (Super Admin only) -->
             <template v-slot:item.org_uuid="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-domain" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 {{ item.org_name || 'N/A' }}
               </div>
@@ -129,7 +120,7 @@
 
             <!-- Actions -->
             <template v-slot:item.actions="{ item }">
-              <div class="action-buttons-cell">
+              <div class="action-buttons-cell justify-center">
                 <!-- Lock/Unlock Button -->
                 <v-tooltip :text="item.is_locked ? 'Unlock Report' : 'Lock Report'" location="top">
                   <template v-slot:activator="{ props }">
@@ -933,15 +924,15 @@ export default {
       if (activeRole === 1) {
         const superAdminHeader = [
           {
+            title: 'Date',
+            key: 'date_input',
+            width: '150px'
+          },
+          {
             title: 'NIS',
             align: 'start',
             key: 'student_nis',
             width: '120px'
-          },
-          {
-            title: 'Date',
-            key: 'date_input',
-            width: '150px'
           },
           {
             title: 'Student',
@@ -987,15 +978,15 @@ export default {
       if (activeRole === 2) {
         const adminHeader = [
           {
+            title: 'Date',
+            key: 'date_input',
+            width: '150px'
+          },
+          {
             title: 'NIS',
             align: 'start',
             key: 'student_nis',
             width: '120px'
-          },
-          {
-            title: 'Date',
-            key: 'date_input',
-            width: '150px'
           },
           {
             title: 'Student',
@@ -1036,15 +1027,15 @@ export default {
       if (activeRole === 3) {
         const teacherHeader = [
           {
+            title: 'Date',
+            key: 'date_input',
+            width: '150px'
+          },
+          {
             title: 'NIS',
             align: 'start',
             key: 'student_nis',
             width: '120px'
-          },
-          {
-            title: 'Date',
-            key: 'date_input',
-            width: '150px'
           },
           {
             title: 'Student',

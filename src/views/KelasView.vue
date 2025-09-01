@@ -72,7 +72,7 @@
 
             <!-- Description -->
             <template v-slot:item.description="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-text" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span class="text-truncate" style="max-width: 200px;">{{ item.description }}</span>
               </div>
@@ -80,7 +80,7 @@
 
             <!-- Period with Icon -->
             <template v-slot:item.period="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-calendar-range" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span>{{ item.period || 'Not Set' }}</span>
               </div>
@@ -96,7 +96,7 @@
 
             <!-- Organization -->
             <template v-slot:item.org_name="{ item }">
-              <div class="d-flex align-center">
+              <div>
                 <v-icon icon="mdi-domain" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 {{ item.org_name }}
               </div>
@@ -104,7 +104,7 @@
 
             <!-- Teacher Info -->
             <template v-slot:item.teacher_firstname="{ item }">
-              <div class="d-flex align-center" v-if="item.teacher_firstname">
+              <div v-if="item.teacher_firstname">
                 <v-avatar color="secondary" size="24" class="mr-2">
                   <span class="text-white text-caption font-weight-bold">
                     {{ getInitials(item.teacher_firstname) }} {{ getInitials(item.teacher_lastname) }}
@@ -117,7 +117,7 @@
 
             <!-- Actions -->
             <template v-slot:item.actions="{ item }">
-              <div class="action-buttons-cell">
+              <div class="action-buttons-cell justify-center">
                 <!-- Start Class -->
                 <v-tooltip text="Start Class" location="top"
                   v-if="item.status === 'not_started' && isSuperAdminOrAdminRole">
