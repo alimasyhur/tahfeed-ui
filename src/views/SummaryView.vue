@@ -26,7 +26,7 @@
     </v-row>
 
     <!-- Search and Statistics Section -->
-    <v-row class="mb-4">
+    <v-row v-if="String(activeRole?.constant_value) !== String(4)" class="mb-4">
       <v-col cols="12" md="8" lg="6">
         <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Search achievements..."
           variant="outlined" clearable hide-details class="search-field" density="comfortable"></v-text-field>
@@ -582,6 +582,14 @@ export default {
         params.filter = query
       }
 
+      if (activeRole.value.constant_value === 4) {
+        const query = {
+          org_uuid: activeRole.value.org_uuid,
+          student_uuid: activeRole.value.student_uuid,
+        }
+        params.filter = query
+      }
+
       this.activeRole = activeRole.value
 
       if (this.search !== "") {
@@ -762,6 +770,41 @@ export default {
           },
         ]
         headers = headers.concat(teacherHeader)
+      }
+
+      if (activeRole === 4) {
+        const studentHeader = [
+          {
+            title: `${pekanLaluLabel}`,
+            class: 'flex font-weight-bold align-center justify-center',
+            children: [
+              { title: 'Ziyadah', key: 'z_total_pekan_lalu', width: '100px' },
+              { title: 'Murojaah', key: 'm_total_pekan_lalu', width: '100px' },
+            ],
+          },
+          {
+            title: `${pekanIniLabel}`,
+            class: 'flex font-weight-bold align-center justify-center',
+            children: [
+              { title: 'Ziyadah', key: 'z_total_pekan_ini', width: '100px' },
+              { title: 'Murojaah', key: 'm_total_pekan_ini', width: '100px' },
+            ],
+          },
+          {
+            title: 'Total',
+            class: 'font-weight-bold',
+            key: 'total',
+            width: '120px'
+          },
+          {
+            title: 'Actions',
+            key: 'actions',
+            sortable: false,
+            width: '100px',
+            align: 'center'
+          },
+        ]
+        headers = headers.concat(studentHeader)
       }
 
       return headers

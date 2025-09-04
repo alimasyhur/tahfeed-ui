@@ -904,6 +904,13 @@ export default {
         }
       }
 
+      if (activeRole.value.constant_value === 4) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid,
+          student_uuid: activeRole.value.student_uuid,
+        }
+      }
+
       this.activeRole = activeRole.value
       this.headers = this.getHeaders(activeRole.value.constant_value)
 
@@ -1071,6 +1078,54 @@ export default {
           },
         ]
         headers = headers.concat(teacherHeader)
+      }
+
+      // Student
+      if (activeRole === 4) {
+        const studentHeader = [
+          {
+            title: 'Date',
+            key: 'date_input',
+            width: '150px'
+          },
+          {
+            title: 'NIS',
+            align: 'start',
+            key: 'student_nis',
+            width: '120px'
+          },
+          {
+            title: 'Student',
+            key: 'student_fullname',
+            width: '200px'
+          },
+          {
+            title: 'Type',
+            key: 'type_report',
+            width: '120px'
+          },
+          {
+            title: 'Start Page',
+            key: 'start_juz_page_name',
+            width: '120px'
+          },
+          {
+            title: 'End Page',
+            key: 'end_juz_page_name',
+            width: '120px'
+          },
+          {
+            title: 'Total',
+            key: 'total',
+            width: '80px'
+          },
+          {
+            title: 'Catatan',
+            key: 'note',
+            width: '80px'
+          },
+        ]
+        headers = headers.concat(studentHeader)
       }
 
       return headers

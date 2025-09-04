@@ -907,7 +907,7 @@ export default {
       this.isSuperAdminRole = isSuperAdmin(activeRole.value)
       this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
 
-      if ([2, 3].includes(activeRole.value.constant_value)) {
+      if ([2, 3, 4].includes(activeRole.value.constant_value)) {
         params.filter = {
           org_uuid: activeRole.value.org_uuid,
         }
@@ -1006,6 +1006,41 @@ export default {
       }
 
       if (activeRole === 3) {
+        const teacherHeader = [
+          {
+            title: 'NIK',
+            key: 'nik',
+            width: '150px'
+          },
+          {
+            title: 'Teacher',
+            align: 'start',
+            key: 'firstname',
+            width: '200px'
+          },
+          {
+            title: 'Birthdate',
+            key: 'birthdate',
+            width: '150px'
+          },
+          {
+            title: 'Phone',
+            key: 'phone',
+            width: '150px'
+          },
+          {
+            title: 'Actions',
+            key: 'actions',
+            sortable: false,
+            width: '50px',
+            align: 'center'
+          },
+        ]
+        headers = headers.concat(teacherHeader)
+      }
+
+      // Student
+      if (activeRole === 4) {
         const teacherHeader = [
           {
             title: 'NIK',

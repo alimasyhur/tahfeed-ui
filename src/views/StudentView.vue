@@ -794,12 +794,8 @@ export default {
         key: 'nis',
       },
       {
-        title: 'First Name',
+        title: 'Name',
         key: 'firstname',
-      },
-      {
-        title: 'Last Name',
-        key: 'lastname',
       },
       {
         title: 'Birthdate',
@@ -993,7 +989,7 @@ export default {
       this.isSuperAdminRole = isSuperAdmin(activeRole.value)
       this.isSuperAdminOrAdminRole = isSuperAdminOrAdmin(activeRole.value)
 
-      if ([2, 3].includes(activeRole.value.constant_value)) {
+      if ([2, 3, 4].includes(activeRole.value.constant_value)) {
         const query = {
           org_uuid: activeRole.value.org_uuid
         }
@@ -1022,13 +1018,8 @@ export default {
       if (activeRole === 1) {
         const superAdminHeader = [
           {
-            title: 'First Name',
+            title: 'Name',
             key: 'firstname',
-            width: '200px'
-          },
-          {
-            title: 'Last Name',
-            key: 'lastname',
             width: '200px'
           },
           {
@@ -1078,13 +1069,8 @@ export default {
       if (activeRole === 2) {
         const adminHeader = [
           {
-            title: 'First Name',
+            title: 'Name',
             key: 'firstname',
-            width: '200px'
-          },
-          {
-            title: 'Last Name',
-            key: 'lastname',
             width: '200px'
           },
           {
@@ -1129,13 +1115,8 @@ export default {
       if (activeRole === 3) {
         const teacherHeader = [
           {
-            title: 'First Name',
+            title: 'Name',
             key: 'firstname',
-            width: '200px'
-          },
-          {
-            title: 'Last Name',
-            key: 'lastname',
             width: '200px'
           },
           {
@@ -1174,6 +1155,52 @@ export default {
         ]
 
         headers = headers.concat(teacherHeader)
+      }
+
+      // STUDENT
+      if (activeRole === 4) {
+        const studentHeader = [
+          {
+            title: 'Name',
+            key: 'firstname',
+            width: '200px'
+          },
+          {
+            title: 'NIK',
+            align: 'start',
+            key: 'nik',
+            width: '150px'
+          },
+          {
+            title: 'NIS',
+            key: 'nis',
+            width: '150px'
+          },
+          {
+            title: 'Birthdate',
+            key: 'birthdate',
+            width: '150px'
+          },
+          {
+            title: 'Phone',
+            key: 'phone',
+            width: '150px'
+          },
+          {
+            title: 'Grade',
+            key: 'grade_period',
+            width: '120px'
+          },
+          {
+            title: 'Actions',
+            key: 'actions',
+            sortable: false,
+            width: '50px',
+            align: 'center'
+          },
+        ]
+
+        headers = headers.concat(studentHeader)
       }
 
       return headers

@@ -92,8 +92,8 @@
 
             <!-- Role with Icon -->
             <template v-slot:item.role_name="{ item }">
-              <v-chip color="secondary" variant="tonal" size="small" prepend-icon="mdi-shield-account">
-                {{ item.role_name }}
+              <v-chip color="secondary" variant="tonal" size="large" prepend-icon="mdi-shield-account">
+                <b>{{ item.role_name }}</b>
               </v-chip>
             </template>
 

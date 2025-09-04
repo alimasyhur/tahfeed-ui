@@ -859,6 +859,14 @@ export default {
         params.filter = query
       }
 
+      if (activeRole.value.constant_value === 4) {
+        const query = {
+          org_uuid: activeRole.value.org_uuid,
+          student_uuid: activeRole.value.student_uuid,
+        }
+        params.filter = query
+      }
+
       this.activeRole = activeRole.value
       this.headers = this.getHeaders(activeRole.value.constant_value)
 
@@ -868,6 +876,8 @@ export default {
 
       const kelasStorage = useKelasStorage()
       const data = await kelasStorage.getKelases(params)
+
+      console.log('Fetched kelas data:', data.data);
 
       this.kelases = data.data
       this.totalItems = data.total
@@ -970,6 +980,41 @@ export default {
       }
 
       if (activeRole === 3) {
+        const teacherHeader = [
+          {
+            title: 'Class',
+            align: 'start',
+            key: 'name',
+            width: '200px'
+          },
+          {
+            title: 'Description',
+            key: 'description',
+            width: '200px'
+          },
+          {
+            title: 'Period',
+            key: 'period',
+            width: '120px'
+          },
+          {
+            title: 'Status',
+            key: 'status',
+            width: '120px'
+          },
+          {
+            title: 'Actions',
+            key: 'actions',
+            sortable: false,
+            width: '100px',
+            align: 'center'
+          },
+        ]
+        headers = headers.concat(teacherHeader)
+      }
+
+      // Student
+      if (activeRole === 4) {
         const teacherHeader = [
           {
             title: 'Class',

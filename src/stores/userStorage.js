@@ -185,6 +185,43 @@ export const useUserStorage = defineStore('user', () => {
       menuDrawerData = menuDrawerData.concat(teacherMenuDrawerData)
     }
 
+    // Student
+    if ([4].includes(actRole?.constant_value)) {
+      const teacherMenuDrawerData = [
+        {
+          icon: 'mdi-account-school-outline',
+          title: 'Student',
+          toRoute: 'student',
+          toValue: 'student'
+        },
+        {
+          icon: 'mdi-clipboard-text',
+          title: 'Report',
+          toRoute: 'report',
+          toValue: 'report'
+        },
+        {
+          icon: 'mdi-chart-line',
+          title: 'Summary',
+          toRoute: 'summary',
+          toValue: 'summary'
+        },
+        {
+          icon: 'mdi-human-male-board',
+          title: 'Teacher',
+          toRoute: 'teacher',
+          toValue: 'teacher'
+        },
+        {
+          icon: 'mdi-google-classroom',
+          title: 'Class',
+          toRoute: 'kelas',
+          toValue: 'kelas'
+        }
+      ]
+      menuDrawerData = menuDrawerData.concat(teacherMenuDrawerData)
+    }
+
     menuDrawerData = menuDrawerData.concat([
       {
         icon: 'mdi-account',
