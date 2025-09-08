@@ -25,6 +25,23 @@
       </v-col>
     </v-row>
 
+    <!-- Bar Chart Section for Memorization Achievements -->
+    <!-- <v-row class="mb-6">
+      <v-col cols="12">
+        <v-card class="chart-card" elevation="4">
+          <v-card-title class="d-flex align-center">
+            <v-icon icon="mdi-chart-bar" class="mr-2" color="primary"></v-icon>
+            Capaian Total Hafalan Santri (0-30 Juz)
+          </v-card-title>
+          <v-card-text>
+            <div ref="chartContainer" class="chart-container">
+              <canvas ref="memorizationChart"></canvas>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row> -->
+
     <!-- Search and Statistics Section -->
     <v-row v-if="String(activeRole?.constant_value) !== String(4)" class="mb-4">
       <v-col cols="12" md="8" lg="6">
@@ -331,12 +348,30 @@
 :deep(.v-data-table__wrapper)::-webkit-scrollbar-thumb:hover {
   background: rgba(var(--v-theme-primary), 0.5);
 }
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
+}
+
+.chart-card {
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.v-theme--dark .chart-card {
+  background: rgba(var(--v-theme-surface), 0.95);
+}
 </style>
 
 <script>
 import { useSummaryStorage } from '@/stores/summaryStorage';
 import { useUserStorage } from '@/stores/userStorage';
 import { storeToRefs } from 'pinia';
+import Chart from 'chart.js/auto';
 
 export default {
   data: () => ({
@@ -370,6 +405,17 @@ export default {
       }
     ],
     achievements: [],
+    // Mock data for student memorization achievements (0-30 juz)
+    mockMemorizationData: [
+      { name: '0-2 Juz', count: 5 },
+      { name: '3-5 Juz', count: 8 },
+      { name: '6-10 Juz', count: 12 },
+      { name: '11-15 Juz', count: 10 },
+      { name: '16-20 Juz', count: 7 },
+      { name: '21-25 Juz', count: 4 },
+      { name: '26-30 Juz', count: 2 }
+    ],
+    memorizationChart: null,
     editedIndex: -1,
     editedItem: {
       uuid: '',
@@ -549,6 +595,86 @@ export default {
 
     onJuzEndChange() {
       this.selectedEndPage = null;
+    },
+
+    createMemorizationChart() {
+      // Destroy existing chart if it exists
+      if (this.memorizationChart) {
+        this.memorizationChart.destroy();
+      }
+
+      // Get chart context
+      const ctx = this.$refs.memorizationChart.getContext('2d');
+
+      // Extract labels and data from mock data
+      const labels = this.mockMemorizationData.map(item => item.name);
+      const data = this.mockMemorizationData.map(item => item.count);
+
+      // Create the bar chart
+      this.memorizationChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Jumlah Santri',
+            data: data,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 205, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)',
+              'rgba(255, 159, 64, 0.7)',
+              'rgba(199, 199, 199, 0.7)'
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 205, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)',
+              'rgba(199, 199, 199, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Jumlah Santri'
+              },
+              ticks: {
+                precision: 0
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Capaian Hafalan (Juz)'
+              }
+            }
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Distribusi Capaian Hafalan Santri',
+              font: {
+                size: 16
+              }
+            },
+            legend: {
+              display: true,
+              position: 'top'
+            }
+          }
+        }
+      });
     },
 
     async fetchData() {
@@ -927,6 +1053,17 @@ export default {
   async mounted() {
     // Initial data loading
     await this.fetchData()
+    // Create the memorization chart
+    this.$nextTick(() => {
+      this.createMemorizationChart();
+    });
+  },
+
+  beforeUnmount() {
+    // Destroy the chart when component is unmounted
+    if (this.memorizationChart) {
+      this.memorizationChart.destroy();
+    }
   }
 }
 </script>

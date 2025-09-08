@@ -225,9 +225,28 @@ export const useReportStorage = defineStore('report', () => {
     }
   }
 
+  const getReportSummary = async (params) => {
+    try {
+      const { data } = await apiService.get('/reports/summary', {
+        headers: {
+          Authorization: `Bearer ${userStorage.accessToken}`
+        },
+        params
+      })
+
+      const reportData = data.data
+
+      reports.value = reportData
+      return data
+    } catch {
+      reports.value = null
+    }
+  }
+
   return {
     reports,
     getReports,
+    getReportSummary,
     removeReport,
     addReport,
     editReport,

@@ -34,6 +34,58 @@
       </v-col>
     </v-row>
 
+    <!-- Chart Section -->
+    <v-row class="mb-6">
+      <v-col cols="12">
+        <v-card class="chart-card" elevation="4">
+          <v-card-title class="chart-header d-flex align-center">
+            <v-icon icon="mdi-chart-line" class="mr-3" color="primary"></v-icon>
+            <span class="text-h6 font-weight-bold">Report Trends</span>
+            <v-spacer></v-spacer>
+            <v-chip color="success" variant="tonal">
+              {{ totalReports }} Total Reports
+            </v-chip>
+          </v-card-title>
+
+          <v-card-text>
+            <div ref="chartContainer" class="chart-container">
+              <canvas ref="reportChart"></canvas>
+            </div>
+          </v-card-text>
+
+          <!-- Chart Statistics -->
+          <v-card-text>
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-card color="primary" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ totalReports }}</div>
+                    <div class="text-subtitle-1">Total Reports</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-card color="success" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ weeklyGrowth }}%</div>
+                    <div class="text-subtitle-1">Weekly Growth</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-card color="warning" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ avgReportsPerWeek }}</div>
+                    <div class="text-subtitle-1">Avg. Per Week</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
     <!-- Search and Statistics Section -->
     <v-row class="mb-4">
       <v-col cols="12" md="8" lg="6">
@@ -629,6 +681,32 @@
   border-color: rgba(var(--v-theme-outline), 0.38);
 }
 
+.chart-card {
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.v-theme--dark .chart-card {
+  background: rgba(var(--v-theme-surface), 0.95);
+}
+
+.chart-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.05) 0%, rgba(var(--v-theme-secondary), 0.02) 100%);
+  padding: 16px 24px;
+}
+
+.v-theme--dark .chart-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.15) 0%, rgba(var(--v-theme-secondary), 0.08) 100%);
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
+}
+
 /* Custom scrollbar */
 :deep(.v-data-table__wrapper) {
   scrollbar-width: thin;
@@ -655,6 +733,7 @@
 </style>
 
 <script>
+import Chart from 'chart.js/auto';
 import { useTeacherStorage } from '@/stores/teacherStorage';
 import { useReportStorage } from '@/stores/reportStorage';
 import { useStudentStorage } from '@/stores/studentStorage';
@@ -666,6 +745,7 @@ import { useQuranStorage } from '@/stores/quranStorage';
 
 export default {
   data: () => ({
+    chart: null,
     pageOptions: [],
     juzOptions: [],
     juzPageOptions: [],
@@ -750,6 +830,7 @@ export default {
       end_juz_page_name: '',
       total: '',
     },
+    reportSummary: [],
     search: '',
     totalItems: 0,
     options: {
@@ -797,7 +878,22 @@ export default {
       const mm = String(date.getMinutes()).padStart(2, '0')
       const ss = String(date.getSeconds()).padStart(2, '0')
       return `${year}-${month}-${day} ${hh}:${mm}:${ss}`
-    }
+    },
+    // Chart computed properties
+    totalReports() {
+      return this.reportSummary.reduce((sum, item) => sum + item.reports, 0);
+    },
+    weeklyGrowth() {
+      if (this.reportSummary.length < 2) return 0;
+      const recent = this.reportSummary[this.reportSummary.length - 1].reports;
+      const previous = this.reportSummary[this.reportSummary.length - 2].reports;
+      return previous > 0 ? Math.round(((recent - previous) / previous) * 100) : 0;
+    },
+    avgReportsPerWeek() {
+      if (this.reportSummary.length === 0) return 0;
+      const total = this.reportSummary.reduce((sum, item) => sum + item.reports, 0);
+      return Math.round(total / this.reportSummary.length);
+    },
   },
 
   watch: {
@@ -871,6 +967,136 @@ export default {
 
     detailReport(slug) {
       this.$router.push({ path: `/report/${slug}` });
+    },
+
+    async createChart() {
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+
+      const params = {
+        sortOrder: '1',
+        sortField: 'is_locked',
+      };
+
+      // summary start
+      if (activeRole.value.constant_value === 2) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid
+        }
+      }
+
+      if (activeRole.value.constant_value === 3) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid,
+          teacher_uuid: activeRole.value.teacher_uuid,
+        }
+      }
+
+      if (activeRole.value.constant_value === 4) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid,
+          student_uuid: activeRole.value.student_uuid,
+        }
+      }
+
+      console.log('Active Role for Chart:', activeRole.value)
+
+      this.activeRole = activeRole.value
+      this.headers = this.getHeaders(activeRole.value.constant_value)
+
+      if (this.search !== "") {
+        params.q = this.search;
+      }
+
+      const reportStorage = useReportStorage()
+      const data = await reportStorage.getReportSummary(params)
+
+      console.log('Report Summary Data:', data.data)
+
+      const reportSummary = data.data
+      this.reportSummary = reportSummary
+      // summary end
+
+
+      if (this.chart) {
+        this.chart.destroy();
+      }
+
+      const ctx = this.$refs.reportChart.getContext('2d');
+
+      // Prepare chart data from mock data
+      const labels = this.reportSummary.map(item => {
+        const startDate = new Date(item.week_start);
+        const endDate = new Date(item.week_end);
+
+        const dateLabel = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        return dateLabel;
+      });
+      const mappedData = reportSummary.map(item => item.reports);
+
+      this.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Reports Submitted',
+            data: mappedData,
+            borderColor: '#4CAF50',
+            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#4CAF50',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Report Submission Trends',
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
+            },
+            legend: {
+              display: true,
+              position: 'bottom'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Number of Reports'
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.1)'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date'
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.1)'
+              }
+            }
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          }
+        }
+      });
     },
 
     async fetchData() {
@@ -1093,11 +1319,6 @@ export default {
             align: 'start',
             key: 'student_nis',
             width: '120px'
-          },
-          {
-            title: 'Student',
-            key: 'student_fullname',
-            width: '200px'
           },
           {
             title: 'Type',
@@ -1483,6 +1704,13 @@ export default {
 
   async mounted() {
     // Initial data loading will be handled by fetchData method
+    this.createChart();
+  },
+
+  beforeUnmount() {
+    if (this.chart) {
+      this.chart.destroy();
+    }
   }
 }
 </script>

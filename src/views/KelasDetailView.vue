@@ -925,6 +925,8 @@ export default {
         const kelasStorage = useKelasStorage()
         const data = await kelasStorage.getKelasStudents(params)
 
+        this.headers = this.getHeaders(activeRole.value.constant_value)
+
         this.students = data.data
         this.totalItems = data.total || data.data.length
       } catch (error) {
@@ -1004,6 +1006,161 @@ export default {
       })
 
       return studentOptions
+    },
+
+    getHeaders(activeRole) {
+      let headers = [];
+
+      if (activeRole === 1) {
+        const superAdminHeader = [
+          {
+            title: 'Student',
+            align: 'start',
+            key: 'firstname',
+            width: '200px'
+          },
+          {
+            title: 'NIK',
+            key: 'nik',
+            width: '150px'
+          },
+          {
+            title: 'NIS',
+            key: 'nis',
+            width: '120px'
+          },
+          {
+            title: 'Birthdate',
+            key: 'birthdate',
+            width: '130px'
+          },
+          {
+            title: 'Phone',
+            key: 'phone',
+            width: '150px'
+          },
+          {
+            title: 'Actions',
+            key: 'actions',
+            sortable: false,
+            width: '100px',
+            align: 'center'
+          },
+        ]
+        headers = headers.concat(superAdminHeader)
+      }
+
+      if (activeRole === 2) {
+        const adminHeader = [
+          {
+            title: 'Student',
+            align: 'start',
+            key: 'firstname',
+            width: '200px'
+          },
+          {
+            title: 'NIK',
+            key: 'nik',
+            width: '150px'
+          },
+          {
+            title: 'NIS',
+            key: 'nis',
+            width: '120px'
+          },
+          {
+            title: 'Birthdate',
+            key: 'birthdate',
+            width: '130px'
+          },
+          {
+            title: 'Phone',
+            key: 'phone',
+            width: '150px'
+          },
+          {
+            title: 'Actions',
+            key: 'actions',
+            sortable: false,
+            width: '100px',
+            align: 'center'
+          },
+        ]
+        headers = headers.concat(adminHeader)
+      }
+
+      if (activeRole === 3) {
+        const teacherHeader = [
+          {
+            title: 'Student',
+            align: 'start',
+            key: 'firstname',
+            width: '200px'
+          },
+          {
+            title: 'NIK',
+            key: 'nik',
+            width: '150px'
+          },
+          {
+            title: 'NIS',
+            key: 'nis',
+            width: '120px'
+          },
+          {
+            title: 'Birthdate',
+            key: 'birthdate',
+            width: '130px'
+          },
+          {
+            title: 'Phone',
+            key: 'phone',
+            width: '150px'
+          },
+          {
+            title: 'Actions',
+            key: 'actions',
+            sortable: false,
+            width: '100px',
+            align: 'center'
+          },
+        ]
+        headers = headers.concat(teacherHeader)
+      }
+
+      if (activeRole === 4) {
+        const studentHeader = [
+          {
+            title: 'Student',
+            align: 'start',
+            key: 'firstname',
+            width: '200px'
+          },
+          {
+            title: 'NIK',
+            key: 'nik',
+            width: '150px'
+          },
+          {
+            title: 'NIS',
+            key: 'nis',
+            width: '120px'
+          },
+          {
+            title: 'Birthdate',
+            key: 'birthdate',
+            width: '130px'
+          },
+          {
+            title: 'Phone',
+            key: 'phone',
+            width: '150px'
+          },
+        ]
+        headers = headers.concat(studentHeader)
+      }
+
+      return headers
     },
 
     deleteItem(item) {

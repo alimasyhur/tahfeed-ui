@@ -30,7 +30,7 @@
     <!-- Statistics Cards -->
     <v-row class="mb-6">
 
-      <v-col cols="12" sm="6" lg="3" v-if="isSuperAdmin">
+      <v-col cols="12" sm="6" lg="4" v-if="isSuperAdmin">
         <v-card class="stats-card stats-card-success" elevation="4">
           <v-card-text class="pa-6">
             <div class="d-flex justify-space-between align-center">
@@ -48,7 +48,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" sm="6" lg="3" v-if="isSuperAdmin">
+      <v-col cols="12" sm="6" lg="4" v-if="isSuperAdmin">
         <v-card class="stats-card stats-card-primary" elevation="4">
           <v-card-text class="pa-6">
             <div class="d-flex justify-space-between align-center">
@@ -66,7 +66,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" sm="6" lg="3">
+      <v-col cols="12" sm="6" lg="4">
         <v-card class="stats-card stats-card-secondary" elevation="4">
           <v-card-text class="pa-6">
             <div class="d-flex justify-space-between align-center">
@@ -84,7 +84,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" sm="6" lg="3">
+      <v-col cols="12" sm="6" lg="4">
         <v-card class="stats-card stats-card-warning" elevation="4">
           <v-card-text class="pa-6">
             <div class="d-flex justify-space-between align-center">
@@ -102,7 +102,7 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" sm="6" lg="3">
+      <v-col cols="12" sm="6" lg="4">
         <v-card class="stats-card stats-card-primary" elevation="4">
           <v-card-text class="pa-6">
             <div class="d-flex justify-space-between align-center">
@@ -120,25 +120,62 @@
         </v-card>
       </v-col>
 
-      <v-col cols="12" sm="6" lg="3">
-        <v-card class="stats-card stats-card-success" elevation="4">
-          <v-card-text class="pa-6">
-            <div class="d-flex justify-space-between align-center">
-              <div>
-                <div class="text-h4 font-weight-bold text-success mb-1">
-                  {{ dashboardData.totalReports || 0 }}
-                </div>
-                <div class="text-body-2 text-medium-emphasis">Total Reports</div>
-              </div>
-              <v-avatar size="64" color="success" variant="tonal">
-                <v-icon icon="mdi-clipboard-text" size="32"></v-icon>
-              </v-avatar>
+    </v-row>
+
+    <!-- REPORT START -->
+    <!-- Chart Section -->
+    <v-row class="mb-6">
+      <v-col cols="12">
+        <v-card class="chart-card" elevation="4">
+          <v-card-title class="chart-header d-flex align-center">
+            <v-icon icon="mdi-chart-line" class="mr-3" color="primary"></v-icon>
+            <span class="text-h6 font-weight-bold">Report Trends</span>
+            <v-spacer></v-spacer>
+            <v-chip color="success" variant="tonal">
+              {{ totalReports }} Total Reports
+            </v-chip>
+          </v-card-title>
+
+          <v-card-text>
+            <div ref="chartContainer" class="chart-container">
+              <canvas ref="reportChart"></canvas>
             </div>
+          </v-card-text>
+
+          <!-- Chart Statistics -->
+          <v-card-text>
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-card color="primary" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ totalReports }}</div>
+                    <div class="text-subtitle-1">Total Reports</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-card color="success" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ weeklyGrowth }}%</div>
+                    <div class="text-subtitle-1">Weekly Growth</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-card color="warning" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ avgReportsPerWeek }}</div>
+                    <div class="text-subtitle-1">Avg. Per Week</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
           </v-card-text>
         </v-card>
       </v-col>
-
     </v-row>
+    <!-- REPORT END -->
+
 
     <!-- 
     GRAFIK START
@@ -383,11 +420,40 @@ GRAFIK START
 .v-theme--dark .header-section {
   background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.15) 0%, rgba(var(--v-theme-secondary), 0.08) 100%);
 }
+
+
+.chart-card {
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.v-theme--dark .chart-card {
+  background: rgba(var(--v-theme-surface), 0.95);
+}
+
+.chart-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.05) 0%, rgba(var(--v-theme-secondary), 0.02) 100%);
+  padding: 16px 24px;
+}
+
+.v-theme--dark .chart-header {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.15) 0%, rgba(var(--v-theme-secondary), 0.08) 100%);
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  width: 100%;
+}
 </style>
 
 <script>
-import { useDashboardStorage } from '@/stores/dashboardStorage';
+import Chart from 'chart.js/auto';
 
+import { useDashboardStorage } from '@/stores/dashboardStorage';
+import { useReportStorage } from '@/stores/reportStorage';
 import { useUserStorage } from '@/stores/userStorage';
 import { storeToRefs } from 'pinia';
 import moment from 'moment';
@@ -429,6 +495,7 @@ ChartJS.register(
 
 export default {
   data: () => ({
+    chart: null,
     isSuperAdmin: false,
     loading: false,
     selectedPeriod: 'month',
@@ -452,12 +519,15 @@ export default {
       reportTypes: null,
       progressTrends: null,
       gradeDistribution: null
-    }
+    },
+    reportSummary: [],
   }),
 
   async mounted() {
     await this.fetchDashboardData();
     this.initializeCharts();
+    this.createChart();
+
   },
 
   beforeUnmount() {
@@ -465,6 +535,26 @@ export default {
     Object.values(this.charts).forEach(chart => {
       if (chart) chart.destroy();
     });
+    if (this.chart) {
+      this.chart.destroy();
+    }
+  },
+
+  computed: {
+    totalReports() {
+      return this.reportSummary.reduce((sum, item) => sum + item.reports, 0);
+    },
+    weeklyGrowth() {
+      if (this.reportSummary.length < 2) return 0;
+      const latestWeek = this.reportSummary[this.reportSummary.length - 1].reports;
+      const previousWeek = this.reportSummary[this.reportSummary.length - 2].reports;
+      if (previousWeek === 0) return 0;
+      return (((latestWeek - previousWeek) / previousWeek) * 100).toFixed(2);
+    },
+    avgReportsPerWeek() {
+      if (this.reportSummary.length === 0) return 0;
+      return Math.round(this.totalReports / this.reportSummary.length);
+    }
   },
 
   methods: {
@@ -807,7 +897,135 @@ export default {
         review: 'info'
       };
       return colors[type] || 'grey';
-    }
+    },
+    async createChart() {
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+
+      const params = {
+        sortOrder: '1',
+        sortField: 'is_locked',
+      };
+
+      // summary start
+      if (activeRole.value.constant_value === 2) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid
+        }
+      }
+
+      if (activeRole.value.constant_value === 3) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid,
+          teacher_uuid: activeRole.value.teacher_uuid,
+        }
+      }
+
+      if (activeRole.value.constant_value === 4) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid,
+          student_uuid: activeRole.value.student_uuid,
+        }
+      }
+
+      console.log('Active Role for Chart:', activeRole.value)
+
+      this.activeRole = activeRole.value
+
+      if (this.search !== "") {
+        params.q = this.search;
+      }
+
+      const reportStorage = useReportStorage()
+      const data = await reportStorage.getReportSummary(params)
+
+      console.log('Report Summary Data:', data.data)
+
+      const reportSummary = data.data
+      this.reportSummary = reportSummary
+      // summary end
+
+
+      if (this.chart) {
+        this.chart.destroy();
+      }
+
+      const ctx = this.$refs.reportChart.getContext('2d');
+
+      // Prepare chart data from mock data
+      const labels = this.reportSummary.map(item => {
+        const startDate = new Date(item.week_start);
+        const endDate = new Date(item.week_end);
+
+        const dateLabel = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        return dateLabel;
+      });
+      const mappedData = reportSummary.map(item => item.reports);
+
+      this.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Reports Submitted',
+            data: mappedData,
+            borderColor: '#4CAF50',
+            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#4CAF50',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Report Submission Trends',
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
+            },
+            legend: {
+              display: true,
+              position: 'bottom'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Number of Reports'
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.1)'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date'
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.1)'
+              }
+            }
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          }
+        }
+      });
+    },
   }
 };
 </script>

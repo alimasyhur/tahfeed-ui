@@ -52,7 +52,7 @@
 
       <!-- Action Buttons -->
       <div class="action-buttons">
-        <v-btn :disabled="!form || loading" :loading="loading" color="primary" size="x-large" type="submit"
+        <v-btn :disabled="!form || loading" :loading="loading" color="success" size="x-large" type="submit"
           variant="elevated" block class="sign-in-btn mb-4">
           <template v-slot:prepend>
             <v-icon icon="mdi-login" v-if="!loading"></v-icon>
