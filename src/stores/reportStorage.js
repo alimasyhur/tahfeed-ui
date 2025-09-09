@@ -137,8 +137,6 @@ export const useReportStorage = defineStore('report', () => {
 
       return data
     } catch (error) {
-      console.log('EDIT DATA:', error)
-
       let errMessage = error?.response?.data?.message ?? 'Internal Server Error'
       if (Array.isArray(errMessage)) {
         errMessage = error.response.data.message[0].name

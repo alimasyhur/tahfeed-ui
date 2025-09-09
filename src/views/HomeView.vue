@@ -53,19 +53,19 @@
                 <div class="hero-image-container">
                   <div class="floating-card">
                     <v-card class="pa-4 rounded-xl" elevation="12">
-                      <v-img src="/images/landing/tahfeed-semangat-hafal.png" max-width="600"
+                      <v-img src="/images/landing/tahfeed-semangat-hafal.png" max-width="1000"
                         class="hero-main-image rounded-xl" />
                       <div class="d-flex align-center mb-2">
                         <v-avatar color="green-lighten-4" class="me-3">
                           <v-icon color="green-darken-3" icon="mdi-book-open-page-variant"></v-icon>
                         </v-avatar>
                         <div>
-                          <div class="font-weight-bold">Muhammad Ali</div>
+                          <div class="font-weight-bold">Abdullah</div>
                           <div class="text-caption text-grey-darken-1">Juz 25</div>
                         </div>
                       </div>
                       <v-progress-linear color="green" model-value="75" height="8" rounded></v-progress-linear>
-                      <div class="text-caption mt-1">Progress: 75%</div>
+                      <div class="text-caption mt-1">Progress: 80%</div>
                     </v-card>
                   </div>
 

@@ -920,8 +920,6 @@ export default {
         params.q = this.search;
       }
 
-      console.log('PARAMS: ', params);
-
       const teacherStorage = useTeacherStorage()
       const data = await teacherStorage.getTeachers(params)
 

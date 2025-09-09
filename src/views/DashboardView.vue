@@ -543,8 +543,6 @@ export default {
           };
         }
 
-        console.log('PARAMS: ', params);
-
         // Fetch dashboard statistics (you'll need to create these API endpoints)
         // For now, using mock data based on your database structure
         await this.fetchStatistics(params);
@@ -560,7 +558,6 @@ export default {
     async fetchStatistics(params) {
       const dashboardStorage = useDashboardStorage()
       const data = await dashboardStorage.getDashboard(params)
-      console.log('DATA: ', data);
       const dashboardData = data.data
 
       // Mock data - replace with actual API calls
@@ -881,8 +878,6 @@ export default {
         }
       }
 
-      console.log('Active Role for Chart:', activeRole.value)
-
       this.activeRole = activeRole.value
 
       if (this.search !== "") {
@@ -891,8 +886,6 @@ export default {
 
       const reportStorage = useReportStorage()
       const data = await reportStorage.getReportSummary(params)
-
-      console.log('Report Summary Data:', data.data)
 
       const reportSummary = data.data
       this.reportSummary = reportSummary
@@ -1018,8 +1011,6 @@ export default {
 
       const reportStorage = useReportStorage()
       const data = await reportStorage.getSetoranSummary(params)
-
-      console.log('Report Summary Data:', data.data)
 
       const setoranSummary = data.data
       this.setoranSummary = setoranSummary

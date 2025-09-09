@@ -1029,18 +1029,13 @@ export default {
             width: '150px'
           },
           {
-            title: 'NIS',
-            key: 'nis',
+            title: 'Email',
+            key: 'user_email',
             width: '150px'
           },
           {
             title: 'Birthdate',
             key: 'birthdate',
-            width: '150px'
-          },
-          {
-            title: 'Phone',
-            key: 'phone',
             width: '150px'
           },
           {
@@ -1080,18 +1075,13 @@ export default {
             width: '150px'
           },
           {
-            title: 'NIS',
-            key: 'nis',
+            title: 'Email',
+            key: 'user_email',
             width: '150px'
           },
           {
             title: 'Birthdate',
             key: 'birthdate',
-            width: '150px'
-          },
-          {
-            title: 'Phone',
-            key: 'phone',
             width: '150px'
           },
           {
@@ -1126,18 +1116,13 @@ export default {
             width: '150px'
           },
           {
-            title: 'NIS',
-            key: 'nis',
+            title: 'Email',
+            key: 'user_email',
             width: '150px'
           },
           {
             title: 'Birthdate',
             key: 'birthdate',
-            width: '150px'
-          },
-          {
-            title: 'Phone',
-            key: 'phone',
             width: '150px'
           },
           {
@@ -1172,18 +1157,13 @@ export default {
             width: '150px'
           },
           {
-            title: 'NIS',
-            key: 'nis',
+            title: 'Email',
+            key: 'user_email',
             width: '150px'
           },
           {
             title: 'Birthdate',
             key: 'birthdate',
-            width: '150px'
-          },
-          {
-            title: 'Phone',
-            key: 'phone',
             width: '150px'
           },
           {

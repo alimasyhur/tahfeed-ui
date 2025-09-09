@@ -136,7 +136,6 @@ watch(
 watch(
     () => activeRole.value,
     (newRole) => {
-        console.log('Active role changed:', newRole)
         if (newRole) {
             listMenu.value = getMenu(newRole)
             updateActiveTab()

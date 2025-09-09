@@ -851,8 +851,6 @@ export default {
         student_uuid: this.$route.params.slug,
       }
 
-      console.log('Active Role for Chart:', activeRole.value)
-
       this.activeRole = activeRole.value
       this.headers = this.getHeaders(activeRole.value.constant_value)
 
@@ -862,8 +860,6 @@ export default {
 
       const reportStorage = useReportStorage()
       const data = await reportStorage.getReportSummary(params)
-
-      console.log('Report Summary Data:', data.data)
 
       const reportSummary = data.data
       this.reportSummary = reportSummary
