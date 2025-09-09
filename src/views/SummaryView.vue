@@ -42,6 +42,58 @@
       </v-col>
     </v-row> -->
 
+    <!-- Chart Section -->
+    <v-row class="mb-6">
+      <v-col cols="12">
+        <v-card class="chart-card" elevation="4">
+          <v-card-title class="chart-header d-flex align-center">
+            <v-icon icon="mdi-chart-line" class="mr-3" color="primary"></v-icon>
+            <span class="text-h6 font-weight-bold">Setoran Trends</span>
+            <v-spacer></v-spacer>
+            <v-chip color="success" variant="tonal">
+              {{ totalSetoran }} Total Setoran
+            </v-chip>
+          </v-card-title>
+
+          <v-card-text>
+            <div ref="chartContainer" class="chart-container">
+              <canvas ref="setoranChart"></canvas>
+            </div>
+          </v-card-text>
+
+          <!-- Chart Statistics -->
+          <v-card-text>
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-card color="primary" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ totalSetoran }}</div>
+                    <div class="text-subtitle-1">Total Setoran</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-card color="success" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ dailyGrowth }}%</div>
+                    <div class="text-subtitle-1">Daily Growth</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-card color="warning" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ avgSetoran }}</div>
+                    <div class="text-subtitle-1">Avg. All</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
     <!-- Search and Statistics Section -->
     <v-row v-if="String(activeRole?.constant_value) !== String(4)" class="mb-4">
       <v-col cols="12" md="8" lg="6">
@@ -368,6 +420,7 @@
 </style>
 
 <script>
+import { useReportStorage } from '@/stores/reportStorage';
 import { useSummaryStorage } from '@/stores/summaryStorage';
 import { useUserStorage } from '@/stores/userStorage';
 import { storeToRefs } from 'pinia';
@@ -375,6 +428,7 @@ import Chart from 'chart.js/auto';
 
 export default {
   data: () => ({
+    chartSecond: null,
     // Juz and selection data
     juzOptions: [],
     juzPageOptions: [],
@@ -415,7 +469,7 @@ export default {
       { name: '21-25 Juz', count: 4 },
       { name: '26-30 Juz', count: 2 }
     ],
-    memorizationChart: null,
+    // memorizationChart: null,
     editedIndex: -1,
     editedItem: {
       uuid: '',
@@ -479,6 +533,7 @@ export default {
       pekan_lalu_label: '',
       total_pekan_lalu: '',
     },
+    setoranSummary: [],
     search: '',
     totalItems: 0,
     options: {
@@ -523,6 +578,21 @@ export default {
       const month = String(date.getMonth() + 1).padStart(2, '0')
       const day = String(date.getDate()).padStart(2, '0')
       return `${year}-${month}-${day}`
+    },
+    // Chart computed properties
+    totalSetoran() {
+      return this.setoranSummary.reduce((sum, item) => Number(sum) + Number(item.jumlah_halaman), 0);
+    },
+    dailyGrowth() {
+      if (this.setoranSummary.length < 2) return 0;
+      const recent = this.setoranSummary[this.setoranSummary.length - 1].jumlah_halaman;
+      const previous = this.setoranSummary[this.setoranSummary.length - 2].jumlah_halaman;
+      return Number(previous) > 0 ? Math.round(((Number(recent) - Number(previous)) / Number(previous)) * 100) : 0;
+    },
+    avgSetoran() {
+      if (this.setoranSummary.length === 0) return 0;
+      const total = this.setoranSummary.reduce((sum, item) => Number(sum) + Number(item.jumlah_halaman), 0);
+      return Math.round(Number(total) / this.setoranSummary.length);
     },
   },
 
@@ -597,85 +667,85 @@ export default {
       this.selectedEndPage = null;
     },
 
-    createMemorizationChart() {
-      // Destroy existing chart if it exists
-      if (this.memorizationChart) {
-        this.memorizationChart.destroy();
-      }
+    // createMemorizationChart() {
+    //   // Destroy existing chart if it exists
+    //   if (this.memorizationChart) {
+    //     this.memorizationChart.destroy();
+    //   }
 
-      // Get chart context
-      const ctx = this.$refs.memorizationChart.getContext('2d');
+    //   // Get chart context
+    //   const ctx = this.$refs.memorizationChart.getContext('2d');
 
-      // Extract labels and data from mock data
-      const labels = this.mockMemorizationData.map(item => item.name);
-      const data = this.mockMemorizationData.map(item => item.count);
+    //   // Extract labels and data from mock data
+    //   const labels = this.mockMemorizationData.map(item => item.name);
+    //   const data = this.mockMemorizationData.map(item => item.count);
 
-      // Create the bar chart
-      this.memorizationChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Jumlah Santri',
-            data: data,
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.7)',
-              'rgba(54, 162, 235, 0.7)',
-              'rgba(255, 205, 86, 0.7)',
-              'rgba(75, 192, 192, 0.7)',
-              'rgba(153, 102, 255, 0.7)',
-              'rgba(255, 159, 64, 0.7)',
-              'rgba(199, 199, 199, 0.7)'
-            ],
-            borderColor: [
-              'rgba(255, 99, 132, 1)',
-              'rgba(54, 162, 235, 1)',
-              'rgba(255, 205, 86, 1)',
-              'rgba(75, 192, 192, 1)',
-              'rgba(153, 102, 255, 1)',
-              'rgba(255, 159, 64, 1)',
-              'rgba(199, 199, 199, 1)'
-            ],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: 'Jumlah Santri'
-              },
-              ticks: {
-                precision: 0
-              }
-            },
-            x: {
-              title: {
-                display: true,
-                text: 'Capaian Hafalan (Juz)'
-              }
-            }
-          },
-          plugins: {
-            title: {
-              display: true,
-              text: 'Distribusi Capaian Hafalan Santri',
-              font: {
-                size: 16
-              }
-            },
-            legend: {
-              display: true,
-              position: 'top'
-            }
-          }
-        }
-      });
-    },
+    //   // Create the bar chart
+    //   this.memorizationChart = new Chart(ctx, {
+    //     type: 'bar',
+    //     data: {
+    //       labels: labels,
+    //       datasets: [{
+    //         label: 'Jumlah Santri',
+    //         data: data,
+    //         backgroundColor: [
+    //           'rgba(255, 99, 132, 0.7)',
+    //           'rgba(54, 162, 235, 0.7)',
+    //           'rgba(255, 205, 86, 0.7)',
+    //           'rgba(75, 192, 192, 0.7)',
+    //           'rgba(153, 102, 255, 0.7)',
+    //           'rgba(255, 159, 64, 0.7)',
+    //           'rgba(199, 199, 199, 0.7)'
+    //         ],
+    //         borderColor: [
+    //           'rgba(255, 99, 132, 1)',
+    //           'rgba(54, 162, 235, 1)',
+    //           'rgba(255, 205, 86, 1)',
+    //           'rgba(75, 192, 192, 1)',
+    //           'rgba(153, 102, 255, 1)',
+    //           'rgba(255, 159, 64, 1)',
+    //           'rgba(199, 199, 199, 1)'
+    //         ],
+    //         borderWidth: 1
+    //       }]
+    //     },
+    //     options: {
+    //       responsive: true,
+    //       maintainAspectRatio: false,
+    //       scales: {
+    //         y: {
+    //           beginAtZero: true,
+    //           title: {
+    //             display: true,
+    //             text: 'Jumlah Santri'
+    //           },
+    //           ticks: {
+    //             precision: 0
+    //           }
+    //         },
+    //         x: {
+    //           title: {
+    //             display: true,
+    //             text: 'Capaian Hafalan (Juz)'
+    //           }
+    //         }
+    //       },
+    //       plugins: {
+    //         title: {
+    //           display: true,
+    //           text: 'Distribusi Capaian Hafalan Santri',
+    //           font: {
+    //             size: 16
+    //           }
+    //         },
+    //         legend: {
+    //           display: true,
+    //           position: 'top'
+    //         }
+    //       }
+    //     }
+    //   });
+    // },
 
     async fetchData() {
       this.loading = true;
@@ -1048,21 +1118,151 @@ export default {
 
       this.loading = false
     },
+
+    async createSetoranChart() {
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+
+      const params = {
+        sortOrder: '1',
+        sortField: 'is_locked',
+      };
+
+      // summary start
+      if (activeRole.value.constant_value === 2) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid
+        }
+      }
+
+      if (activeRole.value.constant_value === 3) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid,
+          teacher_uuid: activeRole.value.teacher_uuid,
+        }
+      }
+
+      if (activeRole.value.constant_value === 4) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid,
+          student_uuid: activeRole.value.student_uuid,
+        }
+      }
+
+      this.activeRole = activeRole.value
+      this.headers = this.getHeaders(activeRole.value.constant_value)
+
+      if (this.search !== "") {
+        params.q = this.search;
+      }
+
+      const reportStorage = useReportStorage()
+      const data = await reportStorage.getSetoranSummary(params)
+
+      const setoranSummary = data.data
+      this.setoranSummary = setoranSummary
+      // summary end
+
+
+      if (this.chartSecond) {
+        this.chartSecond.destroy();
+      }
+
+      const ctx = this.$refs.setoranChart.getContext('2d');
+
+      // Prepare chart data from mock data
+      const labels = this.setoranSummary.map(item => {
+        const date = new Date(item.date);
+
+        const dateLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return dateLabel;
+      });
+      const mappedData = setoranSummary.map(item => item.jumlah_halaman);
+
+      this.chartSecond = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Jumlah Halaman',
+            data: mappedData,
+            borderColor: '#4CAF50',
+            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#4CAF50',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Setoran Trends',
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
+            },
+            legend: {
+              display: true,
+              position: 'bottom'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Jumlah Halaman'
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.1)'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date'
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.1)'
+              }
+            }
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          }
+        }
+      });
+    },
   },
 
   async mounted() {
+    this.createSetoranChart();
     // Initial data loading
     await this.fetchData()
     // Create the memorization chart
-    this.$nextTick(() => {
-      this.createMemorizationChart();
-    });
+    // this.$nextTick(() => {
+    //   this.createMemorizationChart();
+    // });
   },
 
   beforeUnmount() {
     // Destroy the chart when component is unmounted
-    if (this.memorizationChart) {
-      this.memorizationChart.destroy();
+    // if (this.memorizationChart) {
+    //   this.memorizationChart.destroy();
+    // }
+
+    if (this.chartSecond) {
+      this.chartSecond.destroy();
     }
   }
 }

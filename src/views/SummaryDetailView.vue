@@ -194,6 +194,59 @@
       </v-col>
     </v-row>
 
+
+    <!-- Chart Section -->
+    <v-row class="mb-6">
+      <v-col cols="12">
+        <v-card class="chart-card" elevation="4">
+          <v-card-title class="chart-header d-flex align-center">
+            <v-icon icon="mdi-chart-line" class="mr-3" color="primary"></v-icon>
+            <span class="text-h6 font-weight-bold">Setoran Trends</span>
+            <v-spacer></v-spacer>
+            <v-chip color="success" variant="tonal">
+              {{ totalSetoran }} Total Setoran
+            </v-chip>
+          </v-card-title>
+
+          <v-card-text>
+            <div ref="chartContainer" class="chart-container">
+              <canvas ref="setoranChart"></canvas>
+            </div>
+          </v-card-text>
+
+          <!-- Chart Statistics -->
+          <v-card-text>
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-card color="primary" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ totalSetoran }}</div>
+                    <div class="text-subtitle-1">Total Setoran</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-card color="success" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ dailyGrowth }}%</div>
+                    <div class="text-subtitle-1">Daily Growth</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-card color="warning" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ avgSetoran }}</div>
+                    <div class="text-subtitle-1">Avg. All</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
     <!-- Chart Section -->
     <v-row class="mb-6">
       <v-col cols="12">
@@ -574,7 +627,9 @@ export default {
     ],
     activeRole: null,
     chart: null,
+    chartSecond: null,
     reportSummary: [],
+    setoranSummary: [],
   }),
 
   computed: {
@@ -605,6 +660,20 @@ export default {
       if (this.reportSummary.length === 0) return 0;
       const total = this.reportSummary.reduce((sum, item) => sum + item.reports, 0);
       return Math.round(total / this.reportSummary.length);
+    },
+    totalSetoran() {
+      return this.setoranSummary.reduce((sum, item) => Number(sum) + Number(item.jumlah_halaman), 0);
+    },
+    dailyGrowth() {
+      if (this.setoranSummary.length < 2) return 0;
+      const recent = this.setoranSummary[this.setoranSummary.length - 1].jumlah_halaman;
+      const previous = this.setoranSummary[this.setoranSummary.length - 2].jumlah_halaman;
+      return Number(previous) > 0 ? Math.round(((Number(recent) - Number(previous)) / Number(previous)) * 100) : 0;
+    },
+    avgSetoran() {
+      if (this.setoranSummary.length === 0) return 0;
+      const total = this.setoranSummary.reduce((sum, item) => Number(sum) + Number(item.jumlah_halaman), 0);
+      return Math.round(Number(total) / this.setoranSummary.length);
     },
   },
 
@@ -881,12 +950,123 @@ export default {
         }
       });
     },
+
+    async createSetoranChart() {
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+
+      const params = {
+        sortOrder: '1',
+        sortField: 'is_locked',
+      };
+
+      params.filter = {
+        org_uuid: activeRole.value.org_uuid,
+        student_uuid: this.$route.params.slug,
+      }
+
+      this.activeRole = activeRole.value
+      this.headers = this.getHeaders(activeRole.value.constant_value)
+
+      if (this.search !== "") {
+        params.q = this.search;
+      }
+
+      const reportStorage = useReportStorage()
+      const data = await reportStorage.getSetoranSummary(params)
+
+      const setoranSummary = data.data
+      this.setoranSummary = setoranSummary
+      // summary end
+
+
+      if (this.chartSecond) {
+        this.chartSecond.destroy();
+      }
+
+      const ctx = this.$refs.setoranChart.getContext('2d');
+
+      // Prepare chart data from mock data
+      const labels = this.setoranSummary.map(item => {
+        const date = new Date(item.date);
+
+        const dateLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return dateLabel;
+      });
+      const mappedData = setoranSummary.map(item => item.jumlah_halaman);
+
+      this.chartSecond = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Jumlah Halaman',
+            data: mappedData,
+            borderColor: '#4CAF50',
+            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#4CAF50',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Setoran Trends',
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
+            },
+            legend: {
+              display: true,
+              position: 'bottom'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Jumlah Halaman'
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.1)'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date'
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.1)'
+              }
+            }
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          }
+        }
+      });
+    },
   },
 
   async mounted() {
     this.slug = this.$route.params.slug;
 
     this.createChart();
+    this.createSetoranChart();
+
     const studentStorage = useStudentStorage()
     try {
       const data = await studentStorage.showStudentByUUID(this.slug)
@@ -903,6 +1083,10 @@ export default {
   beforeUnmount() {
     if (this.chart) {
       this.chart.destroy();
+    }
+
+    if (this.chartSecond) {
+      this.chartSecond.destroy();
     }
   }
 };

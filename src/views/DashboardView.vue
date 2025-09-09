@@ -16,12 +16,12 @@
             </div>
 
             <!-- Date Filter -->
-            <div class="date-filter-section">
+            <!-- <div class="date-filter-section">
               <v-select v-model="selectedPeriod" :items="periodOptions" item-title="label" item-value="value"
                 variant="outlined" prepend-inner-icon="mdi-calendar-range" label="Period"
                 @update:modelValue="fetchDashboardData" class="period-selector" density="comfortable"
                 style="min-width: 200px;"></v-select>
-            </div>
+            </div> -->
           </div>
         </div>
       </v-col>
@@ -122,6 +122,60 @@
 
     </v-row>
 
+    <!-- setoran trends start -->
+    <!-- Chart Section -->
+    <v-row class="mb-6">
+      <v-col cols="12">
+        <v-card class="chart-card" elevation="4">
+          <v-card-title class="chart-header d-flex align-center">
+            <v-icon icon="mdi-chart-line" class="mr-3" color="primary"></v-icon>
+            <span class="text-h6 font-weight-bold">Setoran Trends</span>
+            <v-spacer></v-spacer>
+            <v-chip color="success" variant="tonal">
+              {{ totalSetoran }} Total Setoran
+            </v-chip>
+          </v-card-title>
+
+          <v-card-text>
+            <div ref="chartContainer" class="chart-container">
+              <canvas ref="setoranChart"></canvas>
+            </div>
+          </v-card-text>
+
+          <!-- Chart Statistics -->
+          <v-card-text>
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-card color="primary" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ totalSetoran }}</div>
+                    <div class="text-subtitle-1">Total Setoran</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-card color="success" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ dailyGrowth }}%</div>
+                    <div class="text-subtitle-1">Daily Growth</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-card color="warning" dark>
+                  <v-card-text class="text-center">
+                    <div class="text-h5">{{ avgSetoran }}</div>
+                    <div class="text-subtitle-1">Avg. All</div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- setoran end -->
+
     <!-- REPORT START -->
     <!-- Chart Section -->
     <v-row class="mb-6">
@@ -175,128 +229,6 @@
       </v-col>
     </v-row>
     <!-- REPORT END -->
-
-
-    <!-- 
-    GRAFIK START
-    <v-row class="mb-6">
-      <v-col cols="12" lg="8">
-        <v-card class="chart-card" elevation="4">
-          <v-card-title class="card-header pa-6">
-            <div class="d-flex align-center">
-              <v-icon icon="mdi-chart-bar" size="24" class="mr-3" color="primary"></v-icon>
-              <span class="text-h6 font-weight-bold">Class Hafalan Achievement (Monthly)</span>
-            </div>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text class="pa-6">
-            <div class="chart-container" style="height: 400px;">
-              <canvas ref="classStatsChart"></canvas>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <v-col cols="12" lg="4">
-        <v-card class="chart-card" elevation="4">
-          <v-card-title class="card-header pa-6">
-            <div class="d-flex align-center">
-              <v-icon icon="mdi-chart-pie" size="24" class="mr-3" color="secondary"></v-icon>
-              <span class="text-h6 font-weight-bold">Report Types</span>
-            </div>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text class="pa-6">
-            <div class="chart-container" style="height: 400px;">
-              <canvas ref="reportTypesChart"></canvas>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <v-row class="mb-6">
-      <v-col cols="12" lg="8">
-        <v-card class="chart-card" elevation="4">
-          <v-card-title class="card-header pa-6">
-            <div class="d-flex align-center justify-space-between w-100">
-              <div class="d-flex align-center">
-                <v-icon icon="mdi-chart-line" size="24" class="mr-3" color="success"></v-icon>
-                <span class="text-h6 font-weight-bold">Student Progress Trends</span>
-              </div>
-              <v-chip color="success" variant="tonal" size="small">
-                Last 6 months
-              </v-chip>
-            </div>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text class="pa-6">
-            <div class="chart-container" style="height: 400px;">
-              <canvas ref="progressTrendsChart"></canvas>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <v-col cols="12" lg="4">
-        <v-card class="chart-card" elevation="4">
-          <v-card-title class="card-header pa-6">
-            <div class="d-flex align-center">
-              <v-icon icon="mdi-school" size="24" class="mr-3" color="warning"></v-icon>
-              <span class="text-h6 font-weight-bold">Grade Distribution</span>
-            </div>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text class="pa-6">
-            <div class="chart-container" style="height: 400px;">
-              <canvas ref="gradeDistributionChart"></canvas>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="12">
-        <v-card class="activities-card" elevation="4">
-          <v-card-title class="card-header pa-6">
-            <div class="d-flex align-center justify-space-between w-100">
-              <div class="d-flex align-center">
-                <v-icon icon="mdi-clock-time-four" size="24" class="mr-3" color="info"></v-icon>
-                <span class="text-h6 font-weight-bold">Recent Activities</span>
-              </div>
-              <v-btn variant="text" color="primary" size="small" to="/reports">
-                View All
-                <v-icon icon="mdi-arrow-right" class="ml-1"></v-icon>
-              </v-btn>
-            </div>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text class="pa-0">
-            <v-list lines="two">
-              <v-list-item v-for="(activity, index) in recentActivities" :key="index"
-                :prepend-icon="getActivityIcon(activity.type)" class="activity-item">
-                <v-list-item-title>{{ activity.title }}</v-list-item-title>
-                <v-list-item-subtitle>
-                  <div class="d-flex align-center">
-                    <span>{{ activity.description }}</span>
-                    <v-spacer></v-spacer>
-                    <span class="text-caption">{{ formatDate(activity.created_at) }}</span>
-                  </div>
-                </v-list-item-subtitle>
-                <template v-slot:prepend>
-                  <v-avatar :color="getActivityColor(activity.type)" variant="tonal" size="40">
-                    <v-icon :icon="getActivityIcon(activity.type)"></v-icon>
-                  </v-avatar>
-                </template>
-</v-list-item>
-</v-list>
-</v-card-text>
-</v-card>
-</v-col>
-</v-row>
-GRAFIK START
--->
 
     <!-- Loading Overlay -->
     <v-overlay v-model="loading" contained class="align-center justify-center">
@@ -496,6 +428,7 @@ ChartJS.register(
 export default {
   data: () => ({
     chart: null,
+    chartSecond: null,
     isSuperAdmin: false,
     loading: false,
     selectedPeriod: 'month',
@@ -521,6 +454,7 @@ export default {
       gradeDistribution: null
     },
     reportSummary: [],
+    setoranSummary: [],
   }),
 
   async mounted() {
@@ -528,6 +462,7 @@ export default {
     this.initializeCharts();
     this.createChart();
 
+    this.createSetoranChart();
   },
 
   beforeUnmount() {
@@ -537,6 +472,9 @@ export default {
     });
     if (this.chart) {
       this.chart.destroy();
+    }
+    if (this.chartSecond) {
+      this.chartSecond.destroy();
     }
   },
 
@@ -554,7 +492,22 @@ export default {
     avgReportsPerWeek() {
       if (this.reportSummary.length === 0) return 0;
       return Math.round(this.totalReports / this.reportSummary.length);
-    }
+    },
+    // Chart computed properties
+    totalSetoran() {
+      return this.setoranSummary.reduce((sum, item) => Number(sum) + Number(item.jumlah_halaman), 0);
+    },
+    dailyGrowth() {
+      if (this.setoranSummary.length < 2) return 0;
+      const recent = this.setoranSummary[this.setoranSummary.length - 1].jumlah_halaman;
+      const previous = this.setoranSummary[this.setoranSummary.length - 2].jumlah_halaman;
+      return Number(previous) > 0 ? Math.round(((Number(recent) - Number(previous)) / Number(previous)) * 100) : 0;
+    },
+    avgSetoran() {
+      if (this.setoranSummary.length === 0) return 0;
+      const total = this.setoranSummary.reduce((sum, item) => Number(sum) + Number(item.jumlah_halaman), 0);
+      return Math.round(Number(total) / this.setoranSummary.length);
+    },
   },
 
   methods: {
@@ -1026,6 +979,137 @@ export default {
         }
       });
     },
-  }
+
+    async createSetoranChart() {
+      const userStorage = useUserStorage()
+      const { activeRole } = storeToRefs(userStorage)
+
+      const params = {
+        sortOrder: '1',
+        sortField: 'is_locked',
+      };
+
+      // summary start
+      if (activeRole.value.constant_value === 2) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid
+        }
+      }
+
+      if (activeRole.value.constant_value === 3) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid,
+          teacher_uuid: activeRole.value.teacher_uuid,
+        }
+      }
+
+      if (activeRole.value.constant_value === 4) {
+        params.filter = {
+          org_uuid: activeRole.value.org_uuid,
+          student_uuid: activeRole.value.student_uuid,
+        }
+      }
+
+      this.activeRole = activeRole.value
+
+      if (this.search !== "") {
+        params.q = this.search;
+      }
+
+      const reportStorage = useReportStorage()
+      const data = await reportStorage.getSetoranSummary(params)
+
+      console.log('Report Summary Data:', data.data)
+
+      const setoranSummary = data.data
+      this.setoranSummary = setoranSummary
+      // summary end
+
+
+      if (this.chartSecond) {
+        this.chartSecond.destroy();
+      }
+
+      const ctx = this.$refs.setoranChart.getContext('2d');
+
+      // Prepare chart data from mock data
+      const labels = this.setoranSummary.map(item => {
+        const date = new Date(item.date);
+
+        const dateLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return dateLabel;
+      });
+      const mappedData = setoranSummary.map(item => item.jumlah_halaman);
+
+      this.chartSecond = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Jumlah Halaman',
+            data: mappedData,
+            borderColor: '#4CAF50',
+            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#4CAF50',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Setoran Trends',
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
+            },
+            legend: {
+              display: true,
+              position: 'bottom'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Jumlah Halaman'
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.1)'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date'
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.1)'
+              }
+            }
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          }
+        }
+      });
+    },
+    async refreshData() {
+      await this.fetchDashboardData();
+      await this.createChart();
+      await this.createSetoranChart();
+    }
+  },
 };
 </script>
