@@ -769,6 +769,11 @@ export default {
           key: 'total',
           width: '100px'
         },
+        {
+          title: 'Keterangan',
+          key: 'note',
+          width: '100px'
+        },
       ];
 
       headers = [...baseHeaders];

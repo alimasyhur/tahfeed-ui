@@ -125,7 +125,6 @@
             <!-- NIS with Icon -->
             <template v-slot:item.nis="{ item }">
               <div>
-                <v-icon icon="mdi-card-account-details" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                 <span class="font-mono">{{ item.nis }}</span>
               </div>
             </template>
