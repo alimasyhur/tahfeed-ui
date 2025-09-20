@@ -17,7 +17,7 @@
           </div>
           <div class="d-flex justify-center justify-md-end ga-4">
             <v-btn icon size="small" :href="sourceCodeLink" target="_blank">
-              <v-icon icon="mdi-github"></v-icon>
+              <v-icon icon="mdi-instagram"></v-icon>
             </v-btn>
             <v-btn icon size="small" :href="contactUsLink" target="_blank">
               <v-icon icon="mdi-whatsapp"></v-icon>
@@ -30,6 +30,6 @@
 </template>
 
 <script setup>
-const sourceCodeLink = "https://github.com/alimasyhur";
+const sourceCodeLink = "https://www.instagram.com/tahfeedofficial";
 const contactUsLink = "https://api.whatsapp.com/send?phone=628156558085&text=Assalamu%27alaikum%0AOrganisasi%20saya%20ingin%20bergabung%20bersama%20tahfeed.%20Bagaimana%20caranya%20ya%3F%0ATerimakasih";
 </script>

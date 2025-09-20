@@ -49,7 +49,7 @@
 
           <v-card-text>
             <div ref="chartContainer" class="chart-container">
-              <canvas ref="reportChart"></canvas>
+              <canvas ref="reportChart" height="400"></canvas>
             </div>
           </v-card-text>
 
@@ -970,128 +970,136 @@ export default {
     },
 
     async createChart() {
-      const userStorage = useUserStorage()
-      const { activeRole } = storeToRefs(userStorage)
+      // Use $nextTick to ensure DOM is updated before accessing refs
+      this.$nextTick(async () => {
+        const userStorage = useUserStorage()
+        const { activeRole } = storeToRefs(userStorage)
 
-      const params = {
-        sortOrder: '1',
-        sortField: 'is_locked',
-      };
+        const params = {
+          sortOrder: '1',
+          sortField: 'is_locked',
+        };
 
-      // summary start
-      if (activeRole.value.constant_value === 2) {
-        params.filter = {
-          org_uuid: activeRole.value.org_uuid
-        }
-      }
-
-      if (activeRole.value.constant_value === 3) {
-        params.filter = {
-          org_uuid: activeRole.value.org_uuid,
-          teacher_uuid: activeRole.value.teacher_uuid,
-        }
-      }
-
-      if (activeRole.value.constant_value === 4) {
-        params.filter = {
-          org_uuid: activeRole.value.org_uuid,
-          student_uuid: activeRole.value.student_uuid,
-        }
-      }
-
-      this.activeRole = activeRole.value
-      this.headers = this.getHeaders(activeRole.value.constant_value)
-
-      if (this.search !== "") {
-        params.q = this.search;
-      }
-
-      const reportStorage = useReportStorage()
-      const data = await reportStorage.getReportSummary(params)
-
-      const reportSummary = data.data
-      this.reportSummary = reportSummary
-      // summary end
-
-
-      if (this.chart) {
-        this.chart.destroy();
-      }
-
-      const ctx = this.$refs.reportChart.getContext('2d');
-
-      // Prepare chart data from mock data
-      const labels = this.reportSummary.map(item => {
-        const startDate = new Date(item.week_start);
-        const endDate = new Date(item.week_end);
-
-        const dateLabel = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-        return dateLabel;
-      });
-      const mappedData = reportSummary.map(item => item.reports);
-
-      this.chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Reports Submitted',
-            data: mappedData,
-            borderColor: '#4CAF50',
-            backgroundColor: 'rgba(76, 175, 80, 0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#4CAF50',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6,
-            pointHoverRadius: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            title: {
-              display: true,
-              text: 'Report Submission Trends',
-              font: {
-                size: 16,
-                weight: 'bold'
-              }
-            },
-            legend: {
-              display: true,
-              position: 'bottom'
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: 'Number of Reports'
-              },
-              grid: {
-                color: 'rgba(0,0,0,0.1)'
-              }
-            },
-            x: {
-              title: {
-                display: true,
-                text: 'Date'
-              },
-              grid: {
-                color: 'rgba(0,0,0,0.1)'
-              }
-            }
-          },
-          interaction: {
-            intersect: false,
-            mode: 'index'
+        // summary start
+        if (activeRole.value.constant_value === 2) {
+          params.filter = {
+            org_uuid: activeRole.value.org_uuid
           }
         }
+
+        if (activeRole.value.constant_value === 3) {
+          params.filter = {
+            org_uuid: activeRole.value.org_uuid,
+            teacher_uuid: activeRole.value.teacher_uuid,
+          }
+        }
+
+        if (activeRole.value.constant_value === 4) {
+          params.filter = {
+            org_uuid: activeRole.value.org_uuid,
+            student_uuid: activeRole.value.student_uuid,
+          }
+        }
+
+        this.activeRole = activeRole.value
+        this.headers = this.getHeaders(activeRole.value.constant_value)
+
+        if (this.search !== "") {
+          params.q = this.search;
+        }
+
+        const reportStorage = useReportStorage()
+        const data = await reportStorage.getReportSummary(params)
+
+        const reportSummary = data.data
+        this.reportSummary = reportSummary
+        // summary end
+
+        // Check if ref exists before proceeding
+        if (!this.$refs.reportChart) {
+          console.warn('reportChart ref not found');
+          return;
+        }
+
+        if (this.chart) {
+          this.chart.destroy();
+        }
+
+        const ctx = this.$refs.reportChart.getContext('2d');
+
+        // Prepare chart data from mock data
+        const labels = this.reportSummary.map(item => {
+          const startDate = new Date(item.week_start);
+          const endDate = new Date(item.week_end);
+
+          const dateLabel = `${startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+          return dateLabel;
+        });
+        const mappedData = reportSummary.map(item => item.reports);
+
+        this.chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Reports Submitted',
+              data: mappedData,
+              borderColor: '#4CAF50',
+              backgroundColor: 'rgba(76, 175, 80, 0.1)',
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: '#4CAF50',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Report Submission Trends',
+                font: {
+                  size: 16,
+                  weight: 'bold'
+                }
+              },
+              legend: {
+                display: true,
+                position: 'bottom'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Number of Reports'
+                },
+                grid: {
+                  color: 'rgba(0,0,0,0.1)'
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Date'
+                },
+                grid: {
+                  color: 'rgba(0,0,0,0.1)'
+                }
+              }
+            },
+            interaction: {
+              intersect: false,
+              mode: 'index'
+            }
+          }
+        });
       });
     },
 
@@ -1700,7 +1708,10 @@ export default {
 
   async mounted() {
     // Initial data loading will be handled by fetchData method
-    this.createChart();
+    // Use $nextTick to ensure DOM is fully rendered before creating charts
+    this.$nextTick(() => {
+      this.createChart();
+    });
   },
 
   beforeUnmount() {

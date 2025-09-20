@@ -659,7 +659,6 @@ import { useUserStorage } from '@/stores/userStorage';
 import { storeToRefs } from 'pinia';
 import { useOrganizationStorage } from '@/stores/organizationStorage';
 import { useGradeStorage } from '@/stores/gradeStorage';
-import moment from 'moment';
 
 export default {
   data: () => ({
@@ -686,7 +685,7 @@ export default {
     editedItem: {
       uuid: '',
       name: '',
-      description: '',
+      // description: '',
       org_uuid: '',
       org_name: '',
       period: '',
@@ -701,7 +700,7 @@ export default {
     defaultItem: {
       uuid: '',
       name: '',
-      description: '',
+      // description: '',
       org_uuid: '',
       org_name: '',
       period: '',
@@ -892,11 +891,11 @@ export default {
             key: 'name',
             width: '200px'
           },
-          {
-            title: 'Description',
-            key: 'description',
-            width: '200px'
-          },
+          // {
+          //   title: 'Description',
+          //   key: 'description',
+          //   width: '200px'
+          // },
           {
             title: 'Period',
             key: 'period',
@@ -941,11 +940,11 @@ export default {
             key: 'name',
             width: '200px'
           },
-          {
-            title: 'Description',
-            key: 'description',
-            width: '200px'
-          },
+          // {
+          //   title: 'Description',
+          //   key: 'description',
+          //   width: '200px'
+          // },
           {
             title: 'Period',
             key: 'period',
@@ -985,11 +984,11 @@ export default {
             key: 'name',
             width: '200px'
           },
-          {
-            title: 'Description',
-            key: 'description',
-            width: '200px'
-          },
+          // {
+          //   title: 'Description',
+          //   key: 'description',
+          //   width: '200px'
+          // },
           {
             title: 'Period',
             key: 'period',
@@ -1020,11 +1019,11 @@ export default {
             key: 'name',
             width: '200px'
           },
-          {
-            title: 'Description',
-            key: 'description',
-            width: '200px'
-          },
+          // {
+          //   title: 'Description',
+          //   key: 'description',
+          //   width: '200px'
+          // },
           {
             title: 'Period',
             key: 'period',

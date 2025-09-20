@@ -62,7 +62,7 @@
                 <div class="action-buttons">
                   <v-tooltip :text="me.profile !== null ? 'Edit Profile' : 'Create Profile'" location="top">
                     <template v-slot:activator="{ props }">
-                      <v-btn v-if="me.profile !== null" color="primary" variant="elevated" size="large"
+                      <v-btn v-if="me.profile !== null" color="warning" variant="elevated" size="large"
                         @click="openEditProfile(me.profile)" class="action-btn" prepend-icon="mdi-pencil"
                         v-bind="props">
                         <span class="d-none d-sm-inline">Edit Profile</span>
@@ -190,17 +190,26 @@
                   <v-tooltip :text="me.organization !== null ? 'Edit Organization' : 'Create Organization'"
                     location="top">
                     <template v-slot:activator="{ props }">
-                      <v-btn v-if="me.organization !== null" color="primary" variant="elevated" size="large"
+                      <v-btn v-if="me.organization !== null" color="warning" variant="elevated" size="large"
                         @click="openEditOrganization(me.organization)" class="action-btn" prepend-icon="mdi-pencil"
                         v-bind="props">
                         <span class="d-none d-sm-inline">Edit Organization</span>
                         <span class="d-sm-none">Edit</span>
                       </v-btn>
+                      &nbsp;
                       <v-btn v-else color="primary" variant="elevated" size="large" @click="openCreateOrganization()"
                         class="action-btn" prepend-icon="mdi-plus" v-bind="props">
                         <span class="d-none d-sm-inline">Create Organization</span>
                         <span class="d-sm-none">Create</span>
                       </v-btn>
+                      &nbsp;
+                      <v-btn v-if="me.organization !== null" color="primary" variant="elevated" size="large"
+                        :href="`/org/${me.organization.domain}`" target="_blank" class="action-btn"
+                        prepend-icon="mdi-eye" v-bind="props">
+                        <span class="d-none d-sm-inline">See Public View</span>
+                        <span class="d-sm-none">See Public View</span>
+                      </v-btn>
+
                     </template>
                   </v-tooltip>
                 </div>

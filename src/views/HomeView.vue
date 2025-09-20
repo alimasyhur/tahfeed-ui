@@ -24,11 +24,11 @@
                   </p>
 
                   <div class="d-flex flex-column flex-sm-row ga-4 mb-8">
-                    <v-btn color="green-darken-2" size="x-large" class="rounded-xl text-none font-weight-bold"
+                    <!-- <v-btn color="green-darken-2" size="x-large" class="rounded-xl text-none font-weight-bold"
                       elevation="8" @click="$vuetify.goTo('#features')">
                       <v-icon start icon="mdi-rocket-launch"></v-icon>
                       Mulai Sekarang
-                    </v-btn>
+                    </v-btn> -->
 
                     <v-btn variant="outlined" color="green-darken-2" size="x-large"
                       class="rounded-xl text-none font-weight-medium" @click="dialog = true">
@@ -49,6 +49,12 @@
             </v-col>
 
             <v-col cols="12" lg="6" class="d-flex justify-center">
+              <v-slide-x-transition appear>
+                <v-img src="/images/landing/tahfeed-home.png" max-width="1000" class="hero-main-image rounded-xl" />
+
+              </v-slide-x-transition>
+            </v-col>
+            <!-- <v-col cols="12" lg="6" class="d-flex justify-center">
               <v-slide-x-transition appear>
                 <div class="hero-image-container">
                   <div class="floating-card">
@@ -71,7 +77,7 @@
 
                 </div>
               </v-slide-x-transition>
-            </v-col>
+            </v-col> -->
           </v-row>
         </v-container>
       </div>
@@ -210,25 +216,25 @@
               Hubungi Kami Sekarang
             </v-btn>
 
-            <v-btn size="x-large" variant="outlined" color="white" class="rounded-xl text-none font-weight-medium"
+            <!-- <v-btn size="x-large" variant="outlined" color="white" class="rounded-xl text-none font-weight-medium"
               :href="sourceCodeLink" target="_blank">
               <v-icon start icon="mdi-github"></v-icon>
               Lihat Source Code
-            </v-btn>
+            </v-btn> -->
           </div>
 
           <div class="d-flex justify-center align-center ga-8 flex-wrap">
-            <!-- <div class="d-flex align-center ga-2">
-              <v-icon icon="mdi-check-circle" color="green-lighten-2"></v-icon>
-              <span>100% Gratis</span>
-            </div> -->
             <div class="d-flex align-center ga-2">
               <v-icon icon="mdi-check-circle" color="green-lighten-2"></v-icon>
-              <span>Open Source</span>
+              <span>Continous Development</span>
             </div>
             <div class="d-flex align-center ga-2">
               <v-icon icon="mdi-check-circle" color="green-lighten-2"></v-icon>
-              <span>Support 24/7</span>
+              <span>Community Driven</span>
+            </div>
+            <div class="d-flex align-center ga-2">
+              <v-icon icon="mdi-check-circle" color="green-lighten-2"></v-icon>
+              <span>24/7 Support</span>
             </div>
           </div>
         </div>

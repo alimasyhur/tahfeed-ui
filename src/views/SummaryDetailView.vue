@@ -23,9 +23,9 @@
 
             <!-- Status Badge -->
             <div class="status-section" v-if="student">
-              <v-chip color="primary" variant="elevated" size="large" prepend-icon="mdi-account-check"
-                class="font-weight-medium status-chip">
-                Active Student
+              <v-chip :href="`/std/${student.user_email}`" target="_blank" color="primary" variant="elevated"
+                size="large" prepend-icon="mdi-eye-check" class="font-weight-medium status-chip">
+                See Public Profile
               </v-chip>
             </div>
           </div>

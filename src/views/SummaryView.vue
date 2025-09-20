@@ -57,7 +57,7 @@
 
           <v-card-text>
             <div ref="chartContainer" class="chart-container">
-              <canvas ref="setoranChart"></canvas>
+              <canvas ref="setoranChart" height="400"></canvas>
             </div>
           </v-card-text>
 
@@ -154,7 +154,7 @@
                   <span class="text-caption">{{ item.total }}</span>
                 </v-progress-circular> -->
                 <!-- <span class="font-weight-medium">{{ item.total }}</span> -->
-                <v-chip color="black" variant="tonal" size="large" prepend-icon="mdi-book">
+                <v-chip color="success" variant="tonal" size="large" prepend-icon="mdi-book">
                   <b>{{ item.total }}</b>
                 </v-chip>
               </div>
@@ -163,7 +163,7 @@
             <!-- Grade with Icon -->
             <template v-slot:item.grade_name="{ item }">
               <div>
-                <v-chip color="primary" variant="tonal" size="small">
+                <v-chip color="teal" variant="tonal" size="small">
                   <v-icon icon="mdi-school" size="small" class="mr-2 text-medium-emphasis"></v-icon>
                   {{ item.grade_name }}
                 </v-chip>
@@ -1119,133 +1119,144 @@ export default {
     },
 
     async createSetoranChart() {
-      const userStorage = useUserStorage()
-      const { activeRole } = storeToRefs(userStorage)
+      // Use $nextTick to ensure DOM is updated before accessing refs
+      this.$nextTick(async () => {
+        const userStorage = useUserStorage()
+        const { activeRole } = storeToRefs(userStorage)
 
-      const params = {
-        sortOrder: '1',
-        sortField: 'is_locked',
-      };
+        const params = {
+          sortOrder: '1',
+          sortField: 'is_locked',
+        };
 
-      // summary start
-      if (activeRole.value.constant_value === 2) {
-        params.filter = {
-          org_uuid: activeRole.value.org_uuid
-        }
-      }
-
-      if (activeRole.value.constant_value === 3) {
-        params.filter = {
-          org_uuid: activeRole.value.org_uuid,
-          teacher_uuid: activeRole.value.teacher_uuid,
-        }
-      }
-
-      if (activeRole.value.constant_value === 4) {
-        params.filter = {
-          org_uuid: activeRole.value.org_uuid,
-          student_uuid: activeRole.value.student_uuid,
-        }
-      }
-
-      this.activeRole = activeRole.value
-      this.headers = this.getHeaders(activeRole.value.constant_value)
-
-      if (this.search !== "") {
-        params.q = this.search;
-      }
-
-      const reportStorage = useReportStorage()
-      const data = await reportStorage.getSetoranSummary(params)
-
-      const setoranSummary = data.data
-      this.setoranSummary = setoranSummary
-      // summary end
-
-
-      if (this.chartSecond) {
-        this.chartSecond.destroy();
-      }
-
-      const ctx = this.$refs.setoranChart.getContext('2d');
-
-      // Prepare chart data from mock data
-      const labels = this.setoranSummary.map(item => {
-        const date = new Date(item.date);
-
-        const dateLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        return dateLabel;
-      });
-      const mappedData = setoranSummary.map(item => item.jumlah_halaman);
-
-      this.chartSecond = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Jumlah Halaman',
-            data: mappedData,
-            borderColor: '#4CAF50',
-            backgroundColor: 'rgba(76, 175, 80, 0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#4CAF50',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 6,
-            pointHoverRadius: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            title: {
-              display: true,
-              text: 'Setoran Trends',
-              font: {
-                size: 16,
-                weight: 'bold'
-              }
-            },
-            legend: {
-              display: true,
-              position: 'bottom'
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: 'Jumlah Halaman'
-              },
-              grid: {
-                color: 'rgba(0,0,0,0.1)'
-              }
-            },
-            x: {
-              title: {
-                display: true,
-                text: 'Date'
-              },
-              grid: {
-                color: 'rgba(0,0,0,0.1)'
-              }
-            }
-          },
-          interaction: {
-            intersect: false,
-            mode: 'index'
+        // summary start
+        if (activeRole.value.constant_value === 2) {
+          params.filter = {
+            org_uuid: activeRole.value.org_uuid
           }
         }
+
+        if (activeRole.value.constant_value === 3) {
+          params.filter = {
+            org_uuid: activeRole.value.org_uuid,
+            teacher_uuid: activeRole.value.teacher_uuid,
+          }
+        }
+
+        if (activeRole.value.constant_value === 4) {
+          params.filter = {
+            org_uuid: activeRole.value.org_uuid,
+            student_uuid: activeRole.value.student_uuid,
+          }
+        }
+
+        this.activeRole = activeRole.value
+        this.headers = this.getHeaders(activeRole.value.constant_value)
+
+        if (this.search !== "") {
+          params.q = this.search;
+        }
+
+        const reportStorage = useReportStorage()
+        const data = await reportStorage.getSetoranSummary(params)
+
+        const setoranSummary = data.data
+        this.setoranSummary = setoranSummary
+        // summary end
+
+        // Check if ref exists before proceeding
+        if (!this.$refs.setoranChart) {
+          console.warn('setoranChart ref not found');
+          return;
+        }
+
+        if (this.chartSecond) {
+          this.chartSecond.destroy();
+        }
+
+        const ctx = this.$refs.setoranChart.getContext('2d');
+
+        // Prepare chart data from mock data
+        const labels = this.setoranSummary.map(item => {
+          const date = new Date(item.date);
+
+          const dateLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          return dateLabel;
+        });
+        const mappedData = setoranSummary.map(item => item.jumlah_halaman);
+
+        this.chartSecond = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Jumlah Halaman',
+              data: mappedData,
+              borderColor: '#4CAF50',
+              backgroundColor: 'rgba(76, 175, 80, 0.1)',
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: '#4CAF50',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: 'Setoran Trends',
+                font: {
+                  size: 16,
+                  weight: 'bold'
+                }
+              },
+              legend: {
+                display: true,
+                position: 'bottom'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Jumlah Halaman'
+                },
+                grid: {
+                  color: 'rgba(0,0,0,0.1)'
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Date'
+                },
+                grid: {
+                  color: 'rgba(0,0,0,0.1)'
+                }
+              }
+            },
+            interaction: {
+              intersect: false,
+              mode: 'index'
+            }
+          }
+        });
       });
     },
   },
 
   async mounted() {
-    this.createSetoranChart();
+    // Use $nextTick to ensure DOM is fully rendered before creating charts
+    this.$nextTick(() => {
+      this.createSetoranChart();
+    });
     // Initial data loading
     await this.fetchData()
     // Create the memorization chart

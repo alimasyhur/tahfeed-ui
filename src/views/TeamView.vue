@@ -91,7 +91,7 @@
 
                 <div class="profile-avatar mb-6">
                   <v-avatar size="160" class="mx-auto">
-                    <v-img src="/images/landing/owner.png" alt="Ali Masyhur" />
+                    <v-img src="/images/landing/tahfeed_owner.png" alt="Ali Masyhur" />
                   </v-avatar>
                 </div>
 
@@ -105,7 +105,7 @@
 
                 <!-- Profile Stats -->
                 <v-row class="mt-6">
-                  <v-col cols="4" v-for="(profileStat, i) in profileStats" :key="i">
+                  <v-col cols="12" v-for="(profileStat, i) in profileStats" :key="i">
                     <div class="text-center">
                       <div class="text-h5 font-weight-bold text-green-darken-2">{{ profileStat.value }}</div>
                       <div class="text-caption text-grey-darken-1">{{ profileStat.label }}</div>
@@ -184,17 +184,17 @@
               Hubungi Kami Sekarang
             </v-btn>
 
-            <v-btn size="x-large" variant="outlined" color="white" class="rounded-xl text-none font-weight-medium"
+            <!-- <v-btn size="x-large" variant="outlined" color="white" class="rounded-xl text-none font-weight-medium"
               :href="sourceCodeLink" target="_blank">
               <v-icon start icon="mdi-github"></v-icon>
               Lihat Source Code
-            </v-btn>
+            </v-btn> -->
           </div>
 
           <div class="d-flex justify-center align-center ga-8 flex-wrap">
             <div class="d-flex align-center ga-2">
               <v-icon icon="mdi-check-circle" color="green-lighten-2"></v-icon>
-              <span>Open Source</span>
+              <span>Continous Development</span>
             </div>
             <div class="d-flex align-center ga-2">
               <v-icon icon="mdi-check-circle" color="green-lighten-2"></v-icon>
@@ -242,14 +242,6 @@ export default {
       ],
 
       profileStats: [
-        {
-          value: '5+',
-          label: 'Tahun Pengalaman'
-        },
-        {
-          value: '1000+',
-          label: 'Pengguna Aktif'
-        },
         {
           value: '∞',
           label: 'Big Dreams'

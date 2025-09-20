@@ -264,15 +264,15 @@
           <div class="d-flex justify-center align-center ga-8 flex-wrap">
             <div class="d-flex align-center ga-2">
               <v-icon icon="mdi-check-circle" color="green-lighten-2"></v-icon>
-              <span>100% Transparan</span>
+              <span>Continous Development</span>
             </div>
             <div class="d-flex align-center ga-2">
               <v-icon icon="mdi-check-circle" color="green-lighten-2"></v-icon>
-              <span>Amanah & Terpercaya</span>
+              <span>Community Driven</span>
             </div>
             <div class="d-flex align-center ga-2">
               <v-icon icon="mdi-check-circle" color="green-lighten-2"></v-icon>
-              <span>Laporan Berkala</span>
+              <span>24/7 Support</span>
             </div>
           </div>
         </div>

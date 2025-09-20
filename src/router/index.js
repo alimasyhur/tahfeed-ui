@@ -18,6 +18,7 @@ import ReportView from '@/views/ReportView.vue'
 import SummaryView from '@/views/SummaryView.vue'
 import SummaryDetailView from '@/views/SummaryDetailView.vue'
 import PublicOrganizationView from '@/views/PublicOrganizationView.vue'
+import PublicStudentView from '@/views/PublicStudentView.vue'
 
 const routes = [
   {
@@ -189,6 +190,15 @@ const routes = [
     component: PublicOrganizationView,
     meta: {
       breadcrumb: 'Organization',
+      requiresAuth: false,
+      requireSuperAdmin: false
+    }
+  },
+  {
+    path: '/std/:slug',
+    component: PublicStudentView,
+    meta: {
+      breadcrumb: 'Student',
       requiresAuth: false,
       requireSuperAdmin: false
     }

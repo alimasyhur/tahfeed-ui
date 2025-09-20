@@ -257,6 +257,51 @@ export const useReportStorage = defineStore('report', () => {
     }
   }
 
+  const getPublicReports = async (params) => {
+    try {
+      const { data } = await apiService.get('/rpts', {
+        params
+      })
+
+      const reportData = data.data
+
+      reports.value = reportData
+      return data
+    } catch {
+      reports.value = null
+    }
+  }
+
+  const getPublicReportSummary = async (params) => {
+    try {
+      const { data } = await apiService.get('/rpts/summary', {
+        params
+      })
+
+      const reportData = data.data
+
+      reports.value = reportData
+      return data
+    } catch {
+      reports.value = null
+    }
+  }
+
+  const getPublicSetoranSummary = async (params) => {
+    try {
+      const { data } = await apiService.get('/rpts/setoran', {
+        params
+      })
+
+      const reportData = data.data
+
+      reports.value = reportData
+      return data
+    } catch {
+      reports.value = null
+    }
+  }
+
   return {
     reports,
     getReports,
@@ -267,6 +312,9 @@ export const useReportStorage = defineStore('report', () => {
     editReport,
     showReportByUUID,
     lockReport,
-    unlockReport
+    unlockReport,
+    getPublicReports,
+    getPublicReportSummary,
+    getPublicSetoranSummary
   }
 })
