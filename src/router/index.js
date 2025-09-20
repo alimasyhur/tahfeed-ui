@@ -17,6 +17,7 @@ import KelasDetailView from '@/views/KelasDetailView.vue'
 import ReportView from '@/views/ReportView.vue'
 import SummaryView from '@/views/SummaryView.vue'
 import SummaryDetailView from '@/views/SummaryDetailView.vue'
+import PublicOrganizationView from '@/views/PublicOrganizationView.vue'
 
 const routes = [
   {
@@ -180,6 +181,16 @@ const routes = [
     component: SummaryDetailView,
     meta: {
       breadcrumb: 'Detail'
+    }
+  },
+  // PUBLIC ROUTES
+  {
+    path: '/org/:slug',
+    component: PublicOrganizationView,
+    meta: {
+      breadcrumb: 'Organization',
+      requiresAuth: false,
+      requireSuperAdmin: false
     }
   }
 ]

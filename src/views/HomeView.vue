@@ -324,8 +324,8 @@ export default {
         },
         {
           icon: 'mdi-calendar-clock',
-          title: 'Jadwal Otomatis',
-          description: 'Penjadwalan ujian dan pengumuman hasil secara otomatis dan terstruktur.',
+          title: 'Support Lengkap',
+          description: 'Dibantu oleh tim dukungan profesional untuk memastikan sistem berjalan lancar.',
           color: 'teal'
         }
       ],

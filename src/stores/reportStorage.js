@@ -101,8 +101,6 @@ export const useReportStorage = defineStore('report', () => {
 
   const editReport = async (inputReport) => {
     try {
-      console.log('date_input: ', inputReport.date_input)
-
       const dateInput =
         typeof inputReport.date_input === 'string'
           ? inputReport.date_input

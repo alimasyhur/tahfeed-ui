@@ -877,8 +877,6 @@ export default {
       const kelasStorage = useKelasStorage()
       const data = await kelasStorage.getKelases(params)
 
-      console.log('Fetched kelas data:', data.data);
-
       this.kelases = data.data
       this.totalItems = data.total
       this.loading = false
